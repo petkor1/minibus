@@ -2,10 +2,131 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Prosta Strona</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twój Przewoźnik Bus | Rozkłady Jazdy | Komunikaty</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Roboto+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
-    <h1>Witamy na prostej stronie!</h1>
-    <p>To jest przykładowa strona HTML wygenerowana automatycznie.</p>
+
+    <header class="main-header">
+        <div class="container header-content">
+            <div class="logo">
+                <a href="#hero-section">BUS TRANS</a>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="#schedules-section" class="active">Rozkłady Jazdy</a></li>
+                    <li><a href="#announcements-section">Komunikaty</a></li>
+                    <li><a href="#tickets-section">Bilety & FAQ</a></li>
+                    <li><a href="#contact-section">Kontakt</a></li>
+                </ul>
+            </nav>
+            <div class="contact-info">
+                <a href="tel:+48123456789">+48 123 456 789</a>
+            </div>
+            <button class="mobile-nav-toggle" aria-label="Toggle navigation">☰</button>
+        </div>
+    </header>
+
+    <section id="hero-section" class="hero-section">
+        <div class="container">
+            <h1>Szybko, Wygodnie, Bezpiecznie</h1>
+            <p>Twoja niezawodna podróż każdego dnia.</p>
+            <a href="#schedules-section" class="button primary">Sprawdź Rozkład</a>
+            <a href="#contact-section" class="button secondary">Skontaktuj Się</a>
+        </div>
+    </section>
+
+    <section id="announcements-section" class="section announcements-section">
+        <div class="container">
+            <h2>Najnowsze Komunikaty</h2>
+            <div class="announcements-grid" id="announcements-container">
+                <p style="text-align: center;">Ładowanie komunikatów...</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="schedules-section" class="section schedules-section">
+        <div class="container">
+            <h2>Rozkłady Jazdy</h2>
+            <div class="schedule-links-grid">
+                <a href="data/schedules/myslenice-gdow.html" class="schedule-link">Myślenice &lt;–&gt Gdów</a>
+                <a href="data/schedules/myslenice-dobczyce.html" class="schedule-link">Myślenice &lt;–&gt Dobczyce</a>
+                </div>
+            <div class="schedule-content" id="schedule-details">
+                <p style="text-align: center; padding: 50px;">Wybierz trasę, aby wyświetlić rozkład jazdy.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="tickets-section" class="section tickets-section">
+        <div class="container">
+            <h2>Bilety i Często Zadawane Pytania (FAQ)</h2>
+
+            <div class="faq-item">
+                <h3>Jak kupić bilet miesięczny?</h3>
+                <p>Bilety miesięczne dostępne są w punkcie sprzedaży na Dworcu Dekada w Myślenicach, stanowisko nr 8, od 25. dnia poprzedniego miesiąca. Godziny otwarcia: 10:00 - 17:00.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>Czy mogę kupić bilet u kierowcy?</h3>
+                <p>Tak, bilety jednorazowe są dostępne u kierowcy podczas wsiadania do busa. Płatność tylko gotówką.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>Czy są zniżki dla uczniów/studentów?</h3>
+                <p>Tak, oferujemy zniżki dla uczniów i studentów po okazaniu ważnej legitymacji szkolnej/studenckiej. Ceny biletów miesięcznych ze zniżką podane są w komunikatach.</p>
+            </div>
+
+            <div class="download-rodo">
+                <a href="docs/RODO-zgoda.pdf" class="button primary download-button" target="_blank" download>Pobierz formularz RODO</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact-section" class="section contact-section">
+        <div class="container">
+            <h2>Kontakt</h2>
+            <div class="contact-info-grid">
+                <div class="contact-item">
+                    <h3>Telefon</h3>
+                    <p>Biuro Obsługi Klienta:</p>
+                    <p><a href="tel:+48123456789">+48 123 456 789</a></p>
+                </div>
+                <div class="contact-item">
+                    <h3>Email</h3>
+                    <p>Adres email:</p>
+                    <p><a href="mailto:kontakt@twojprzewoznik.pl">kontakt@twojprzewoznik.pl</a></p>
+                </div>
+                <div class="contact-item">
+                    <h3>Adres</h3>
+                    <p>ul. Dworcowa 10</p>
+                    <p>32-400 Myślenice</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="main-footer">
+        <div class="container footer-content">
+            <nav class="footer-nav">
+                <ul>
+                    <li><a href="#schedules-section">Rozkłady Jazdy</a></li>
+                    <li><a href="#announcements-section">Komunikaty</a></li>
+                    <li><a href="#tickets-section">Bilety & FAQ</a></li>
+                    <li><a href="#contact-section">Kontakt</a></li>
+                    <li><a href="#">Polityka Prywatności</a></li>
+                </ul>
+            </nav>
+            <div class="footer-contact">
+                <p>Telefon: <a href="tel:+48123456789">+48 123 456 789</a></p>
+                <p>Email: <a href="mailto:kontakt@twojprzewoznik.pl">kontakt@twojprzewoznik.pl</a></p>
+            </div>
+            <p class="copyright">&copy; 2025 Twoja Firma Bus. Wszelkie prawa zastrzeżone.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
 </body>
 </html>

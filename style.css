@@ -1,0 +1,734 @@
+            /* General Styles */
+:root {
+    --primary-color: #0056b3; /* Darker blue for accents */
+    --secondary-color: #007bff; /* Main blue color */
+    --text-color: #333;
+    --light-gray: #f4f4f4;
+    --white: #fff;
+    --dark-gray: #555;
+    --border-color: #ddd;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--light-gray);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+a {
+    color: var(--secondary-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: var(--primary-color);
+}
+
+h1, h2, h3 {
+    color: var(--primary-color);
+    margin-bottom: 20px;
+}
+
+h2 {
+    text-align: center;
+    font-size: 2.5em;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+h2::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 4px;
+    background-color: var(--secondary-color);
+    margin: 10px auto 0;
+    border-radius: 2px;
+}
+
+.button {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    text-align: center;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.button.primary {
+    background-color: var(--secondary-color);
+    color: var(--white);
+}
+
+.button.primary:hover {
+    background-color: var(--primary-color);
+}
+
+.button.secondary {
+    background-color: var(--white);
+    color: var(--secondary-color);
+    border: 2px solid var(--secondary-color);
+}
+
+.button.secondary:hover {
+    background-color: var(--secondary-color);
+    color: var(--white);
+}
+
+/* Header */
+.main-header {
+    background-color: var(--white);
+    padding: 15px 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+}
+
+.logo a {
+    font-size: 1.8em;
+    font-weight: bold;
+    color: var(--primary-color);
+    text-transform: uppercase;
+}
+
+.main-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+.main-nav li {
+    margin-left: 30px;
+}
+
+.main-nav a {
+    font-weight: bold;
+    padding: 5px 0;
+    position: relative;
+}
+
+.main-nav a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--secondary-color);
+    transition: width 0.3s ease;
+}
+
+.main-nav a:hover::after,
+.main-nav a.active::after {
+    width: 100%;
+}
+
+.contact-info a {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: var(--primary-color);
+}
+
+.mobile-nav-toggle {
+    display: none; /* Hidden by default */
+    background: none;
+    border: none;
+    font-size: 1.8em;
+    cursor: pointer;
+    color: var(--primary-color);
+}
+
+/* Hero Section */
+.hero-section {
+    background: url('../img/hero-bus.jpg') no-repeat center center/cover;
+    color: var(--white);
+    text-align: center;
+    padding: 100px 20px;
+    position: relative;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Overlay for readability */
+}
+
+.hero-section .container {
+    position: relative;
+    z-index: 1;
+}
+
+.hero-section h1 {
+    font-size: 3.5em;
+    margin-bottom: 20px;
+    color: var(--white);
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+}
+
+.hero-section p {
+    font-size: 1.4em;
+    margin-bottom: 40px;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+}
+
+.hero-section .button {
+    margin: 0 10px;
+}
+
+/* Sections */
+.section {
+    padding: 60px 0;
+    background-color: var(--white);
+    margin-bottom: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+.section:last-of-type {
+    margin-bottom: 0;
+}
+
+/* Announcements Section */
+.announcements-section {
+    padding: 60px 0;
+    background-color: var(--light-gray);
+}
+
+.announcements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    align-items: stretch;
+}
+
+.announcement-card {
+    background-color: var(--white);
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.announcement-card:hover {
+    transform: translateY(-5px);
+}
+
+.announcement-card h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.5em;
+    color: var(--primary-color);
+}
+
+.announcement-card .date {
+    font-size: 0.9em;
+    color: var(--dark-gray);
+    margin-bottom: 15px;
+}
+
+.announcement-card .announcement-content {
+    flex-grow: 1;
+    margin-bottom: 20px;
+    color: var(--text-color);
+    overflow: hidden; /* na wypadek, gdyby tekst był bardzo długi */
+    /* text-overflow: ellipsis; /* Tylko przy single-line */
+}
+
+/* Styl dla listy w tekście (jeśli używasz list w komunikatach) */
+.announcement-card .announcement-content ul {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding-left: 20px;
+}
+
+.announcement-card .read-more {
+    display: inline-block;
+    color: var(--secondary-color);
+    font-weight: bold;
+    margin-top: auto;
+}
+
+
+/* Schedules Section */
+.schedules-section {
+    padding: 60px 0;
+    background-color: var(--light-gray);
+}
+
+.schedule-links-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+    margin-bottom: 40px;
+}
+
+.schedule-link {
+    display: block;
+    background-color: #fff;
+    padding: 15px 20px;
+    border-radius: 8px;
+    text-align: center;
+    text-decoration: none;
+    color: var(--primary-color);
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.schedule-link:hover {
+    background-color: var(--primary-color);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    transform: translateY(-2px);
+}
+
+.schedule-link.active {
+    background-color: var(--secondary-color);
+    color: #fff;
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transform: translateY(-2px);
+}
+
+.schedule-content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    position: relative; /* Dodane dla overflow w responsywności */
+    overflow: hidden;   /* Dodane dla overflow w responsywności */
+}
+
+.schedule-content h3,
+.schedule-content p,
+.schedule-content div.schedule-stops,
+.schedule-content table,
+.schedule-content .schedule-notes,
+.schedule-content .schedule-update {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.schedule-content h3 {
+    font-size: 2em;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    text-align: center;
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 15px;
+}
+
+.schedule-content p:first-of-type {
+    font-weight: bold;
+    color: var(--secondary-color);
+    text-align: center;
+    margin-top: -10px;
+    margin-bottom: 25px;
+}
+
+.schedule-content p {
+    font-size: 1.1em;
+    line-height: 1.6;
+    color: var(--text-color);
+    margin-bottom: 15px;
+}
+
+.schedule-content p strong {
+    color: var(--dark-gray);
+}
+
+.schedule-content .schedule-stops {
+    margin-bottom: 30px;
+    padding: 15px 20px;
+    background-color: #f9f9f9;
+    border-left: 5px solid var(--secondary-color);
+    border-radius: 4px;
+}
+.schedule-content .schedule-stops h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: var(--primary-color);
+    font-size: 1.1em;
+}
+.schedule-content .schedule-stops ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.schedule-content .schedule-stops li {
+    margin-bottom: 5px;
+    font-size: 1em;
+    color: var(--text-color);
+    line-height: 1.4;
+}
+.schedule-content .schedule-stops li:last-child {
+    margin-bottom: 0;
+}
+
+.schedule-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0;
+    margin-bottom: 30px;
+    font-size: 1em;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.schedule-content th,
+.schedule-content td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.schedule-content th {
+    background-color: var(--primary-color);
+    color: var(--white);
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.9em;
+    letter-spacing: 0.5px;
+}
+
+.schedule-content tbody tr td:first-child {
+    font-weight: bold;
+    color: var(--primary-color);
+    white-space: nowrap;
+}
+
+.schedule-content tbody tr:nth-child(even) {
+    background-color: #f8f8f8;
+}
+
+.schedule-content tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+.schedule-content td {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 1.05em;
+    letter-spacing: 0.5px;
+    line-height: 1.4;
+}
+
+.schedule-content .schedule-notes {
+    margin-top: 25px;
+    padding-top: 15px;
+    border-top: 1px dashed #ccc;
+    color: var(--text-color);
+    font-size: 0.95em;
+}
+
+.schedule-content .schedule-notes strong {
+    color: var(--primary-color);
+}
+
+.schedule-content .schedule-notes ul {
+    list-style: disc inside;
+    margin-top: 10px;
+    padding-left: 0;
+    color: var(--text-color);
+}
+
+.schedule-content .schedule-notes li {
+    margin-bottom: 5px;
+}
+
+.schedule-content .schedule-update {
+    text-align: right;
+    font-size: 0.85em;
+    color: var(--dark-gray);
+    margin-top: 20px;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+}
+
+/* Tickets Section (FAQ) */
+.faq-item {
+    background-color: var(--white);
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+.faq-item h3 {
+    margin-top: 0;
+    color: var(--primary-color);
+    font-size: 1.3em;
+}
+
+.download-rodo {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.download-button {
+    background-color: #28a745; /* Green for download */
+    color: var(--white);
+}
+
+.download-button:hover {
+    background-color: #218838;
+}
+
+/* Contact Section */
+.contact-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    text-align: center;
+}
+
+.contact-item {
+    background-color: var(--white);
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.contact-item h3 {
+    margin-top: 0;
+    color: var(--primary-color);
+    font-size: 1.4em;
+}
+
+.contact-item p {
+    margin-bottom: 5px;
+}
+
+/* Footer */
+.main-footer {
+    background-color: var(--primary-color);
+    color: var(--white);
+    padding: 30px 0;
+    text-align: center;
+    margin-top: 50px;
+}
+
+.footer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.footer-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.footer-nav li {
+    margin: 0 15px;
+}
+
+.footer-nav a {
+    color: var(--white);
+    font-weight: bold;
+}
+
+.footer-nav a:hover {
+    color: #cceeff; /* Lighter shade on hover */
+}
+
+.footer-contact p {
+    margin: 5px 0;
+}
+
+.footer-contact a {
+    color: var(--white);
+}
+
+.footer-contact a:hover {
+    color: #cceeff;
+}
+
+.copyright {
+    font-size: 0.9em;
+    margin-top: 15px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .main-nav {
+        display: none; /* Hide main nav on smaller screens */
+        width: 100%;
+        margin-top: 15px;
+        background-color: var(--white);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        border-radius: 5px;
+    }
+
+    .main-nav.active {
+        display: block;
+    }
+
+    .main-nav ul {
+        flex-direction: column;
+        align-items: center;
+        padding: 10px 0;
+    }
+
+    .main-nav li {
+        margin: 10px 0;
+    }
+
+    .mobile-nav-toggle {
+        display: block; /* Show toggle button */
+    }
+
+    .header-content {
+        flex-wrap: nowrap; /* Prevent wrapping for core header elements */
+        justify-content: space-between;
+    }
+
+    .logo {
+        flex-grow: 1;
+    }
+
+    .contact-info {
+        display: none; /* Hide contact info in header on small screens */
+    }
+
+    .hero-section h1 {
+        font-size: 2.5em;
+    }
+
+    .hero-section p {
+        font-size: 1.1em;
+    }
+
+    .hero-section .button {
+        display: block;
+        width: 80%;
+        margin: 15px auto;
+    }
+
+    .announcements-grid,
+    .schedule-links-grid,
+    .contact-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* KLUCZOWA SEKCJA: RESPONSYWNOŚĆ TABELI ROZKŁADU JAZDY */
+    .schedule-content table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+        max-width: 100%;
+        border-collapse: collapse;
+        margin-top: 0;
+        margin-bottom: 30px;
+        font-size: 1em;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .schedule-content thead {
+        border: none;
+        clip: rect(0 0 0 0);
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        padding: 0;
+        position: absolute;
+        width: 1px;
+    }
+
+    .schedule-content table tr {
+        display: block;
+        margin-bottom: 20px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        padding: 15px;
+    }
+
+    .schedule-content table td {
+        border-bottom: 1px solid #eee;
+        display: block;
+        text-align: right;
+        padding: 10px 0;
+    }
+
+    .schedule-content table td:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+
+    .schedule-content table td::before {
+        content: attr(data-label);
+        float: left;
+        font-weight: bold;
+        color: var(--primary-color);
+        margin-right: 10px;
+        text-align: left;
+        width: auto;
+    }
+
+    .schedule-content tbody tr td:first-child {
+        text-align: left;
+        font-size: 1.1em;
+        border-bottom: 2px solid var(--secondary-color);
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+    }
+    .schedule-content tbody tr td:first-child::before {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-section {
+        padding: 60px 20px;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    h2 {
+        font-size: 2em;
+    }
+
+    .contact-info a {
+        font-size: 1em;
+    }
+}

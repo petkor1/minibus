@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twój Przewoźnik Bus | Rozkłady Jazdy | Komunikaty</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+    <style>
+        /* General Styles */
+        :root {
+            --primary-color: #0056b3; /* Darker blue for accents */
+            --secondary-color: #007bff; /* Main blue color */
+            --text-color: #333;
+            --light-gray: #f4f4f4;
+            --white: #fff;
+            --dark-gray: #555;
+            --border-color: #ddd;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-gray);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: var(--primary-color);
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        h2::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background-color: var(--secondary-color);
+            margin: 10px auto 0;
+            border-radius: 2px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-align: center;
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+            border: 2px solid transparent;
+        }
+
+        .button.primary {
+            background-color: var(--secondary-color);
+            color: var(--white);
+        }
+
+        .button.primary:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .button.secondary {
+            background-color: var(--white);
+            color: var(--secondary-color);
+            border: 2px solid var(--secondary-color);
+        }
+
+        .button.secondary:hover {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        /* Header */
+        .main-header {
+            background-color: var(--white);
+            padding: 15px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo a {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-transform: uppercase;
+        }
+
+        .main-nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        .main-nav li {
+            margin-left: 30px;
+        }
+
+        .main-nav a {
+            font-weight: bold;
+            padding: 5px 0;
+            position: relative;
+        }
+
+        .main-nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--secondary-color);
+            transition: width 0.3s ease;
+        }
+
+        .main-nav a:hover::after,
+        .main-nav a.active::after {
+            width: 100%;
+        }
+
+        .contact-info a {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: var(--primary-color);
+        }
+
+        .mobile-nav-toggle {
+            display: none; /* Hidden by default */
+            background: none;
+            border: none;
+            font-size: 1.8em;
+            cursor: pointer;
+            color: var(--primary-color);
+        }
+        
+        body.mobile-nav-open {
+            overflow: hidden;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: url('https://placehold.co/1920x1080/0056b3/ffffff?text=Twój+Przewoźnik+Bus') no-repeat center center/cover;
+            color: var(--white);
+            text-align: center;
+            padding: 100px 20px;
+            position: relative;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5); /* Overlay for readability */
+        }
+
+        .hero-section .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-section h1 {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            color: var(--white);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+        }
+
+        .hero-section p {
+            font-size: 1.4em;
+            margin-bottom: 40px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+        }
+
+        .hero-section .button {
+            margin: 0 10px;
+        }
+
+        /* Sections */
+        .section {
+            padding: 60px 20px;
+            background-color: var(--white);
+            margin: 30px auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+        #announcements-section, #schedules-section {
+             background-color: var(--light-gray);
+             box-shadow: none;
+             border-radius: 0;
+        }
+
+
+        .section:last-of-type {
+            margin-bottom: 0;
+        }
+
+        /* Announcements Section */
+        .announcements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            align-items: stretch;
+        }
+
+        .announcement-card {
+            background-color: var(--white);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .announcement-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+
+        .announcement-card h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.5em;
+            color: var(--primary-color);
+        }
+
+        .announcement-card .date {
+            font-size: 0.9em;
+            color: var(--dark-gray);
+            margin-bottom: 15px;
+        }
+
+        .announcement-card .announcement-content {
+            flex-grow: 1;
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+
+        .announcement-card .read-more {
+            display: inline-block;
+            color: var(--secondary-color);
+            font-weight: bold;
+            margin-top: auto;
+            cursor: pointer;
+        }
+
+        /* Schedules Section */
+        .schedule-links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .schedule-link {
+            display: block;
+            background-color: #fff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--primary-color);
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .schedule-link:hover {
+            background-color: var(--primary-color);
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transform: translateY(-2px);
+        }
+
+        .schedule-link.active {
+            background-color: var(--secondary-color);
+            color: #fff;
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transform: translateY(-2px);
+        }
+
+        .schedule-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            margin-top: 20px;
+        }
+
+        .schedule-content h3 {
+            font-size: 2em;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            text-align: center;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 15px;
+        }
+
+        .schedule-content p.valid-from {
+            font-weight: bold;
+            color: var(--secondary-color);
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 25px;
+        }
+
+        .schedule-content .schedule-stops {
+            margin-bottom: 30px;
+            padding: 15px 20px;
+            background-color: #f9f9f9;
+            border-left: 5px solid var(--secondary-color);
+            border-radius: 4px;
+        }
+        .schedule-content .schedule-stops h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            font-size: 1.1em;
+        }
+        .schedule-content .schedule-stops ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .schedule-content .schedule-stops li {
+            margin-bottom: 5px;
+            font-size: 1em;
+            color: var(--text-color);
+        }
+        
+        .schedule-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            font-size: 1em;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .schedule-content th,
+        .schedule-content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .schedule-content th {
+            background-color: var(--primary-color);
+            color: var(--white);
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 0.5px;
+        }
+
+        .schedule-content tbody tr td:first-child {
+            font-weight: bold;
+            color: var(--primary-color);
+            white-space: nowrap;
+        }
+
+        .schedule-content tbody tr:nth-child(even) {
+            background-color: #f8f8f8;
+        }
+
+        .schedule-content tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .schedule-content td {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.05em;
+            letter-spacing: 0.5px;
+            line-height: 1.4;
+        }
+
+        .schedule-content .schedule-notes {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px dashed #ccc;
+            font-size: 0.95em;
+        }
+
+        .schedule-content .schedule-update {
+            text-align: right;
+            font-size: 0.85em;
+            color: var(--dark-gray);
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+
+        /* Tickets Section (FAQ) */
+        .faq-item {
+            background-color: var(--white);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        }
+
+        .faq-item h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+            font-size: 1.3em;
+        }
+
+        .download-rodo {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .download-button {
+            background-color: #28a745; /* Green for download */
+            color: var(--white);
+        }
+
+        .download-button:hover {
+            background-color: #218838;
+        }
+
+        /* Contact Section */
+        .contact-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            text-align: center;
+        }
+
+        .contact-item {
+            background-color: var(--white);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Footer */
+        .main-footer {
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 30px 0;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .footer-nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .footer-nav li {
+            margin: 0 15px;
+        }
+
+        .footer-nav a {
+            color: var(--white);
+        }
+
+        .copyright {
+            font-size: 0.9em;
+            margin-top: 15px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .contact-info {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-wrap: wrap;
+            }
+            .main-nav {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                order: 3;
+                background-color: var(--white);
+                margin-top: 15px;
+                padding: 10px 0;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            }
+            .main-nav.active {
+                display: flex;
+            }
+            .main-nav ul {
+                flex-direction: column;
+                width: 100%;
+                align-items: center;
+            }
+            .main-nav li {
+                margin: 10px 0;
+                width: 100%;
+                text-align: center;
+            }
+            .main-nav a {
+                 padding: 10px 0;
+                 display: block;
+                 width: 100%;
+            }
+            .main-nav a::after {
+                display: none;
+            }
+
+            .mobile-nav-toggle {
+                display: block;
+            }
+
+            .hero-section h1 {
+                font-size: 2.5em;
+            }
+            .hero-section .button {
+                display: block;
+                width: 80%;
+                margin: 15px auto;
+            }
+
+            /* Responsive table */
+            .schedule-content {
+                overflow-x: auto;
+            }
+            .schedule-content table {
+                display: block;
+                width: 100%;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h2 { font-size: 2em; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="container header-content">
+            <div class="logo">
+                <a href="#">MINIBUS-ZP</a>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="#schedules-section" class="active">Rozkłady Jazdy</a></li>
+                    <li><a href="#announcements-section">Komunikaty</a></li>
+                    <li><a href="#tickets-section">Bilety & FAQ</a></li>
+                    <li><a href="#contact-section">Kontakt</a></li>
+                </ul>
+            </nav>
+            <div class="contact-info">
+                <a href="tel:+48123456789">+48 123 456 789</a>
+            </div>
+            <button class="mobile-nav-toggle" aria-label="Toggle navigation">☰</button>
+        </div>
+    </header>
+
+    <section id="hero-section" class="hero-section">
+        <div class="container">
+            <h1>Szybko, Wygodnie, Bezpiecznie</h1>
+            <p>Twoja niezawodna podróż każdego dnia.</p>
+            <a href="#schedules-section" class="button primary">Sprawdź Rozkład</a>
+            <a href="#contact-section" class="button secondary">Skontaktuj Się</a>
+        </div>
+    </section>
+    
+    <section id="announcements-section" class="section announcements-section">
+        <div class="container">
+            <h2>Najnowsze Komunikaty</h2>
+            <div class="announcements-grid" id="announcements-container">
+                <p style="text-align: center;">Ładowanie komunikatów...</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="schedules-section" class="section schedules-section">
+        <div class="container">
+            <h2>Rozkłady Jazdy</h2>
+            <div class="schedule-links-grid">
+                <a href="data/schedules/myslenice-gdow.html" class="schedule-link">Myślenice &lt;–&gt Gdów</a>
+                <a href="data/schedules/myslenice-dobczyce.html" class="schedule-link">Myślenice &lt;–&gt Dobczyce</a>
+            </div>
+            <div class="schedule-content" id="schedule-details">
+                <p style="text-align: center; padding: 50px;">Wybierz trasę, aby wyświetlić rozkład jazdy.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="tickets-section" class="section tickets-section">
+        <div class="container">
+            <h2>Bilety i Często Zadawane Pytania (FAQ)</h2>
+
+            <div class="faq-item">
+                <h3>Jak kupić bilet miesięczny?</h3>
+                <p>Bilety miesięczne dostępne są w punkcie sprzedaży na Dworcu Dekada w Myślenicach, stanowisko nr 8, od 25. dnia poprzedniego miesiąca. Godziny otwarcia: 10:00 - 17:00.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>Czy mogę kupić bilet u kierowcy?</h3>
+                <p>Tak, bilety jednorazowe są dostępne u kierowcy podczas wsiadania do busa. Płatność tylko gotówką.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>Czy są zniżki dla uczniów/studentów?</h3>
+                <p>Tak, oferujemy zniżki dla uczniów i studentów po okazaniu ważnej legitymacji szkolnej/studenckiej. Ceny biletów miesięcznych ze zniżką podane są w komunikatach.</p>
+            </div>
+
+            <div class="download-rodo">
+                <a href="docs/RODO-zgoda.pdf" class="button primary download-button" target="_blank" download>Pobierz formularz RODO</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact-section" class="section contact-section">
+        <div class="container">
+            <h2>Kontakt</h2>
+            <div class="contact-info-grid">
+                <div class="contact-item">
+                    <h3>Telefon</h3>
+                    <p>Biuro Obsługi Klienta:</p>
+                    <p><a href="tel:+48123456789">+48 123 456 789</a></p>
+                </div>
+                <div class="contact-item">
+                    <h3>Email</h3>
+                    <p>Adres email:</p>
+                    <p><a href="mailto:kontakt@twojprzewoznik.pl">kontakt@twojprzewoznik.pl</a></p>
+                </div>
+                <div class="contact-item">
+                    <h3>Adres</h3>
+                    <p>ul. Słowackiego 120</p>
+                    <p>32-400 Myślenice</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="main-footer">
+        <div class="container footer-content">
+            <nav class="footer-nav">
+                <ul>
+                    <li><a href="#schedules-section">Rozkłady Jazdy</a></li>
+                    <li><a href="#announcements-section">Komunikaty</a></li>
+                    <li><a href="#tickets-section">Bilety & FAQ</a></li>
+                    <li><a href="#">Polityka Prywatności</a></li>
+                </ul>
+            </nav>
+            <p class="copyright">&copy; 2025 BUS TRANS. Wszelkie prawa zastrzeżone.</p>
+        </div>
+    </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // --- DATA STORE ---
+        // Schedule HTML content is stored here to avoid fetching external files.
+        const scheduleData = {
+            'data/schedules/myslenice-gdow.html': `
+                <h3>Rozkład Jazdy: Myślenice &lt;–&gt Gdów</h3>
+                <p class="valid-from"><strong>Obowiązuje od: 01.07.2025</strong></p>
+                <div class="schedule-stops">
+                    <h4>Przystanki na trasie:</h4>
+                    <ul><li>Myślenice Dworzec</li><li>Myślenice Dworzec Dekada</li><li>Osieczany</li><li>Węgrzce Wielkie</li><li>Gdów Rynek</li></ul>
+                </div>
+                <table>
+                    <thead><tr><th>PRZYSTANEK / DZIEŃ</th><th>DNI ROBOCZE</th><th>SOBOTY</th><th>NIEDZIELE I ŚWIĘTA</th></tr></thead>
+                    <tbody>
+                        <tr><td data-label="PRZYSTANEK / DZIEŃ">Myślenice Dworzec</td><td data-label="DNI ROBOCZE">06:30,<br>08:00,<br>10:00,<br>12:30,<br>15:00,<br>17:30</td><td data-label="SOBOTY">08:30,<br>12:30,<br>16:30</td><td data-label="NIEDZIELE I ŚWIĘTA">Brak kursów</td></tr>
+                        <tr><td data-label="PRZYSTANEK / DZIEŃ">Gdów Rynek</td><td data-label="DNI ROBOCZE">07:15,<br>09:00,<br>11:00,<br>13:30,<br>16:00,<br>18:30</td><td data-label="SOBOTY">09:15,<br>13:15,<br>17:15</td><td data-label="NIEDZIELE I ŚWIĘTA">Brak kursów</td></tr>
+                    </tbody>
+                </table>
+                <div class="schedule-notes"><strong>Uwagi:</strong><ul><li>Kursy mogą ulec zmianie w święta państwowe.</li><li>Szczegóły u kierowcy.</li></ul></div>
+                <p class="schedule-update">Ostatnia aktualizacja: 2025-06-20</p>`,
+            'data/schedules/myslenice-dobczyce.html': `
+                <h3>Rozkład Jazdy: Myślenice &lt;–&gt Dobczyce</h3>
+                <p class="valid-from"><strong>Obowiązuje od: 01.07.2025</strong></p>
+                <div class="schedule-stops">
+                    <h4>Przystanki na trasie:</h4>
+                    <ul><li>Myślenice Dworzec</li><li>Myślenice Dworzec Dekada</li><li>Bysina</li><li>Borzęta</li><li>Dziekanowice</li><li>Dobczyce Rynek</li><li>Dobczyce Ratajówka</li></ul>
+                </div>
+                <table>
+                    <thead><tr><th>PRZYSTANEK / DZIEŃ</th><th>DNI ROBOCZE</th><th>SOBOTY</th><th>NIEDZIELE I ŚWIĘTA</th></tr></thead>
+                    <tbody>
+                        <tr><td data-label="PRZYSTANEK / DZIEŃ">Myślenice Dworzec</td><td data-label="DNI ROBOCZE">05:30 45,<br>06:00 15 30 45,<br>07:00 15 30 45,<br>08:00 15 30 45,<br>09:00 15 45,<br>10:00 15 30 45,<br>11:00 15 30 45,<br>12:00 15 30 45,<br>13:00 15 45,<br>14:00 15 45,<br>15:00 15 30 45,<br>16:00 15 45,<br>17:00 15 30 45,<br>18:00 15,<br>19:00 30,<br>20:15,<br>22:15</td><td data-label="SOBOTY">05:45,<br>06:45,<br>07:45,<br>08:45,<br>09:45,<br>10:45,<br>11:45,<br>12:45,<br>13:45,<br>14:45,<br>15:45,<br>16:45,<br>17:15,<br>18:00,<br>20:00</td><td data-label="NIEDZIELE I ŚWIĘTA">06:45,<br>07:45,<br>08:45,<br>09:45,<br>10:45,<br>11:45,<br>12:45,<br>13:45,<br>14:45,<br>15:45,<br>16:45,<br>17:45</td></tr>
+                        <tr><td data-label="PRZYSTANEK / DZIEŃ">Dobczyce Rynek</td><td data-label="DNI ROBOCZE">05:15 30 45,<br>06:15 30 45,<br>07:15 30 45,<br>08:15 45,<br>09:15 45,<br>10:15 30 45,<br>11:15 45,<br>12:15 45,<br>13:15 45,<br>14:15 45,<br>15:15 45,<br>16:15 45,<br>17:15 30,<br>18:30,<br>19:30,<br>21:15</td><td data-label="SOBOTY">05:15,<br>06:15,<br>07:15,<br>08:15,<br>09:15,<br>10:15,<br>11:15,<br>12:15,<br>13:15,<br>14:15,<br>15:15,<br>16:15,<br>17:30,<br>18:30,<br>19:30</td><td data-label="NIEDZIELE I ŚWIĘTA">Brak kursów</td></tr>
+                    </tbody>
+                </table>
+                <div class="schedule-notes"><strong>Uwagi:</strong><ul><li>Kursy mogą ulec zmianie w święta państwowe.</li><li>Szczegóły u kierowcy.</li></ul></div>
+                <p class="schedule-update">Ostatnia aktualizacja: 2025-06-20</p>`
+        };
+
+        // Sample announcements data.
+        const announcements = [
+            {
+                "title": "Zmiany w kursowaniu 1 listopada",
+                "date": "2025-10-25",
+                "text": "Uprzejmie informujemy, że w dniu **1 listopada (Wszystkich Świętych)** autobusy będą kursować według **rozkładu niedzielnego**. Prosimy o wcześniejsze zaplanowanie podróży.\nDodatkowo uruchomione zostaną specjalne kursy w okolice cmentarzy."
+            },
+            {
+                "title": "Nowe ceny biletów miesięcznych",
+                "date": "2025-06-18",
+                "text": "Informujemy, że od dnia 1 lipca 2025 r. obowiązują nowe ceny biletów miesięcznych. Szczegółowy cennik dostępny jest u kierowców oraz w punkcie sprzedaży na dworcu."
+            },
+            {
+                "title": "Korekta rozkładu jazdy linii Myślenice - Dobczyce",
+                "date": "2025-06-15",
+                "text": "Od dnia 1 lipca 2025 r. wprowadzona zostaje korekta w rozkładzie jazdy na linii Myślenice - Dobczyce. Zmiany dotyczą wybranych kursów w godzinach porannych. **Prosimy o zapoznanie się z nowym rozkładem**."
+            }
+        ];
+        
+        // --- LOGIC ---
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                const targetElement = document.querySelector(href);
+                if (targetElement) {
+                    e.preventDefault();
+                    targetElement.scrollIntoView({ behavior: 'smooth' });
+
+                    // Close mobile menu if open
+                    const mainNav = document.querySelector('.main-nav');
+                    const body = document.body;
+                    if (body.classList.contains('mobile-nav-open')) {
+                        body.classList.remove('mobile-nav-open');
+                        mainNav.classList.remove('active');
+                    }
+                }
+            });
+        });
+
+        // Mobile navigation toggle
+        const mobileNavToggle = document.querySelector('.mobile-nav-toggle');
+        const mainNav = document.querySelector('.main-nav');
+        const body = document.body;
+
+        if (mobileNavToggle && mainNav) {
+            mobileNavToggle.addEventListener('click', () => {
+                mainNav.classList.toggle('active');
+                body.classList.toggle('mobile-nav-open');
+            });
+        }
+        
+        // Dynamic schedule loading from internal data object
+        const scheduleLinksContainer = document.querySelector('.schedule-links-grid');
+        const scheduleContentDiv = document.getElementById('schedule-details');
+
+        if (scheduleLinksContainer && scheduleContentDiv) {
+            scheduleLinksContainer.addEventListener('click', (event) => {
+                const targetLink = event.target.closest('.schedule-link');
+                if (targetLink) {
+                    event.preventDefault();
+
+                    document.querySelectorAll('.schedule-link').forEach(link => link.classList.remove('active'));
+                    targetLink.classList.add('active');
+
+                    const scheduleUrlKey = targetLink.getAttribute('href');
+                    const scheduleHtml = scheduleData[scheduleUrlKey];
+
+                    if (scheduleHtml) {
+                        scheduleContentDiv.innerHTML = scheduleHtml;
+                    } else {
+                        scheduleContentDiv.innerHTML = '<p style="text-align: center; padding: 50px; color: red;">Niestety, nie udało się załadować tego rozkładu jazdy.</p>';
+                    }
+                }
+            });
+        }
+
+        // Simple Markdown-like formatter for announcements
+        function formatTextWithMarkdown(text) {
+            if (!text) return '';
+            let formattedText = text.replace(/\n/g, '<br>');
+            formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            return formattedText;
+        }
+
+        // Load announcements from internal data object
+        const announcementsContainer = document.getElementById('announcements-container');
+        if (announcementsContainer) {
+            announcementsContainer.innerHTML = ''; // Clear loading message
+
+            if (!announcements || announcements.length === 0) {
+                announcementsContainer.innerHTML = '<p>Brak dostępnych komunikatów.</p>';
+            } else {
+                const TRUNCATE_LENGTH = 150;
+
+                announcements.forEach(announcement => {
+                    const card = document.createElement('div');
+                    card.classList.add('announcement-card');
+
+                    const formattedFullText = formatTextWithMarkdown(announcement.text);
+                    const plainText = announcement.text.replace(/\*\*([^*]+)\*\*/g, '$1').replace(/\n/g, ' ');
+
+                    let displayedText = formattedFullText;
+                    let needsReadMore = false;
+
+                    if (plainText.length > TRUNCATE_LENGTH) {
+                        // Find a good place to cut the text
+                        let cutIndex = plainText.lastIndexOf(' ', TRUNCATE_LENGTH);
+                        if(cutIndex === -1) cutIndex = TRUNCATE_LENGTH;
+                        
+                        displayedText = formatTextWithMarkdown(announcement.text.substring(0, cutIndex)) + '...';
+                        needsReadMore = true;
+                    }
+
+                    card.innerHTML = `
+                      <h3>${announcement.title}</h3>
+                      <p class="date">${announcement.date}</p>
+                      <div class="announcement-content">${displayedText}</div>
+                      ${needsReadMore ? 
+                        `<a class="read-more">Czytaj więcej</a>` : ''
+                      }
+                    `;
+                    announcementsContainer.appendChild(card);
+                    
+                    if (needsReadMore) {
+                        const readMoreBtn = card.querySelector('.read-more');
+                        const contentDiv = card.querySelector('.announcement-content');
+                        
+                        readMoreBtn.addEventListener('click', function() {
+                            if (this.textContent === 'Czytaj więcej') {
+                                contentDiv.innerHTML = formattedFullText;
+                                this.textContent = 'Zwiń';
+                            } else {
+                                contentDiv.innerHTML = displayedText;
+                                this.textContent = 'Czytaj więcej';
+                            }
+                        });
+                    }
+                });
+            }
+        }
+    });
+    </script>
+</body>
+</html>

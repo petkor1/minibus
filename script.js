@@ -1,23 +1,19 @@
+
 document.addEventListener('DOMContentLoaded', () => {
-
   // Smooth scrolling for navigation links
-  document.querySelectorAll('nav a[href^="#"]').forEach(anchor => {
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
-      e.preventDefault();
-
-      const targetElement = document.querySelector(this.getAttribute('href'));
+      const href = this.getAttribute('href');
+      const targetElement = document.querySelector(href);
       if (targetElement) {
-        targetElement.scrollIntoView({
-          behavior: 'smooth'
-        });
-      }
+        e.preventDefault();
+        targetElement.scrollIntoView({ behavior: 'smooth' });
 
-      // Close mobile menu if open
-      const mainNav = document.querySelector('.main-nav');
-      const body = document.body;
-      if (body.classList.contains('mobile-nav-open')) {
-        body.classList.remove('mobile-nav-open');
-        if (mainNav) {
+        // Close mobile menu if open
+        const mainNav = document.querySelector('.main-nav');
+        const body = document.body;
+        if (body.classList.contains('mobile-nav-open')) {
+          body.classList.remove('mobile-nav-open');
           mainNav.classList.remove('active');
         }
       }
@@ -29,34 +25,27 @@ document.addEventListener('DOMContentLoaded', () => {
   const mainNav = document.querySelector('.main-nav');
   const body = document.body;
 
-  if (mobileNavToggle && mainNav && body) {
+  if (mobileNavToggle && mainNav) {
     mobileNavToggle.addEventListener('click', () => {
       mainNav.classList.toggle('active');
-      body.classList.toggle('mobile-nav-open'); // Add a class to body for potential overlay
+      body.classList.toggle('mobile-nav-open');
     });
   }
 
-  // Dynamic schedule loading and smooth scrolling
+  // Dynamic schedule loading from external HTML files
   const scheduleLinksContainer = document.querySelector('.schedule-links-grid');
-  const scheduleContentDiv = document.getElementById('schedule-details'); // ID zmienione na 'schedule-details' w index.html
+  const scheduleContentDiv = document.getElementById('schedule-details');
 
   if (scheduleLinksContainer && scheduleContentDiv) {
     scheduleLinksContainer.addEventListener('click', async (event) => {
       const targetLink = event.target.closest('.schedule-link');
       if (targetLink) {
-        event.preventDefault(); // KLUCZOWE: Zapobiega domyślnej nawigacji przeglądarki
+        event.preventDefault();
 
-        // Usuń klasę 'active' ze wszystkich linków
-        document.querySelectorAll('.schedule-link').forEach(link => {
-          link.classList.remove('active');
-        });
-
-        // Dodaj klasę 'active' do klikniętego linku
+        document.querySelectorAll('.schedule-link').forEach(link => link.classList.remove('active'));
         targetLink.classList.add('active');
 
-        const scheduleUrl = targetLink.getAttribute('href'); // Pobierz URL pliku HTML z rozkładem
-        
-        // Wyświetl komunikat ładowania
+        const scheduleUrl = targetLink.getAttribute('href');
         scheduleContentDiv.innerHTML = '<p style="text-align: center; padding: 50px;">Ładowanie rozkładu jazdy...</p>';
 
         try {
@@ -66,34 +55,25 @@ document.addEventListener('DOMContentLoaded', () => {
           }
           const scheduleHtml = await response.text();
           scheduleContentDiv.innerHTML = scheduleHtml;
-
-          // Przewiń płynnie PO załadowaniu treści
-          scheduleContentDiv.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          });
-
         } catch (error) {
-          console.error('Failed to load schedule:', error);
-          scheduleContentDiv.innerHTML = '<p style="text-align: center; padding: 50px; color: red;">Niestety, nie udało się załadować rozkładu jazdy. Spróbuj ponownie później.</p>';
+          scheduleContentDiv.innerHTML = '<p style="text-align: center; padding: 50px; color: red;">Niestety, nie udało się załadować tego rozkładu jazdy.</p>';
         }
       }
     });
   }
 
-  // Funkcja do prostego formatowania tekstu z Markdownu na HTML
+  // Simple Markdown-like formatter for announcements
   function formatTextWithMarkdown(text) {
     if (!text) return '';
-
     let formattedText = text.replace(/\n/g, '<br>');
     formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     return formattedText;
   }
 
-  // "Czytaj więcej" functionality for announcements
+  // Load announcements from external JSON file
   const announcementsContainer = document.getElementById('announcements-container');
   if (announcementsContainer) {
-    fetch('announcements.json') // Upewnij się, że ścieżka 'announcements.json' jest poprawna
+    fetch('announcements.json')
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -101,68 +81,61 @@ document.addEventListener('DOMContentLoaded', () => {
         return response.json();
       })
       .then(announcements => {
-        announcementsContainer.innerHTML = ''; // Wyczyść statyczną zawartość
+        announcementsContainer.innerHTML = ''; // Clear loading message
 
-        if (announcements.length === 0) {
-          announcementsContainer.innerHTML = '<p>Brak dostępnych komunikatów w tym momencie.</p>';
+        if (!announcements || announcements.length === 0) {
+          announcementsContainer.innerHTML = '<p>Brak dostępnych komunikatów.</p>';
         } else {
-          const TRUNCATE_LENGTH = 150; // Definiujemy długość przycięcia
+          const TRUNCATE_LENGTH = 150;
 
           announcements.forEach(announcement => {
             const card = document.createElement('div');
             card.classList.add('announcement-card');
 
             const formattedFullText = formatTextWithMarkdown(announcement.text);
+            const plainText = announcement.text.replace(/\*\*([^*]+)\*\*/g, '$1').replace(/\n/g, ' ');
+
             let displayedText = formattedFullText;
             let needsReadMore = false;
 
-            const plainText = announcement.text.replace(/\*\*([^*]+)\*\*/g, '$1').replace(/\n/g, ' ');
-
             if (plainText.length > TRUNCATE_LENGTH) {
-              displayedText = formatTextWithMarkdown(plainText.substring(0, TRUNCATE_LENGTH)) + '...';
+              // Find a good place to cut the text
+              let cutIndex = plainText.lastIndexOf(' ', TRUNCATE_LENGTH);
+              if (cutIndex === -1) cutIndex = TRUNCATE_LENGTH;
+
+              displayedText = formatTextWithMarkdown(announcement.text.substring(0, cutIndex)) + '...';
               needsReadMore = true;
             }
 
             card.innerHTML = `
               <h3>${announcement.title}</h3>
               <p class="date">${announcement.date}</p>
-              <p class="announcement-content">${displayedText}</p>
+              <div class="announcement-content">${displayedText}</div>
               ${needsReadMore ?
-                `<a href="#" class="read-more"
-                   data-full-text="${formattedFullText.replace(/"/g, '&quot;')}"
-                   data-preview-text="${displayedText.replace(/"/g, '&quot;')}"
-                   >Czytaj więcej</a>` :
-                ''
+                `<a class="read-more">Czytaj więcej</a>` : ''
               }
             `;
             announcementsContainer.appendChild(card);
-          });
 
-          // WAŻNE: Po dodaniu wszystkich komunikatów, przypnij event listenery
-          document.querySelectorAll('.announcement-card .read-more').forEach(button => {
-            button.addEventListener('click', function(e) {
-              e.preventDefault();
-              const card = this.closest('.announcement-card');
-              const contentParagraph = card.querySelector('.announcement-content');
+            if (needsReadMore) {
+              const readMoreBtn = card.querySelector('.read-more');
+              const contentDiv = card.querySelector('.announcement-content');
 
-              const fullText = this.getAttribute('data-full-text');
-              const previewText = this.getAttribute('data-preview-text');
-
-              if (contentParagraph.innerHTML === fullText) {
-                contentParagraph.innerHTML = previewText;
-                this.textContent = 'Czytaj więcej';
-              } else {
-                contentParagraph.innerHTML = fullText;
-                this.textContent = 'Zwiń';
-              }
-            });
+              readMoreBtn.addEventListener('click', function () {
+                if (this.textContent === 'Czytaj więcej') {
+                  contentDiv.innerHTML = formattedFullText;
+                  this.textContent = 'Zwiń';
+                } else {
+                  contentDiv.innerHTML = displayedText;
+                  this.textContent = 'Czytaj więcej';
+                }
+              });
+            }
           });
         }
       })
       .catch(error => {
-        console.error('Błąd podczas ładowania komunikatów:', error);
         announcementsContainer.innerHTML = '<p>Niestety, nie udało się załadować komunikatów. Spróbuj ponownie później.</p>';
       });
   }
-
 });

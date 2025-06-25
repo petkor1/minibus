@@ -170,8 +170,7 @@ body.mobile-nav-open {
 
 /* Hero Section */
 .hero-section {
-  background: url("https://placehold.co/1920x1080/0056b3/ffffff?text=Twój+Przewoźnik+Bus")
-    no-repeat center center/cover;
+  background-color: var(--primary-color);
   color: var(--white);
   text-align: center;
   padding: 100px 20px;

@@ -1,13 +1,22 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   // Smooth scrolling for navigation links
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  const navLinks = document.querySelectorAll('a[href^="#"]');
+
+  // Remove active class from all links initially
+  navLinks.forEach(link => link.classList.remove('active'));
+
+  navLinks.forEach(anchor => {
     anchor.addEventListener('click', function (e) {
       const href = this.getAttribute('href');
       const targetElement = document.querySelector(href);
       if (targetElement) {
         e.preventDefault();
         targetElement.scrollIntoView({ behavior: 'smooth' });
+
+        // Update active state
+        navLinks.forEach(link => link.classList.remove('active'));
+        this.classList.add('active');
 
         // Close mobile menu if open
         const mainNav = document.querySelector('.main-nav');

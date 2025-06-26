@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!announcements || announcements.length === 0) {
           announcementsContainer.innerHTML = '<p>Brak dostępnych komunikatów.</p>';
         } else {
-          const TRUNCATE_LENGTH = 150;
+          const TRUNCATE_LENGTH = 250;
 
           announcements.forEach(announcement => {
             const card = document.createElement('div');

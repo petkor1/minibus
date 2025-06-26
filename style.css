@@ -1,7 +1,7 @@
 /* General Styles */
 :root {
-  --primary-color: #0056b3; /* Darker blue for accents */
-  --secondary-color: #007bff; /* Main blue color */
+  --primary-color: #cc8500; /* Darker blue for accents */
+  --secondary-color: #e59500; /* Main blue color */
   --text-color: #333;
   --light-gray: #f4f4f4;
   --white: #fff;
@@ -19,7 +19,7 @@ body {
   padding: 0;
   line-height: 1.6;
   color: var(--text-color);
-  background-color: var(--light-gray);
+  background-color: var(--white);
 }
 
 .container {
@@ -28,7 +28,7 @@ body {
   padding: 0 20px;
 }
 a {
-  color: var(--secondary-color);
+  color: var(--primary-color);
   text-decoration: none;
   transition: color 0.3s ease;
 }
@@ -40,7 +40,7 @@ a:hover {
 h1,
 h2,
 h3 {
-  color: var(--primary-color);
+  color: var(--text-color);
   margin-bottom: 20px;
 }
 
@@ -72,7 +72,7 @@ h2::after {
 }
 
 .button.primary {
-  background-color: var(--secondary-color);
+  background-color: var(--primary-color);
   color: var(--white);
 }
 
@@ -83,12 +83,12 @@ h2::after {
 
 .button.secondary {
   background-color: var(--white);
-  color: var(--secondary-color);
+  color: var(--primary-color);
   border: 2px solid var(--secondary-color);
 }
 
 .button.secondary:hover {
-  background-color: var(--secondary-color);
+  background-color: var(--primary-color);
   color: var(--white);
   transform: translateY(-2px);
 }
@@ -131,6 +131,7 @@ h2::after {
   font-weight: bold;
   padding: 5px 0;
   position: relative;
+  color: var(--text-color);
 }
 
 .main-nav a::after {
@@ -170,7 +171,8 @@ body.mobile-nav-open {
 
 /* Hero Section */
 .hero-section {
-  background-color: var(--primary-color);
+  background: url("img/ash-gerlach-6fF-Ojxov6o-unsplash.jpg") center/cover
+    no-repeat;
   color: var(--white);
   text-align: center;
   padding: 100px 20px;
@@ -196,7 +198,7 @@ body.mobile-nav-open {
   font-size: 3.5em;
   margin-bottom: 20px;
   color: var(--white);
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
 }
 
 .hero-section p {
@@ -219,7 +221,7 @@ body.mobile-nav-open {
 }
 #announcements-section,
 #schedules-section {
-  background-color: var(--light-gray);
+  background-color: var(--white);
   box-shadow: none;
   border-radius: 0;
 }
@@ -237,7 +239,7 @@ body.mobile-nav-open {
 }
 
 .announcement-card {
-  background-color: var(--white);
+  background-color: var(--light-gray);
   padding: 25px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -256,7 +258,7 @@ body.mobile-nav-open {
   margin-top: 0;
   margin-bottom: 10px;
   font-size: 1.5em;
-  color: var(--primary-color);
+  color: var(--text-color);
 }
 
 .announcement-card .date {
@@ -434,16 +436,16 @@ body.mobile-nav-open {
 
 /* Tickets Section (FAQ) */
 .faq-item {
-  background-color: var(--white);
+  background-color: var(--light-gray);
   padding: 20px;
   border-radius: 8px;
   margin-bottom: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.16);
 }
 
 .faq-item h3 {
   margin-top: 0;
-  color: var(--primary-color);
+  color: var(--text-color);
   font-size: 1.3em;
 }
 
@@ -470,7 +472,7 @@ body.mobile-nav-open {
 }
 
 .contact-item {
-  background-color: var(--white);
+  background-color: var(--light-gray);
   padding: 25px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -553,6 +555,7 @@ body.mobile-nav-open {
     padding: 10px 0;
     display: block;
     width: 100%;
+    color: var(--text-color);
   }
   .main-nav a::after {
     display: none;

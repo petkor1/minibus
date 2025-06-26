@@ -172,8 +172,7 @@ body.mobile-nav-open {
 
 /* Hero Section */
 .hero-section {
-  background: url("img/ash-gerlach-6fF-Ojxov6o-unsplash.jpg") center/cover
-    no-repeat;
+  background: url("img/tlo.jpg") center/cover no-repeat;
   color: var(--white);
   text-align: center;
   padding: 100px 20px;

@@ -77,15 +77,15 @@
         padding: 0.4rem 1rem;
         font-size: 1em;
         font-weight: bold;
-        color: #28a745;
-        border: 1px solid #28a745;
+        color: #ea580c;
+        border: 1px solid #ea580c;
         border-radius: 6px;
         cursor: pointer;
         transition: background-color 0.3s;
       }
       .toggle-full-schedule-btn:hover {
         color: white;
-        background-color: #218838;
+        background-color: #ea580c;
       }
       #schedule-placeholder-text {
         text-align: center;
@@ -118,50 +118,50 @@
           class="main-nav hidden md:flex absolute md:relative top-full left-0 w-full bg-white md:bg-transparent shadow-md md:shadow-none justify-center flex-1"
         >
           <ul
-            class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-8 p-4 md:p-0"
+        class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-8 p-4 md:p-0 text-right"
           >
-            <li>
-              <a
-                href="#schedules-section"
-                class="text-gray-600 hover:text-orange-600 pb-1 border-b-2 border-transparent hover:border-orange-600 transition whitespace-nowrap"
-                >Rozkłady Jazdy</a
-              >
-            </li>
-            <li>
-              <a
-                href="#announcements-section"
-                class="text-gray-600 hover:text-orange-600 pb-1 border-b-2 border-transparent hover:border-orange-600 transition whitespace-nowrap"
-                >Komunikaty</a
-              >
-            </li>
-            <li>
-              <a
-                href="#tickets-section"
-                class="text-gray-600 hover:text-orange-600 pb-1 border-b-2 border-transparent hover:border-orange-600 transition whitespace-nowrap"
-                >Bilety & FAQ</a
-              >
-            </li>
-            <li>
-              <a
-                href="#contact-section"
-                class="text-gray-600 hover:text-orange-600 pb-1 border-b-2 border-transparent hover:border-orange-600 transition whitespace-nowrap"
-                >Kontakt</a
-              >
-            </li>
-            <li class="md:hidden">
-              <a
-                href="tel:+48604619863"
-                class="text-lg font-semibold text-orange-600 whitespace-nowrap"
-                >+48 604 619 863</a
-              >
-            </li>
-          </ul>
-        </nav>
-        <div class="contact-info hidden lg:block min-w-[150px] text-right">
+        <li>
+          <a
+            href="#schedules-section"
+            class="text-gray-600 hover:text-orange-600 pb-1 border-b-2 border-transparent hover:border-orange-600 transition whitespace-nowrap"
+            >Rozkłady Jazdy</a
+          >
+        </li>
+        <li>
+          <a
+            href="#announcements-section"
+            class="text-gray-600 hover:text-orange-600 pb-1 border-b-2 border-transparent hover:border-orange-600 transition whitespace-nowrap"
+            >Komunikaty</a
+          >
+        </li>
+        <li>
+          <a
+            href="#tickets-section"
+            class="text-gray-600 hover:text-orange-600 pb-1 border-b-2 border-transparent hover:border-orange-600 transition whitespace-nowrap"
+            >Bilety & FAQ</a
+          >
+        </li>
+        <li>
+          <a
+            href="#contact-section"
+            class="text-gray-600 hover:text-orange-600 pb-1 border-b-2 border-transparent hover:border-orange-600 transition whitespace-nowrap"
+            >Kontakt</a
+          >
+        </li>
+        <li class="md:hidden">
           <a
             href="tel:+48604619863"
             class="text-lg font-semibold text-orange-600 whitespace-nowrap"
             >+48 604 619 863</a
+          >
+        </li>
+          </ul>
+        </nav>
+        <div class="contact-info hidden lg:block min-w-[150px] text-right">
+          <a
+        href="tel:+48604619863"
+        class="text-lg font-semibold text-orange-600 whitespace-nowrap"
+        >+48 604 619 863</a
           >
         </div>
         <button
@@ -222,7 +222,10 @@
         class="section schedules-section py-16 bg-gray-100"
       >
         <div class="container mx-auto px-4">
-          <h2 class="text-3xl font-bold text-center mb-10">Rozkłady jazdy</h2>
+          <h2 class="text-3xl font-bold text-center mb-8">Rozkłady jazdy na trasach</h2>
+          <p id="schedule-placeholder-text" class="text-blue-600 p-3 mb-4 rounded-lg border border-blue-200 bg-blue-50/50 backdrop-blur-sm shadow-sm">
+            Wybierz trasę, aby wyświetlić rozkład jazdy dla obu kierunków.
+          </p>
           <!-- Kontener na przyciski wyboru trasy -->
           <div id="schedule-selector-container" class="schedule-selector-grid">
             <!-- Przyciski będą generowane dynamicznie przez JS -->
@@ -235,9 +238,6 @@
           >
             <!-- Rozkład będzie wstrzykiwany dynamicznie przez JS -->
           </div>
-          <p id="schedule-placeholder-text" class="text-blue-600 p-4 rounded-lg border border-blue-200 bg-blue-50/50 backdrop-blur-sm shadow-sm">
-            Wybierz trasę, aby wyświetlić rozkład jazdy dla obu kierunków.
-          </p>
         </div>
       </section>
 

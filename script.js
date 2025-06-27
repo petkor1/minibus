@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       } else {
         // Skrócony widok: pokaż tylko bieżący typ dnia
-        html += `<h5 class="font-semibold text-lg mb-3 text-gray-700 day-type-display">${currentDayType.displayName}</h5>`;
+        html += `<h5 class="font-semibold text-lg mb-3 text-gray-700 day-type-display">${currentDayType.displayName} - najbliższe kursy</h5>`;
         html += generateTimesGridHtml(direction.times[currentDayType.key] || [], true, now, 5);
       }
       html += `</div>`;
@@ -178,9 +178,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const TRUNCATE_LENGTH = 250;
-        announcements.forEach(announcement => {
+        announcements.forEach((announcement, index) => {
           const card = document.createElement('div');
           card.className = 'bg-white p-6 rounded-lg shadow-md flex flex-col';
+
+          // Add red border to first announcement
+          if (index === 0) {
+            card.style.borderLeft = '3px solid red';
+          }
 
           const formattedFullText = formatTextWithMarkdown(announcement.text);
           const plainText = announcement.text.replace(/\*\*([^*]+)\*\*/g, '$1').replace(/\n/g, ' ');
@@ -196,11 +201,11 @@ document.addEventListener('DOMContentLoaded', () => {
           }
 
           card.innerHTML = `
-                      <h3 class="font-bold text-xl mb-2">${announcement.title}</h3>
-                      <p class="text-sm text-gray-500 mb-4">${announcement.date}</p>
-                      <div class="announcement-content text-gray-700">${displayedText}</div>
-                      ${needsReadMore ? `<a class="read-more text-blue-600 hover:underline mt-auto pt-2 cursor-pointer font-semibold">Czytaj więcej</a>` : ''}
-                  `;
+                <h3 class="font-bold text-xl mb-2">${announcement.title}</h3>
+                <p class="text-sm text-gray-500 mb-4">${announcement.date}</p>
+                <div class="announcement-content text-gray-700">${displayedText}</div>
+                ${needsReadMore ? `<a class="read-more text-blue-600 hover:underline mt-auto pt-2 cursor-pointer font-semibold">Czytaj więcej</a>` : ''}
+            `;
           announcementsContainer.appendChild(card);
 
           if (needsReadMore) {

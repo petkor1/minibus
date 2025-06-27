@@ -40,10 +40,7 @@ const schedulesData = {
                         "17:15", "18:00", "20:00"
                     ],
                     // Godziny odjazdów w niedziele i święta
-                    sundays: [
-                        "06:45", "07:45", "08:45", "09:45", "10:45", "11:45",
-                        "12:45", "13:45", "14:45", "15:45", "16:45", "17:45"
-                    ]
+                    sundays: []
                 }
             },
             {
@@ -67,7 +64,117 @@ const schedulesData = {
             }
         ]
     },
-    "myslenice-gdow": {
+    "myslenice-gdow1": {
+        routeName: "Myślenice &lt;–&gt; Gdów",
+        validFrom: "01.09.2024",
+        directions: [
+            {
+                directionName: "Myślenice Dworzec → Gdów",
+                times: {
+                    workdays: ["06:30", "08:30", "10:30", "12:30", "14:30", "16:30"],
+                    saturdays: ["07:30", "11:30", "15:30"],
+                    sundays: []
+                }
+            },
+            {
+                directionName: "Gdów → Myślenice Dworzec",
+                times: {
+                    workdays: ["07:30", "09:30", "11:30", "13:30", "15:30", "17:30"],
+                    saturdays: ["08:30", "12:30", "16:30"],
+                    sundays: []
+                }
+            }
+        ]
+    },
+    "myslenice-gdow2": {
+        routeName: "Myślenice &lt;–&gt; Gdów",
+        validFrom: "01.09.2024",
+        directions: [
+            {
+                directionName: "Myślenice Dworzec → Gdów",
+                times: {
+                    workdays: ["06:30", "08:30", "10:30", "12:30", "14:30", "16:30"],
+                    saturdays: ["07:30", "11:30", "15:30"],
+                    sundays: []
+                }
+            },
+            {
+                directionName: "Gdów → Myślenice Dworzec",
+                times: {
+                    workdays: ["07:30", "09:30", "11:30", "13:30", "15:30", "17:30"],
+                    saturdays: ["08:30", "12:30", "16:30"],
+                    sundays: []
+                }
+            }
+        ]
+    },
+    "myslenice-gdow3": {
+        routeName: "Myślenice &lt;–&gt; Gdów",
+        validFrom: "01.09.2024",
+        directions: [
+            {
+                directionName: "Myślenice Dworzec → Gdów",
+                times: {
+                    workdays: ["06:30", "08:30", "10:30", "12:30", "14:30", "16:30"],
+                    saturdays: ["07:30", "11:30", "15:30"],
+                    sundays: []
+                }
+            },
+            {
+                directionName: "Gdów → Myślenice Dworzec",
+                times: {
+                    workdays: ["07:30", "09:30", "11:30", "13:30", "15:30", "17:30"],
+                    saturdays: ["08:30", "12:30", "16:30"],
+                    sundays: []
+                }
+            }
+        ]
+    },
+    "myslenice-gdow4": {
+        routeName: "Myślenice &lt;–&gt; Gdów",
+        validFrom: "01.09.2024",
+        directions: [
+            {
+                directionName: "Myślenice Dworzec → Gdów",
+                times: {
+                    workdays: ["06:30", "08:30", "10:30", "12:30", "14:30", "16:30"],
+                    saturdays: ["07:30", "11:30", "15:30"],
+                    sundays: []
+                }
+            },
+            {
+                directionName: "Gdów → Myślenice Dworzec",
+                times: {
+                    workdays: ["07:30", "09:30", "11:30", "13:30", "15:30", "17:30"],
+                    saturdays: ["08:30", "12:30", "16:30"],
+                    sundays: []
+                }
+            }
+        ]
+    },
+    "myslenice-gdow5": {
+        routeName: "Myślenice &lt;–&gt; Gdów",
+        validFrom: "01.09.2024",
+        directions: [
+            {
+                directionName: "Myślenice Dworzec → Gdów",
+                times: {
+                    workdays: ["06:30", "08:30", "10:30", "12:30", "14:30", "16:30"],
+                    saturdays: ["07:30", "11:30", "15:30"],
+                    sundays: []
+                }
+            },
+            {
+                directionName: "Gdów → Myślenice Dworzec",
+                times: {
+                    workdays: ["07:30", "09:30", "11:30", "13:30", "15:30", "17:30"],
+                    saturdays: ["08:30", "12:30", "16:30"],
+                    sundays: []
+                }
+            }
+        ]
+    },
+    "myslenice-gdow6": {
         routeName: "Myślenice &lt;–&gt; Gdów",
         validFrom: "01.09.2024",
         directions: [

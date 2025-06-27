@@ -72,9 +72,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /**
-  * Główna funkcja renderująca widok rozkładu (skrócony lub pełny)
-  */
-  function renderSchedule(routeId, isFullView) {
+ * Główna funkcja renderująca widok rozkładu (skrócony lub pełny)
+ */
+  function renderSchedule(routeId, isFullView, scrollToDirection = null) { // Dodajemy parametr scrollToDirection
     const route = schedulesData[routeId];
     const now = new Date();
     const currentDayType = getDayType(now);
@@ -87,24 +87,27 @@ document.addEventListener('DOMContentLoaded', () => {
     let html = '';
 
     route.directions.forEach((direction, index) => {
+      // Generujemy unikalny ID dla każdej sekcji kierunku
+      const directionId = `${routeId}-${direction.directionName.replace(/[^a-zA-Z0-9]/g, '-')}-${index}`;
+
       // Add separator before direction (except for the first one)
       if (index > 0) {
         html += '<hr class="my-6 border-gray-300">';
       }
 
-      html += `<div class="schedule-direction" data-direction-name="${direction.directionName}">
-            <h4 class="font-bold text-xl flex items-center gap-2">
-          <span class="inline-block align-middle text-orange-600" aria-hidden="true">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <rect x="3" y="5" width="18" height="12" rx="3" fill="#c2410c" stroke="#c2410c" />
-              <rect x="6" y="8" width="4" height="4" rx="1" fill="#fff" />
-              <rect x="14" y="8" width="4" height="4" rx="1" fill="#fff" />
-              <circle cx="7.5" cy="17" r="1.5" fill="#1e293b"/>
-              <circle cx="16.5" cy="17" r="1.5" fill="#1e293b"/>
-            </svg>
-          </span>
-          ${direction.directionName}
-            </h4>`;
+      html += `<div class="schedule-direction" id="${directionId}" data-direction-name="${direction.directionName}">
+                    <h4 class="font-bold text-xl flex items-center gap-2">
+                    <span class="inline-block align-middle text-orange-600" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <rect x="3" y="5" width="18" height="12" rx="3" fill="#c2410c" stroke="#c2410c" />
+                            <rect x="6" y="8" width="4" height="4" rx="1" fill="#fff" />
+                            <rect x="14" y="8" width="4" height="4" rx="1" fill="#fff" />
+                            <circle cx="7.5" cy="17" r="1.5" fill="#1e293b"/>
+                            <circle cx="16.5" cy="17" r="1.5" fill="#1e293b"/>
+                        </svg>
+                    </span>
+                    ${direction.directionName}
+                    </h4>`;
 
       if (isFullView) {
         // Pełny widok: iteruj po wszystkich typach dni
@@ -115,16 +118,17 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         // Skrócony widok: pokaż tylko bieżący typ dnia
         html += `<div class="flex justify-between items-center mt-2 mb-2">
-                <p class="text-gray-700">Najbliższe kursy dzisiaj</p>
-              </div>`;
+                        <p class="text-gray-700">Najbliższe kursy dzisiaj</p>
+                    </div>`;
         html += generateTimesGridHtml(direction.times[currentDayType.key] || [], true, now, 5);
       }
 
       // Przycisk "Pełny rozkład" / "Zwiń" zawsze pod siatką godzin
       const buttonText = isFullView ? 'Zwiń rozkład' : 'Pełny rozkład ->';
+      // Dodajemy data-direction-id do przycisku, aby wiedzieć, do której sekcji przewinąć
       html += `<div class="flex justify-start mt-4">
-              <button class="toggle-full-schedule-btn data-route-id="${routeId}" data-full-view="${isFullView}">${buttonText}</button>
-            </div>`;
+                    <button class="toggle-full-schedule-btn" data-route-id="${routeId}" data-full-view="${isFullView}" data-direction-id="${directionId}">${buttonText}</button>
+                </div>`;
 
       html += `</div>`;
     });
@@ -135,9 +139,19 @@ document.addEventListener('DOMContentLoaded', () => {
     detailsContainer.querySelectorAll('.toggle-full-schedule-btn').forEach(button => {
       button.addEventListener('click', (e) => {
         const currentIsFull = e.target.dataset.fullView === 'true';
-        renderSchedule(routeId, !currentIsFull);
+        const targetDirectionId = e.target.dataset.directionId; // Pobieramy ID kierunku
+        // Przekazujemy ID kierunku, do którego ma nastąpić przewinięcie
+        renderSchedule(routeId, !currentIsFull, targetDirectionId);
       });
     });
+
+    // Przewijanie do konkretnego kierunku po renderowaniu (tylko w widoku pełnym)
+    if (isFullView && scrollToDirection) {
+      const targetElement = document.getElementById(scrollToDirection);
+      if (targetElement) {
+        targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
   }
 
   /**

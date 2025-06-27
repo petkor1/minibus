@@ -86,26 +86,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let html = '';
 
-    route.directions.forEach(direction => {
+    route.directions.forEach((direction, index) => {
+      // Add separator before direction (except for the first one)
+      if (index > 0) {
+        html += '<hr class="my-6 border-gray-300">';
+      }
+
       html += `<div class="schedule-direction" data-direction-name="${direction.directionName}">
                       <h4 class="font-bold text-xl">${direction.directionName}</h4>`;
 
       if (isFullView) {
         // Pełny widok: iteruj po wszystkich typach dni
         dayTypes.forEach(dayType => {
-          html += `<p class="mt-4 mb-4 text-gray-700">${dayType.displayName}</p>`;
+          html += `<p class="mt-6 mb-2 text-gray-700">${dayType.displayName}</p>`;
           html += generateTimesGridHtml(direction.times[dayType.key] || [], false, now);
         });
       } else {
         // Skrócony widok: pokaż tylko bieżący typ dnia
-        html += `<p class="mt-2 mb-2 text-gray-700">Najbliższe kursy</p>`;
+        const buttonText = isFullView ? 'Zwiń rozkład' : 'Pełny rozkład ->';
+        html += `<div class="flex justify-between items-center mt-2 mb-2">
+                  <p class="text-gray-700">Najbliższe kursy</p>
+                  <button class="toggle-full-schedule-btn" data-route-id="${routeId}" data-full-view="${isFullView}">${buttonText}</button>
+                </div>`;
         html += generateTimesGridHtml(direction.times[currentDayType.key] || [], true, now, 5);
       }
       html += `</div>`;
     });
-
-    const buttonText = isFullView ? 'Zwiń rozkład' : 'Pokaż pełny rozkład';
-    html += `<button class="toggle-full-schedule-btn" data-route-id="${routeId}" data-full-view="${isFullView}">${buttonText}</button>`;
 
     detailsContainer.innerHTML = html;
 

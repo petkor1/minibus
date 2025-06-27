@@ -72,8 +72,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /**
-   * Główna funkcja renderująca widok rozkładu (skrócony lub pełny)
-   */
+  * Główna funkcja renderująca widok rozkładu (skrócony lub pełny)
+  */
   function renderSchedule(routeId, isFullView) {
     const route = schedulesData[routeId];
     const now = new Date();
@@ -93,7 +93,18 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       html += `<div class="schedule-direction" data-direction-name="${direction.directionName}">
-                      <h4 class="font-bold text-xl">${direction.directionName}</h4>`;
+            <h4 class="font-bold text-xl flex items-center gap-2">
+          <span class="inline-block align-middle text-blue-600" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <rect x="3" y="5" width="18" height="12" rx="3" fill="#2563eb" stroke="#2563eb" />
+              <rect x="6" y="8" width="4" height="4" rx="1" fill="#fff" />
+              <rect x="14" y="8" width="4" height="4" rx="1" fill="#fff" />
+              <circle cx="7.5" cy="17" r="1.5" fill="#1e293b"/>
+              <circle cx="16.5" cy="17" r="1.5" fill="#1e293b"/>
+            </svg>
+          </span>
+          ${direction.directionName}
+            </h4>`;
 
       if (isFullView) {
         // Pełny widok: iteruj po wszystkich typach dni
@@ -103,22 +114,29 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       } else {
         // Skrócony widok: pokaż tylko bieżący typ dnia
-        const buttonText = isFullView ? 'Zwiń rozkład' : 'Pełny rozkład ->';
         html += `<div class="flex justify-between items-center mt-2 mb-2">
-                  <p class="text-gray-700">Najbliższe kursy</p>
-                  <button class="toggle-full-schedule-btn" data-route-id="${routeId}" data-full-view="${isFullView}">${buttonText}</button>
-                </div>`;
+                <p class="text-gray-700">Najbliższe kursy dzisiaj</p>
+              </div>`;
         html += generateTimesGridHtml(direction.times[currentDayType.key] || [], true, now, 5);
       }
+
+      // Przycisk "Pełny rozkład" / "Zwiń" zawsze pod siatką godzin
+      const buttonText = isFullView ? 'Zwiń rozkład' : 'Pełny rozkład ->';
+      html += `<div class="flex justify-start mt-4">
+              <button class="toggle-full-schedule-btn data-route-id="${routeId}" data-full-view="${isFullView}">${buttonText}</button>
+            </div>`;
+
       html += `</div>`;
     });
 
     detailsContainer.innerHTML = html;
 
     // Ponowne podpięcie eventu do nowego przycisku
-    detailsContainer.querySelector('.toggle-full-schedule-btn').addEventListener('click', (e) => {
-      const currentIsFull = e.target.dataset.fullView === 'true';
-      renderSchedule(routeId, !currentIsFull);
+    detailsContainer.querySelectorAll('.toggle-full-schedule-btn').forEach(button => {
+      button.addEventListener('click', (e) => {
+        const currentIsFull = e.target.dataset.fullView === 'true';
+        renderSchedule(routeId, !currentIsFull);
+      });
     });
   }
 
@@ -127,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
    */
   function generateTimesGridHtml(timesArray, useNextDepartureLogic, now, limit = null) {
     if (timesArray.length === 0) {
-      return '<p class="text-gray-500">Brak kursów.</p>';
+      return '<p class="text-blue-600 p-4 rounded-lg border border-blue-200 bg-blue-50/50 backdrop-blur-sm shadow-sm">W tym dniu nie ma kursów</p>';
     }
 
     const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes();

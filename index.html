@@ -51,8 +51,6 @@
         font-size: 1.2em;
         color: #333;
         margin-bottom: 0.5rem;
-        /* border-bottom: 2px solid #007bff; */
-        padding-bottom: 0.5rem;
       }
       .time-grid {
         display: grid;
@@ -76,25 +74,23 @@
       }
       .toggle-full-schedule-btn {
         display: block;
-        margin: 1.5rem auto 0;
-        padding: 0.8rem 1.5rem;
+        padding: 0.4rem 1rem;
         font-size: 1em;
         font-weight: bold;
-        color: #fff;
-        background-color: #28a745;
-        border: none;
+        color: #28a745;
+        border: 1px solid #28a745;
         border-radius: 6px;
         cursor: pointer;
         transition: background-color 0.3s;
       }
       .toggle-full-schedule-btn:hover {
+        color: white;
         background-color: #218838;
       }
       #schedule-placeholder-text {
         text-align: center;
-        padding: 50px;
-        font-size: 1.2em;
-        color: #666;
+        padding: 25px;
+        font-size: 1rem;
       }
       /* Style dla mobilnej nawigacji */
       .main-nav.active {
@@ -239,8 +235,8 @@
           >
             <!-- Rozkład będzie wstrzykiwany dynamicznie przez JS -->
           </div>
-          <p id="schedule-placeholder-text">
-            Wybierz trasę, aby wyświetlić rozkład jazdy.
+          <p id="schedule-placeholder-text" class="text-blue-600 p-4 rounded-lg border border-blue-200 bg-blue-50/50 backdrop-blur-sm shadow-sm">
+            Wybierz trasę, aby wyświetlić rozkład jazdy dla obu kierunków.
           </p>
         </div>
       </section>
@@ -280,7 +276,7 @@
                 zniżką podane są w komunikatach lub u kierowcy.
               </p>
             </div>
-            <div class="download-rodo text-center pt">
+            <div class="text-center pt-10">
               <a
                 href="docs/UPOWAZNIENIE-DO-PRZEKAZYWANIA-DANYCH.pdf"
                 class="button primary bg-blue-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-blue-700 transition"
@@ -324,7 +320,7 @@
             </div>
             <div class="contact-item">
               <h3 class="text-xl font-bold mb-2">Adres</h3>
-              <p class="text-lg">ul. Stojowice 96<br />32-410 Dobczyce</p>
+              <p class="text-lg">Stojowice 96<br />32-410 Dobczyce</p>
             </div>
           </div>
         </div>

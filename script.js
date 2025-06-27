@@ -45,11 +45,25 @@ document.addEventListener('DOMContentLoaded', () => {
       const button = e.target.closest('.schedule-selector-btn');
       if (button) {
         const routeId = button.dataset.routeId;
+
+        // Remove 'active' class from all buttons and add to the clicked one
         document.querySelectorAll('.schedule-selector-btn').forEach(btn => btn.classList.remove('active'));
         button.classList.add('active');
+
+        // Render the schedule
         renderSchedule(routeId, false); // Zawsze pokazuj początkowo widok skrócony
+
+        // Show schedule details and hide placeholder
         placeholderText.classList.add('hidden');
         detailsContainer.classList.remove('hidden');
+
+        // Scroll to the schedule-details-container
+        // We already have 'detailsContainer' referenced, which is the target element.
+        if (detailsContainer) {
+          detailsContainer.scrollIntoView({
+            behavior: 'smooth' // This makes the scroll animated
+          });
+        }
       }
     });
   } else {
@@ -201,10 +215,10 @@ document.addEventListener('DOMContentLoaded', () => {
           }
 
           card.innerHTML = `
-                <h3 class="font-bold text-xl mb-2">${announcement.title}</h3>
-                <p class="text-sm text-gray-500 mb-4">${announcement.date}</p>
+                <h3 class="font-bold text-xl mb-1">${announcement.title}</h3>
+                <p class="text-sm text-gray-500 mb-6">${announcement.date}</p>
                 <div class="announcement-content text-gray-700">${displayedText}</div>
-                ${needsReadMore ? `<a class="read-more text-blue-600 hover:underline mt-auto pt-2 cursor-pointer font-semibold">Czytaj więcej</a>` : ''}
+                ${needsReadMore ? `<a class="read-more text-blue-600 hover:underline pt-2 cursor-pointer font-semibold mt-4">Czytaj więcej</a>` : ''}
             `;
           announcementsContainer.appendChild(card);
 

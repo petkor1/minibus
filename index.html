@@ -100,6 +100,14 @@
       .main-nav.active {
         display: block !important;
       }
+      .shadow-text{
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
+      }
+      .hero-bacgkround {
+        background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('img/tlo.jpg');
+        background-size: cover;
+        background-position: center;
+      }
     </style>
   </head>
   <body class="bg-gray-50">
@@ -172,22 +180,22 @@
     <main>
       <section
         id="hero-section"
-        class="hero-section bg-blue-600 text-white text-center py-20"
+        class="hero-section text-white text-center py-20 bg-cover bg-center hero-bacgkround"
       >
         <div class="container mx-auto px-4"></div>
-          <h1 class="text-4xl md:text-5xl font-bold mb-4">
+          <h1 class="text-4xl md:text-5xl font-bold mb-4 shadow-text">
         MINIBUS-ZP - Podróż każdego dnia
           </h1>
           <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mt-8 px-4">
         <a
           href="#schedules-section"
           class="button primary bg-white text-blue-600 font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-gray-100 transition w-full sm:w-auto sm:px-4"
-          >Sprawdź Rozkład</a
+          >Sprawdź rozkład</a
         >
         <a
           href="#announcements-section"
           class="button secondary bg-blue-500 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-blue-400 transition w-full sm:w-auto sm:px-4"
-          >Zobacz Komunikaty</a
+          >Zobacz komunikaty</a
         >
           </div>
         </div>
@@ -197,17 +205,17 @@
         id="announcements-section"
         class="section announcements-section py-16"
       >
-        <div class="container mx-auto px-4">
+        <div class="container mx-auto px-4 max-w-4xl">
           <h2 class="text-3xl font-bold text-center mb-10">
-            Najnowsze Komunikaty
+        Najnowsze komunikaty
           </h2>
           <div
-            class="announcements-grid grid grid-cols-1 md:grid-cols-3 auto-cols-fr gap-8"
-            id="announcements-container"
+        class="announcements-grid grid grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-8"
+        id="announcements-container"
           >
-            <p class="text-center col-span-full text-xl py-20">
-              Ładowanie komunikatów...
-            </p>
+        <p class="text-center col-span-full text-xl py-20">
+          Ładowanie komunikatów...
+        </p>
           </div>
         </div>
       </section>
@@ -218,7 +226,7 @@
         class="section schedules-section py-16 bg-gray-100"
       >
         <div class="container mx-auto px-4">
-          <h2 class="text-3xl font-bold text-center mb-10">Rozkłady Jazdy</h2>
+          <h2 class="text-3xl font-bold text-center mb-10">Rozkłady jazdy</h2>
           <!-- Kontener na przyciski wyboru trasy -->
           <div id="schedule-selector-container" class="schedule-selector-grid">
             <!-- Przyciski będą generowane dynamicznie przez JS -->
@@ -240,7 +248,7 @@
       <section id="tickets-section" class="section tickets-section py-16">
         <div class="container mx-auto px-4 max-w-4xl">
           <h2 class="text-3xl font-bold text-center mb-10">
-            Bilety i Często Zadawane Pytania (FAQ)
+            Bilety miesięczne (FAQ)
           </h2>
           <div class="space-y-6">
             <div class="faq-item bg-white p-6 rounded-lg shadow">
@@ -250,17 +258,17 @@
               <p>
                 Bilety miesięczne dostępne są w punkcie sprzedaży na Dworcu
                 Dekada w Myślenicach, stanowisko nr 8, od 25. dnia poprzedniego
-                miesiąca. Godziny otwarcia: 10:00 - 17:00.
+                miesiąca. Terminy sprzedaży biletów miesięcznych są publikowane w komunikatach.
               </p>
             </div>
             <div class="faq-item bg-white p-6 rounded-lg shadow">
               <h3 class="font-bold text-xl mb-2">
                 Czy mogę kupić bilet u kierowcy?
               </h3>
-              <p>
-                Tak, bilety jednorazowe są dostępne u kierowcy podczas wsiadania
-                do busa. Płatność tylko gotówką.
-              </p>
+                <p>
+                Bilety miesięczne dostępne są w punkcie sprzedaży na Dworcu
+                Dekada w Myślenicach. Terminy sprzedaży biletów miesięcznych są publikowane w komunikatach. 
+                </p>
             </div>
             <div class="faq-item bg-white p-6 rounded-lg shadow">
               <h3 class="font-bold text-xl mb-2">
@@ -269,10 +277,10 @@
               <p>
                 Tak, oferujemy zniżki dla uczniów i studentów po okazaniu ważnej
                 legitymacji szkolnej/studenckiej. Ceny biletów miesięcznych ze
-                zniżką podane są w komunikatach.
+                zniżką podane są w komunikatach lub u kierowcy.
               </p>
             </div>
-            <div class="download-rodo text-center mt-10">
+            <div class="download-rodo text-center pt-10">
               <a
                 href="docs/UPOWAZNIENIE-DO-PRZEKAZYWANIA-DANYCH.pdf"
                 class="button primary bg-blue-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-blue-700 transition"

@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (isFullView) {
         // Pełny widok: iteruj po wszystkich typach dni
         dayTypes.forEach(dayType => {
-          html += `<p class="font-semibold mt-4 mb-2 text-gray-700">${dayType.displayName}</p>`;
+          html += `<p class="mt-4 mb-4 text-gray-700">${dayType.displayName}</p>`;
           html += generateTimesGridHtml(direction.times[dayType.key] || [], false, now);
         });
       } else {
@@ -149,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (departures.length === 0) {
-      return '<p class="text-gray-500">Brak kolejnych kursów w tym dniu.</p>';
+      return '<p class="text-blue-600 p-4 rounded-lg border border-blue-200 bg-blue-50/50 backdrop-blur-sm shadow-sm">W tym dniu nie ma już dostępnych kursów dla tego kierunku.</p>';
     }
 
     const timesHtml = departures.map(time =>

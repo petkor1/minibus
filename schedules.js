@@ -71,7 +71,7 @@ const schedulesData = {
             {
                 directionName: "Myślenice Dworzec → Gdów",
                 times: {
-                    workdays: ["06:30", "08:30", "10:30", "12:30", "14:30", "16:30"],
+                    workdays: ["06:30", "08:30", "10:30", "12:30"],
                     saturdays: ["07:30", "11:30", "15:30"],
                     sundays: []
                 }

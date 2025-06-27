@@ -94,9 +94,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
       html += `<div class="schedule-direction" data-direction-name="${direction.directionName}">
             <h4 class="font-bold text-xl flex items-center gap-2">
-          <span class="inline-block align-middle text-blue-600" aria-hidden="true">
+          <span class="inline-block align-middle text-orange-600" aria-hidden="true">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <rect x="3" y="5" width="18" height="12" rx="3" fill="#2563eb" stroke="#2563eb" />
+              <rect x="3" y="5" width="18" height="12" rx="3" fill="#c2410c" stroke="#c2410c" />
               <rect x="6" y="8" width="4" height="4" rx="1" fill="#fff" />
               <rect x="14" y="8" width="4" height="4" rx="1" fill="#fff" />
               <circle cx="7.5" cy="17" r="1.5" fill="#1e293b"/>
@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           // Add red border to first announcement
           if (index === 0) {
-            card.style.borderLeft = '3px solid red';
+            card.style.borderLeft = '3px solid #c2410c';
           }
 
           const formattedFullText = formatTextWithMarkdown(announcement.text);
@@ -243,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <h3 class="font-bold text-xl mb-1">${announcement.title}</h3>
                 <p class="text-sm text-gray-500 mb-6">${announcement.date}</p>
                 <div class="announcement-content text-gray-700">${displayedText}</div>
-                ${needsReadMore ? `<a class="read-more text-blue-600 hover:underline pt-2 cursor-pointer font-semibold mt-4">Czytaj więcej</a>` : ''}
+                ${needsReadMore ? `<a class="read-more text-orange-700 hover:underline pt-2 cursor-pointer font-semibold mt-4">Czytaj więcej</a>` : ''}
             `;
           announcementsContainer.appendChild(card);
 

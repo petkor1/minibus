@@ -19,7 +19,7 @@ const schedulesData = {
         validFrom: "01.07.2025",
         directions: [
             {
-                directionName: "Myślenice Dworzec → Dobczyce",
+                directionName: "Myślenice → Dobczyce",
                 // Godziny odjazdów w dni robocze
                 times: {
                     workdays: [
@@ -44,7 +44,7 @@ const schedulesData = {
                 }
             },
             {
-                directionName: "Dobczyce → Myślenice Dworzec",
+                directionName: "Dobczyce → Myślenice",
                 times: {
                     workdays: [
                         "05:15", "05:30", "05:45", "06:15", "06:30", "06:45",

@@ -57,11 +57,12 @@ document.addEventListener('DOMContentLoaded', () => {
         placeholderText.classList.add('hidden');
         detailsContainer.classList.remove('hidden');
 
-        // Scroll to the schedule-details-container
-        // We already have 'detailsContainer' referenced, which is the target element.
+        // Scroll to 60px above the schedule-details-container
         if (detailsContainer) {
-          detailsContainer.scrollIntoView({
-            behavior: 'smooth' // This makes the scroll animated
+          const targetPosition = detailsContainer.getBoundingClientRect().top + window.pageYOffset - 70;
+          window.scrollTo({
+            top: targetPosition,
+            behavior: 'smooth'
           });
         }
       }
@@ -83,11 +84,11 @@ document.addEventListener('DOMContentLoaded', () => {
       { key: 'sundays', displayName: 'Niedziele i Święta' }
     ];
 
-    let html = `<p class="text-center text-gray-600 mb-6"><strong>Obowiązuje od:</strong> ${route.validFrom}</p>`;
+    let html = '';
 
     route.directions.forEach(direction => {
       html += `<div class="schedule-direction" data-direction-name="${direction.directionName}">
-                      <h4 class="font-bold text-xl mb-3">${direction.directionName}</h4>`;
+                      <h4 class="font-bold text-xl">${direction.directionName}</h4>`;
 
       if (isFullView) {
         // Pełny widok: iteruj po wszystkich typach dni
@@ -97,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       } else {
         // Skrócony widok: pokaż tylko bieżący typ dnia
-        html += `<p class="mt-4 mb-2 text-gray-700">Najbliższe kursy</p>`;
+        html += `<p class="mt-2 mb-2 text-gray-700">Najbliższe kursy</p>`;
         html += generateTimesGridHtml(direction.times[currentDayType.key] || [], true, now, 5);
       }
       html += `</div>`;

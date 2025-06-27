@@ -158,7 +158,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isFullView && scrollToDirection) {
       const targetElement = document.getElementById(scrollToDirection);
       if (targetElement) {
-        targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const yOffset = -70; // wysokość offsetu w px (możesz dostosować)
+        const y = targetElement.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
       }
     }
   }

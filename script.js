@@ -92,12 +92,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (isFullView) {
         // Pełny widok: iteruj po wszystkich typach dni
         dayTypes.forEach(dayType => {
-          html += `<h5 class="font-semibold text-lg mt-4 mb-2 text-gray-700">${dayType.displayName}</h5>`;
+          html += `<p class="font-semibold mt-4 mb-2 text-gray-700">${dayType.displayName}</p>`;
           html += generateTimesGridHtml(direction.times[dayType.key] || [], false, now);
         });
       } else {
         // Skrócony widok: pokaż tylko bieżący typ dnia
-        html += `<h5 class="font-semibold text-lg mb-3 text-gray-700 day-type-display">${currentDayType.displayName} - najbliższe kursy</h5>`;
+        html += `<p class="mt-4 mb-2 text-gray-700">Najbliższe kursy</p>`;
         html += generateTimesGridHtml(direction.times[currentDayType.key] || [], true, now, 5);
       }
       html += `</div>`;

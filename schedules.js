@@ -64,8 +64,8 @@ const schedulesData = {
             }
         ]
     },
-    "myslenice-gdow1": {
-        routeName: "Myślenice &lt;–&gt; Gdów",
+    "myslenice-gdowek": {
+        routeName: "Myślenice &lt;–&gt; Gdówek",
         validFrom: "01.09.2024",
         directions: [
             {

@@ -72,8 +72,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /**
- * Główna funkcja renderująca widok rozkładu (skrócony lub pełny)
- */
+   * Główna funkcja renderująca widok rozkładu (skrócony lub pełny)
+   */
   function renderSchedule(routeId, isFullView, scrollToDirection = null) { // Dodajemy parametr scrollToDirection
     const route = schedulesData[routeId];
     const now = new Date();
@@ -139,9 +139,18 @@ document.addEventListener('DOMContentLoaded', () => {
     detailsContainer.querySelectorAll('.toggle-full-schedule-btn').forEach(button => {
       button.addEventListener('click', (e) => {
         const currentIsFull = e.target.dataset.fullView === 'true';
-        const targetDirectionId = e.target.dataset.directionId; // Pobieramy ID kierunku
-        // Przekazujemy ID kierunku, do którego ma nastąpić przewinięcie
+        const targetDirectionId = e.target.dataset.directionId;
         renderSchedule(routeId, !currentIsFull, targetDirectionId);
+
+        // Nowa logika: jeśli po kliknięciu przechodzimy do widoku skróconego, przewiń do sekcji schedules-section
+        if (currentIsFull) {
+          const schedulesSection = document.getElementById('schedules-section');
+          if (schedulesSection) {
+            setTimeout(() => {
+              schedulesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100); // małe opóźnienie, by zdążył się wyrenderować nowy widok
+          }
+        }
       });
     });
 

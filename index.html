@@ -4,148 +4,342 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MINIBUS-ZP | Rozkłady Jazdy | Komunikaty</title>
-    <link rel="stylesheet" href="style.css" />
     <link
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Roboto+Mono&display=swap"
       rel="stylesheet"
     />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* Dostosowanie Tailwind CSS */
+      body {
+        font-family: "Roboto", sans-serif;
+      }
+      .schedule-selector-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+      .schedule-selector-btn {
+        background-color: #f0f0f0;
+        border: 1px solid #ddd;
+        padding: 1rem;
+        border-radius: 8px;
+        text-align: center;
+        font-size: 1.1em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s, box-shadow 0.3s;
+      }
+      .schedule-selector-btn:hover,
+      .schedule-selector-btn.active {
+        background-color: #007bff;
+        color: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      .schedule-details-container {
+        margin-top: 2rem;
+        padding: 1.5rem;
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      }
+      .schedule-direction {
+        margin-bottom: 2rem;
+      }
+      .schedule-direction h4 {
+        font-size: 1.5em;
+        color: #333;
+        margin-bottom: 1rem;
+        border-bottom: 2px solid #007bff;
+        padding-bottom: 0.5rem;
+      }
+      .time-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+        gap: 0.75rem;
+      }
+      .time-box {
+        background-color: #f9f9f9;
+        padding: 0.5rem;
+        border-radius: 6px;
+        text-align: center;
+        font-family: "Roboto Mono", monospace;
+        font-size: 1.1em;
+        border: 1px solid #eee;
+      }
+      .time-box.next-departure {
+        background-color: #d4edda; /* zielony */
+        color: #155724;
+        font-weight: bold;
+        border-color: #c3e6cb;
+      }
+      .toggle-full-schedule-btn {
+        display: block;
+        margin: 1.5rem auto 0;
+        padding: 0.8rem 1.5rem;
+        font-size: 1em;
+        font-weight: bold;
+        color: #fff;
+        background-color: #28a745;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      .toggle-full-schedule-btn:hover {
+        background-color: #218838;
+      }
+      #schedule-placeholder-text {
+        text-align: center;
+        padding: 50px;
+        font-size: 1.2em;
+        color: #666;
+      }
+      /* Style dla mobilnej nawigacji */
+      .main-nav.active {
+        display: block !important;
+      }
+    </style>
   </head>
-  <body>
-    <header class="main-header">
-      <div class="container header-content">
-        <div class="logo">
+  <body class="bg-gray-50">
+    <header class="main-header bg-white shadow-md sticky top-0 z-50">
+      <div
+        class="container mx-auto flex justify-between items-center p-4 header-content"
+      >
+        <div class="logo text-2xl font-bold text-blue-600 min-w-[150px]">
           <a href="#">MINIBUS-ZP</a>
         </div>
-        <nav class="main-nav">
-          <ul>
+        <nav
+          class="main-nav hidden md:flex absolute md:relative top-full left-0 w-full bg-white md:bg-transparent shadow-md md:shadow-none justify-center flex-1"
+        >
+          <ul
+            class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-8 p-4 md:p-0"
+          >
             <li>
-              <a href="#schedules-section" class="active">Rozkłady Jazdy</a>
+              <a
+                href="#schedules-section"
+                class="text-gray-600 hover:text-blue-600 pb-1 border-b-2 border-transparent hover:border-blue-600 transition whitespace-nowrap"
+                >Rozkłady Jazdy</a
+              >
             </li>
-            <li><a href="#announcements-section">Komunikaty</a></li>
-            <li><a href="#tickets-section">Bilety & FAQ</a></li>
-            <li><a href="#contact-section">Kontakt</a></li>
+            <li>
+              <a
+                href="#announcements-section"
+                class="text-gray-600 hover:text-blue-600 pb-1 border-b-2 border-transparent hover:border-blue-600 transition whitespace-nowrap"
+                >Komunikaty</a
+              >
+            </li>
+            <li>
+              <a
+                href="#tickets-section"
+                class="text-gray-600 hover:text-blue-600 pb-1 border-b-2 border-transparent hover:border-blue-600 transition whitespace-nowrap"
+                >Bilety & FAQ</a
+              >
+            </li>
+            <li>
+              <a
+                href="#contact-section"
+                class="text-gray-600 hover:text-blue-600 pb-1 border-b-2 border-transparent hover:border-blue-600 transition whitespace-nowrap"
+                >Kontakt</a
+              >
+            </li>
+            <li class="md:hidden">
+              <a
+                href="tel:+48604619863"
+                class="text-lg font-semibold text-blue-600 whitespace-nowrap"
+                >+48 604 619 863</a
+              >
+            </li>
           </ul>
         </nav>
-        <div class="contact-info">
-          <a href="tel:+48604619863">+48 604 619 863</a>
+        <div class="contact-info hidden lg:block min-w-[150px] text-right">
+          <a
+            href="tel:+48604619863"
+            class="text-lg font-semibold text-blue-600 whitespace-nowrap"
+            >+48 604 619 863</a
+          >
         </div>
-        <button class="mobile-nav-toggle" aria-label="Toggle navigation">
+        <button
+          class="mobile-nav-toggle md:hidden text-3xl z-50"
+          aria-label="Toggle navigation"
+        >
           ☰
         </button>
       </div>
     </header>
 
-    <section id="hero-section" class="hero-section">
-      <div class="container">
-        <h1>MINIBUS-ZP - Podróż każdego dnia</h1>
-        <a href="#schedules-section" class="button primary">Sprawdź Rozkład</a>
-        <a href="#announcements-section" class="button secondary"
-          >Zobacz Komunikaty</a
-        >
-      </div>
-    </section>
-
-    <section id="announcements-section" class="section announcements-section">
-      <div class="container">
-        <h2>Najnowsze Komunikaty</h2>
-        <div class="announcements-grid" id="announcements-container">
-          <p style="text-align: center">Ładowanie komunikatów...</p>
+    <main>
+      <section
+        id="hero-section"
+        class="hero-section bg-blue-600 text-white text-center py-20"
+      >
+        <div class="container mx-auto">
+          <h1 class="text-4xl md:text-5xl font-bold mb-4">
+            MINIBUS-ZP - Podróż każdego dnia
+          </h1>
+          <div class="space-x-4 mt-8">
+            <a
+              href="#schedules-section"
+              class="button primary bg-white text-blue-600 font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-gray-100 transition"
+              >Sprawdź Rozkład</a
+            >
+            <a
+              href="#announcements-section"
+              class="button secondary bg-blue-500 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-blue-400 transition"
+              >Zobacz Komunikaty</a
+            >
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <section id="schedules-section" class="section schedules-section">
-      <div class="container">
-        <!-- <h2>Rozkłady Jazdy</h2>
-            <div class="schedule-links-grid">
-                <a href="data/schedules/myslenice-gdow.html" class="schedule-link">Myślenice &lt;–&gt Gdów</a>
-                <a href="data/schedules/myslenice-dobczyce.html" class="schedule-link">Myślenice &lt;–&gt Dobczyce</a>
-            </div>
-            <div class="schedule-content" id="schedule-details">
-                <p style="text-align: center; padding: 50px;">Wybierz trasę, aby wyświetlić rozkład jazdy.</p>
-            </div> -->
-        <h2>Rozkłady Jazdy</h2>
-        <div class="schedule-placeholder">
-          <p style="text-align: center; padding: 50px; font-size: 1.2em">
-            Strona w budowie. Rozkłady jazdy będą dostępne wkrótce. Dziękujemy
-            za cierpliwość!
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <section id="tickets-section" class="section tickets-section">
-      <div class="container">
-        <h2>Bilety i Często Zadawane Pytania (FAQ)</h2>
-
-        <div class="faq-item">
-          <h3>Jak kupić bilet miesięczny?</h3>
-          <p>
-            Bilety miesięczne dostępne są w punkcie sprzedaży na Dworcu Dekada w
-            Myślenicach, stanowisko nr 8, od 25. dnia poprzedniego miesiąca.
-            Godziny otwarcia: 10:00 - 17:00.
-          </p>
-        </div>
-
-        <div class="faq-item">
-          <h3>Czy mogę kupić bilet u kierowcy?</h3>
-          <p>
-            Tak, bilety jednorazowe są dostępne u kierowcy podczas wsiadania do
-            busa. Płatność tylko gotówką.
-          </p>
-        </div>
-
-        <div class="faq-item">
-          <h3>Czy są zniżki dla uczniów/studentów?</h3>
-          <p>
-            Tak, oferujemy zniżki dla uczniów i studentów po okazaniu ważnej
-            legitymacji szkolnej/studenckiej. Ceny biletów miesięcznych ze
-            zniżką podane są w komunikatach.
-          </p>
-        </div>
-
-        <div class="download-rodo">
-          <a
-            href="docs/UPOWAZNIENIE-DO-PRZEKAZYWANIA-DANYCH.pdf"
-            class="button primary download-button"
-            target="_blank"
-            download
-            >Pobierz formularz RODO</a
+      <section
+        id="announcements-section"
+        class="section announcements-section py-16"
+      >
+        <div class="container mx-auto px-4">
+          <h2 class="text-3xl font-bold text-center mb-10">
+            Najnowsze Komunikaty
+          </h2>
+          <div
+            class="announcements-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            id="announcements-container"
           >
-        </div>
-      </div>
-    </section>
-
-    <section id="contact-section" class="section contact-section">
-      <div class="container">
-        <h2>Kontakt</h2>
-        <div class="contact-info-grid">
-          <div class="contact-item">
-            <h3>Telefon</h3>
-            <p><a href="tel:+48604619863">+48 604 619 863</a></p>
-          </div>
-          <div class="contact-item">
-            <h3>Email</h3>
-            <p>
-              <a href="mailto:minibus@and.pl">minibus@and.pl</a>
-            </p>
-          </div>
-          <div class="contact-item">
-            <h3>Adres</h3>
-            <p>ul. Stojowice 96</p>
-            <p>32-410 Dobczyce</p>
+            <p class="text-center col-span-full">Ładowanie komunikatów...</p>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <footer class="main-footer">
-      <div class="container footer-content">
-        <nav class="footer-nav">
-          <ul>
-            <li><a href="#schedules-section">Rozkłady Jazdy</a></li>
-            <li><a href="#announcements-section">Komunikaty</a></li>
-            <li><a href="#tickets-section">Bilety & FAQ</a></li>
+      <!-- Sekcja Rozkładów Jazdy - ZMODERNIZOWANA -->
+      <section
+        id="schedules-section"
+        class="section schedules-section py-16 bg-gray-100"
+      >
+        <div class="container mx-auto px-4">
+          <h2 class="text-3xl font-bold text-center mb-10">Rozkłady Jazdy</h2>
+          <!-- Kontener na przyciski wyboru trasy -->
+          <div id="schedule-selector-container" class="schedule-selector-grid">
+            <!-- Przyciski będą generowane dynamicznie przez JS -->
+          </div>
+
+          <!-- Kontener do wyświetlania szczegółów rozkładu -->
+          <div
+            id="schedule-details-container"
+            class="schedule-details-container hidden"
+          >
+            <!-- Rozkład będzie wstrzykiwany dynamicznie przez JS -->
+          </div>
+          <p id="schedule-placeholder-text">
+            Wybierz trasę, aby wyświetlić rozkład jazdy.
+          </p>
+        </div>
+      </section>
+
+      <section id="tickets-section" class="section tickets-section py-16">
+        <div class="container mx-auto px-4 max-w-4xl">
+          <h2 class="text-3xl font-bold text-center mb-10">
+            Bilety i Często Zadawane Pytania (FAQ)
+          </h2>
+          <div class="space-y-6">
+            <div class="faq-item bg-white p-6 rounded-lg shadow">
+              <h3 class="font-bold text-xl mb-2">
+                Jak kupić bilet miesięczny?
+              </h3>
+              <p>
+                Bilety miesięczne dostępne są w punkcie sprzedaży na Dworcu
+                Dekada w Myślenicach, stanowisko nr 8, od 25. dnia poprzedniego
+                miesiąca. Godziny otwarcia: 10:00 - 17:00.
+              </p>
+            </div>
+            <div class="faq-item bg-white p-6 rounded-lg shadow">
+              <h3 class="font-bold text-xl mb-2">
+                Czy mogę kupić bilet u kierowcy?
+              </h3>
+              <p>
+                Tak, bilety jednorazowe są dostępne u kierowcy podczas wsiadania
+                do busa. Płatność tylko gotówką.
+              </p>
+            </div>
+            <div class="faq-item bg-white p-6 rounded-lg shadow">
+              <h3 class="font-bold text-xl mb-2">
+                Czy są zniżki dla uczniów/studentów?
+              </h3>
+              <p>
+                Tak, oferujemy zniżki dla uczniów i studentów po okazaniu ważnej
+                legitymacji szkolnej/studenckiej. Ceny biletów miesięcznych ze
+                zniżką podane są w komunikatach.
+              </p>
+            </div>
+            <div class="download-rodo text-center mt-10">
+              <a
+                href="docs/UPOWAZNIENIE-DO-PRZEKAZYWANIA-DANYCH.pdf"
+                class="button primary bg-blue-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-blue-700 transition"
+                target="_blank"
+                download
+                >Pobierz formularz RODO</a
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section
+        id="contact-section"
+        class="section contact-section py-16 bg-gray-800 text-white"
+      >
+        <div class="container mx-auto px-4">
+          <h2 class="text-3xl font-bold text-center mb-10">Kontakt</h2>
+          <div
+            class="contact-info-grid grid grid-cols-1 md:grid-cols-3 gap-8 text-center"
+          >
+            <div class="contact-item">
+              <h3 class="text-xl font-bold mb-2">Telefon</h3>
+              <p>
+                <a
+                  href="tel:+48604619863"
+                  class="text-blue-300 hover:text-blue-200 text-lg"
+                  >+48 604 619 863</a
+                >
+              </p>
+            </div>
+            <div class="contact-item">
+              <h3 class="text-xl font-bold mb-2">Email</h3>
+              <p>
+                <a
+                  href="mailto:minibus@and.pl"
+                  class="text-blue-300 hover:text-blue-200 text-lg"
+                  >minibus@and.pl</a
+                >
+              </p>
+            </div>
+            <div class="contact-item">
+              <h3 class="text-xl font-bold mb-2">Adres</h3>
+              <p class="text-lg">ul. Stojowice 96<br />32-410 Dobczyce</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="main-footer bg-gray-900 text-gray-400 py-8">
+      <div class="container mx-auto footer-content text-center">
+        <nav class="footer-nav mb-4">
+          <ul class="flex justify-center space-x-6">
+            <li>
+              <a href="#schedules-section" class="hover:text-white"
+                >Rozkłady Jazdy</a
+              >
+            </li>
+            <li>
+              <a href="#announcements-section" class="hover:text-white"
+                >Komunikaty</a
+              >
+            </li>
+            <li>
+              <a href="#tickets-section" class="hover:text-white"
+                >Bilety & FAQ</a
+              >
+            </li>
           </ul>
         </nav>
         <p class="copyright">
@@ -157,6 +351,9 @@
         </p>
       </div>
     </footer>
+
+    <!-- Pliki JS muszą być na końcu, w tej kolejności -->
+    <script src="schedules.js"></script>
     <script src="script.js"></script>
   </body>
 </html>

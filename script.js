@@ -1,10 +1,8 @@
-
 document.addEventListener('DOMContentLoaded', () => {
-  // Smooth scrolling for navigation links
+  // --- OBSŁUGA NAWIGACJI ---
+  const mobileNavToggle = document.querySelector('.mobile-nav-toggle');
+  const mainNav = document.querySelector('.main-nav');
   const navLinks = document.querySelectorAll('a[href^="#"]');
-
-  // Remove active class from all links initially
-  navLinks.forEach(link => link.classList.remove('active'));
 
   navLinks.forEach(anchor => {
     anchor.addEventListener('click', function (e) {
@@ -13,65 +11,152 @@ document.addEventListener('DOMContentLoaded', () => {
       if (targetElement) {
         e.preventDefault();
         targetElement.scrollIntoView({ behavior: 'smooth' });
-
-        // Update active state
-        navLinks.forEach(link => link.classList.remove('active'));
-        this.classList.add('active');
-
-        // Close mobile menu if open
-        const mainNav = document.querySelector('.main-nav');
-        const body = document.body;
-        if (body.classList.contains('mobile-nav-open')) {
-          body.classList.remove('mobile-nav-open');
+        if (mainNav.classList.contains('active')) {
           mainNav.classList.remove('active');
         }
       }
     });
   });
 
-  // Mobile navigation toggle
-  const mobileNavToggle = document.querySelector('.mobile-nav-toggle');
-  const mainNav = document.querySelector('.main-nav');
-  const body = document.body;
-
   if (mobileNavToggle && mainNav) {
     mobileNavToggle.addEventListener('click', () => {
       mainNav.classList.toggle('active');
-      body.classList.toggle('mobile-nav-open');
     });
   }
 
-  // Dynamic schedule loading from external HTML files
-  const scheduleLinksContainer = document.querySelector('.schedule-links-grid');
-  const scheduleContentDiv = document.getElementById('schedule-details');
+  // --- LOGIKA ROZKŁADÓW JAZDY ---
+  const selectorContainer = document.getElementById('schedule-selector-container');
+  const detailsContainer = document.getElementById('schedule-details-container');
+  const placeholderText = document.getElementById('schedule-placeholder-text');
 
-  if (scheduleLinksContainer && scheduleContentDiv) {
-    scheduleLinksContainer.addEventListener('click', async (event) => {
-      const targetLink = event.target.closest('.schedule-link');
-      if (targetLink) {
-        event.preventDefault();
+  if (typeof schedulesData !== 'undefined' && selectorContainer && detailsContainer) {
+    // Generowanie przycisków wyboru trasy
+    Object.keys(schedulesData).forEach(routeId => {
+      const route = schedulesData[routeId];
+      const button = document.createElement('button');
+      button.className = 'schedule-selector-btn';
+      button.innerHTML = route.routeName;
+      button.dataset.routeId = routeId;
+      selectorContainer.appendChild(button);
+    });
 
-        document.querySelectorAll('.schedule-link').forEach(link => link.classList.remove('active'));
-        targetLink.classList.add('active');
-
-        const scheduleUrl = targetLink.getAttribute('href');
-        scheduleContentDiv.innerHTML = '<p style="text-align: center; padding: 50px;">Ładowanie rozkładu jazdy...</p>';
-
-        try {
-          const response = await fetch(scheduleUrl);
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          const scheduleHtml = await response.text();
-          scheduleContentDiv.innerHTML = scheduleHtml;
-        } catch (error) {
-          scheduleContentDiv.innerHTML = '<p style="text-align: center; padding: 50px; color: red;">Niestety, nie udało się załadować tego rozkładu jazdy.</p>';
-        }
+    // Obsługa kliknięcia w trasę
+    selectorContainer.addEventListener('click', (e) => {
+      const button = e.target.closest('.schedule-selector-btn');
+      if (button) {
+        const routeId = button.dataset.routeId;
+        document.querySelectorAll('.schedule-selector-btn').forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        renderSchedule(routeId, false); // Zawsze pokazuj początkowo widok skrócony
+        placeholderText.classList.add('hidden');
+        detailsContainer.classList.remove('hidden');
       }
     });
+  } else {
+    if (placeholderText) placeholderText.textContent = "Błąd ładowania modułu rozkładów jazdy.";
   }
 
-  // Simple Markdown-like formatter for announcements
+  /**
+   * Główna funkcja renderująca widok rozkładu (skrócony lub pełny)
+   */
+  function renderSchedule(routeId, isFullView) {
+    const route = schedulesData[routeId];
+    const now = new Date();
+    const currentDayType = getDayType(now);
+    const dayTypes = [
+      { key: 'workdays', displayName: 'Dni Robocze' },
+      { key: 'saturdays', displayName: 'Soboty' },
+      { key: 'sundays', displayName: 'Niedziele i Święta' }
+    ];
+
+    let html = `<p class="text-center text-gray-600 mb-6"><strong>Obowiązuje od:</strong> ${route.validFrom}</p>`;
+
+    route.directions.forEach(direction => {
+      html += `<div class="schedule-direction" data-direction-name="${direction.directionName}">
+                      <h4 class="font-bold text-xl mb-3">${direction.directionName}</h4>`;
+
+      if (isFullView) {
+        // Pełny widok: iteruj po wszystkich typach dni
+        dayTypes.forEach(dayType => {
+          html += `<h5 class="font-semibold text-lg mt-4 mb-2 text-gray-700">${dayType.displayName}</h5>`;
+          html += generateTimesGridHtml(direction.times[dayType.key] || [], false, now);
+        });
+      } else {
+        // Skrócony widok: pokaż tylko bieżący typ dnia
+        html += `<h5 class="font-semibold text-lg mb-3 text-gray-700 day-type-display">${currentDayType.displayName}</h5>`;
+        html += generateTimesGridHtml(direction.times[currentDayType.key] || [], true, now, 5);
+      }
+      html += `</div>`;
+    });
+
+    const buttonText = isFullView ? 'Zwiń rozkład' : 'Pokaż pełny rozkład';
+    html += `<button class="toggle-full-schedule-btn" data-route-id="${routeId}" data-full-view="${isFullView}">${buttonText}</button>`;
+
+    detailsContainer.innerHTML = html;
+
+    // Ponowne podpięcie eventu do nowego przycisku
+    detailsContainer.querySelector('.toggle-full-schedule-btn').addEventListener('click', (e) => {
+      const currentIsFull = e.target.dataset.fullView === 'true';
+      renderSchedule(routeId, !currentIsFull);
+    });
+  }
+
+  /**
+   * Generuje siatkę z godzinami odjazdów
+   */
+  function generateTimesGridHtml(timesArray, useNextDepartureLogic, now, limit = null) {
+    if (timesArray.length === 0) {
+      return '<p class="text-gray-500">Brak kursów.</p>';
+    }
+
+    const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes();
+    let foundNext = false;
+
+    let departures = timesArray.map(timeStr => {
+      const [h, m] = timeStr.split(':').map(Number);
+      return { time: timeStr, totalMinutes: h * 60 + m };
+    });
+
+    if (useNextDepartureLogic) {
+      departures = departures
+        .filter(timeObj => timeObj.totalMinutes >= currentTimeInMinutes)
+        .map(timeObj => {
+          let isNext = false;
+          if (!foundNext && timeObj.totalMinutes >= currentTimeInMinutes) {
+            isNext = true;
+            foundNext = true;
+          }
+          return { ...timeObj, isNext };
+        });
+      if (limit) {
+        departures = departures.slice(0, limit);
+      }
+    }
+
+    if (departures.length === 0) {
+      return '<p class="text-gray-500">Brak kolejnych kursów w tym dniu.</p>';
+    }
+
+    const timesHtml = departures.map(time =>
+      `<div class="time-box ${time.isNext ? 'next-departure' : ''}">${time.time}</div>`
+    ).join('');
+
+    return `<div class="time-grid">${timesHtml}</div>`;
+  }
+
+  /**
+   * Określa typ dnia
+   */
+  function getDayType(date) {
+    const day = date.getDay();
+    if (day === 0) return { key: 'sundays', displayName: 'Niedziele i Święta' };
+    if (day === 6) return { key: 'saturdays', displayName: 'Soboty' };
+    return { key: 'workdays', displayName: 'Dni Robocze' };
+  }
+
+  // --- PRZYWRÓCONA LOGIKA ŁADOWANIA KOMUNIKATÓW ---
+  const announcementsContainer = document.getElementById('announcements-container');
+
   function formatTextWithMarkdown(text) {
     if (!text) return '';
     let formattedText = text.replace(/\n/g, '<br>');
@@ -79,72 +164,64 @@ document.addEventListener('DOMContentLoaded', () => {
     return formattedText;
   }
 
-  // Load announcements from external JSON file
-  const announcementsContainer = document.getElementById('announcements-container');
   if (announcementsContainer) {
     fetch('announcements.json')
       .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         return response.json();
       })
       .then(announcements => {
-        announcementsContainer.innerHTML = ''; // Clear loading message
-
+        announcementsContainer.innerHTML = '';
         if (!announcements || announcements.length === 0) {
-          announcementsContainer.innerHTML = '<p>Brak dostępnych komunikatów.</p>';
-        } else {
-          const TRUNCATE_LENGTH = 250;
-
-          announcements.forEach(announcement => {
-            const card = document.createElement('div');
-            card.classList.add('announcement-card');
-
-            const formattedFullText = formatTextWithMarkdown(announcement.text);
-            const plainText = announcement.text.replace(/\*\*([^*]+)\*\*/g, '$1').replace(/\n/g, ' ');
-
-            let displayedText = formattedFullText;
-            let needsReadMore = false;
-
-            if (plainText.length > TRUNCATE_LENGTH) {
-              // Find a good place to cut the text
-              let cutIndex = plainText.lastIndexOf(' ', TRUNCATE_LENGTH);
-              if (cutIndex === -1) cutIndex = TRUNCATE_LENGTH;
-
-              displayedText = formatTextWithMarkdown(announcement.text.substring(0, cutIndex)) + '...';
-              needsReadMore = true;
-            }
-
-            card.innerHTML = `
-              <h3>${announcement.title}</h3>
-              <p class="date">${announcement.date}</p>
-              <div class="announcement-content">${displayedText}</div>
-              ${needsReadMore ?
-                `<a class="read-more">Czytaj więcej</a>` : ''
-              }
-            `;
-            announcementsContainer.appendChild(card);
-
-            if (needsReadMore) {
-              const readMoreBtn = card.querySelector('.read-more');
-              const contentDiv = card.querySelector('.announcement-content');
-
-              readMoreBtn.addEventListener('click', function () {
-                if (this.textContent === 'Czytaj więcej') {
-                  contentDiv.innerHTML = formattedFullText;
-                  this.textContent = 'Zwiń';
-                } else {
-                  contentDiv.innerHTML = displayedText;
-                  this.textContent = 'Czytaj więcej';
-                }
-              });
-            }
-          });
+          announcementsContainer.innerHTML = '<p class="col-span-full text-center">Brak dostępnych komunikatów.</p>';
+          return;
         }
+
+        const TRUNCATE_LENGTH = 250;
+        announcements.forEach(announcement => {
+          const card = document.createElement('div');
+          card.className = 'bg-white p-6 rounded-lg shadow-md flex flex-col';
+
+          const formattedFullText = formatTextWithMarkdown(announcement.text);
+          const plainText = announcement.text.replace(/\*\*([^*]+)\*\*/g, '$1').replace(/\n/g, ' ');
+
+          let displayedText = formattedFullText;
+          let needsReadMore = false;
+
+          if (plainText.length > TRUNCATE_LENGTH) {
+            let cutIndex = plainText.lastIndexOf(' ', TRUNCATE_LENGTH);
+            if (cutIndex === -1) cutIndex = TRUNCATE_LENGTH;
+            displayedText = formatTextWithMarkdown(announcement.text.substring(0, cutIndex)) + '...';
+            needsReadMore = true;
+          }
+
+          card.innerHTML = `
+                      <h3 class="font-bold text-xl mb-2">${announcement.title}</h3>
+                      <p class="text-sm text-gray-500 mb-4">${announcement.date}</p>
+                      <div class="announcement-content text-gray-700">${displayedText}</div>
+                      ${needsReadMore ? `<a class="read-more text-blue-600 hover:underline mt-auto pt-2 cursor-pointer font-semibold">Czytaj więcej</a>` : ''}
+                  `;
+          announcementsContainer.appendChild(card);
+
+          if (needsReadMore) {
+            const readMoreBtn = card.querySelector('.read-more');
+            const contentDiv = card.querySelector('.announcement-content');
+
+            readMoreBtn.addEventListener('click', function () {
+              if (this.textContent === 'Czytaj więcej') {
+                contentDiv.innerHTML = formattedFullText;
+                this.textContent = 'Zwiń';
+              } else {
+                contentDiv.innerHTML = displayedText;
+                this.textContent = 'Czytaj więcej';
+              }
+            });
+          }
+        });
       })
       .catch(error => {
-        announcementsContainer.innerHTML = '<p>Niestety, nie udało się załadować komunikatów. Spróbuj ponownie później.</p>';
+        console.error("Błąd ładowania komunikatów:", error);
+        announcementsContainer.innerHTML = '<p class="col-span-full text-center text-red-600">Niestety, nie udało się załadować komunikatów.</p>';
       });
   }
 });

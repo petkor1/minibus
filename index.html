@@ -52,65 +52,61 @@
         color: #333;
         margin-bottom: 0.5rem;
       }
-      .time-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(60px, max-content)); /* każda kolumna dopasowuje się do zawartości */
-        gap: 0.75rem;
-      }
-      .time-box {
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-        flex-wrap: nowrap;
-        min-width: 0;
-        max-width: 100%;
-        word-break: break-word;
-        white-space: nowrap; /* NIE zawijaj tekstu */
-        gap: 4px;
-        padding-left: 8px;
-        padding-right: 8px;
-        /* width: 100%;  USUŃ TĘ LINIĘ */
-        box-sizing: border-box;
-        overflow: visible; /* NIE przewijaj, pokaż całość */
-      }
-      .time-box.next-departure {
-        background-color: #d4edda; /* zielony */
-        color: #155724;
-        font-weight: bold;
-        border-color: #c3e6cb;
-      }
-      .toggle-full-schedule-btn {
-        display: block;
-        padding: 0.4rem 1rem;
-        font-size: 1em;
-        font-weight: bold;
-        color: #ea580c;
-        border: 1px solid #ea580c;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-      }
-      .toggle-full-schedule-btn:hover {
-        color: white;
-        background-color: #ea580c;
-      }
-      #schedule-placeholder-text {
-        text-align: center;
-        padding: 25px;
-        font-size: 1rem;
-      }
-      /* Style dla mobilnej nawigacji */
-      .main-nav.active {
-        display: block !important;
-      }
-      .shadow-text{
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
-      }
-      .hero-bacgkround {
-        background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('img/tlo.jpg');
-        background-size: cover;
-        background-position: center;
-      }
+ .time-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(60px, max-content)); /* każda kolumna dopasowuje się do zawartości */
+    gap: 0.75rem;
+}
+.time-box {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    min-width: 0;
+    max-width: 100%;
+    word-break: break-word;
+    white-space: nowrap; /* NIE zawijaj tekstu */
+    gap: 4px;
+    padding-left: 8px;
+    padding-right: 8px;
+    box-sizing: border-box;
+    overflow: visible; /* NIE przewijaj, pokaż całość */
+    border-radius: 4px; /* Dodaj zaokrąglone rogi dla lepszego wyglądu */
+    transition: background-color 0.3s ease; /* Płynne przejście koloru tła */
+}
+/* Usunięto .time-box.next-departure, ponieważ jest zastąpione przez nowe klasy */
+.toggle-full-schedule-btn {
+    display: block;
+    padding: 0.4rem 1rem;
+    font-size: 1em;
+    font-weight: bold;
+    color: #ea580c;
+    border: 1px solid #ea580c;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.toggle-full-schedule-btn:hover {
+    color: white;
+    background-color: #ea580c;
+}
+#schedule-placeholder-text {
+    text-align: center;
+    padding: 25px;
+    font-size: 1rem;
+}
+/* Style dla mobilnej nawigacji */
+.main-nav.active {
+    display: block !important;
+}
+.shadow-text {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
+}
+.hero-bacgkround {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('img/tlo.jpg');
+    background-size: cover;
+    background-position: center;
+}
 /*
  * ZAKTUALIZOWANE STYLE DLA GODZIN I ADNOTACJI
  */
@@ -136,17 +132,17 @@
 /* Nowe style dla adnotacji */
 .time-note {
     /* Rozmiar i waga fonta */
-    font-size: 1em;  /* Taki sam rozmiar jak godzina (dziedziczony z .time-box) */
+    font-size: 1em; /* Taki sam rozmiar jak godzina (dziedziczony z .time-box) */
     font-weight: bold;
 
     /* Kolor */
     color: #c2410c; /* Kolor pomarańczowy, pasujący do motywu */
-    
+
     /* Odstęp od godziny */
-    margin-left: 5px; 
-    
+    margin-left: 5px;
+
     /* Kursor podpowiadający, że można najechać po więcej informacji */
-    cursor: help; 
+    cursor: help;
     word-break: break-word; /* łamie długie notatki */
     white-space: normal; /* pozwala na zawijanie */
     max-width: 100%;
@@ -160,6 +156,23 @@
 }
 .time-box[title] {
     cursor: help;
+}
+
+/* Nowe klasy dla tła, zgodnie z wymaganiami */
+.bg-light-red {
+    background-color: #fcebeb; /* Bardzo jasny czerwony */
+}
+
+.bg-light-gray {
+    background-color: #f3f4f6; /* Jasnoszary */
+}
+
+.bg-no-background {
+    background-color: transparent; /* Brak tła */
+}
+.time-box.past-departure {
+    background-color: #f0f0f0; /* Jasnoszary kolor tła */
+    color: #888; /* Opcjonalnie ciemniejszy kolor tekstu */
 }
     </style>
   </head>

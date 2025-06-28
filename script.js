@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderSchedule(routeId, isFullView, scrollToDirection = null) {
     const route = schedulesData[routeId];
     const now = new Date();
-    const currentDayType = getDayType(now);
+    const currentDayType = getDayType(now); // Określa typ dnia DZIŚ (np. Sobota)
     const dayTypes = [
       { key: 'workdays', displayName: 'Dni Robocze' },
       { key: 'saturdays', displayName: 'Soboty' },
@@ -88,31 +88,33 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       html += `<div class="schedule-direction" id="${directionId}" data-direction-name="${direction.directionName}">
-                        <h4 class="font-bold text-xl flex items-center gap-2">
-                        <span class="inline-block align-middle text-orange-600" aria-hidden="true">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <rect x="3" y="5" width="18" height="12" rx="3" fill="#c2410c" stroke="#c2410c" />
-                                <rect x="6" y="8" width="4" height="4" rx="1" fill="#fff" />
-                                <rect x="14" y="8" width="4" height="4" rx="1" fill="#fff" />
-                                <circle cx="7.5" cy="17" r="1.5" fill="#1e293b"/>
-                                <circle cx="16.5" cy="17" r="1.5" fill="#1e293b"/>
-                            </svg>
-                        </span>
-                        ${direction.directionName}
-                        </h4>`;
+                                <h4 class="font-bold text-xl flex items-center gap-2">
+                                <span class="inline-block align-middle text-orange-600" aria-hidden="true">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <rect x="3" y="5" width="18" height="12" rx="3" fill="#c2410c" stroke="#c2410c" />
+                                        <rect x="6" y="8" width="4" height="4" rx="1" fill="#fff" />
+                                        <rect x="14" y="8" width="4" height="4" rx="1" fill="#fff" />
+                                        <circle cx="7.5" cy="17" r="1.5" fill="#1e293b"/>
+                                        <circle cx="16.5" cy="17" r="1.5" fill="#1e293b"/>
+                                    </svg>
+                                </span>
+                                ${direction.directionName}
+                                </h4>`;
 
       const notesLegend = direction.notes || {};
 
       if (isFullView) {
         dayTypes.forEach(dayType => {
           html += `<p class="mt-6 mb-2 text-gray-700">${dayType.displayName}</p>`;
-          html += generateTimesGridHtml(direction.times[dayType.key] || [], notesLegend, false, now);
+          // W pełnym widoku: przekazujemy typ dnia, dla którego generujemy siatkę (dayType)
+          html += generateTimesGridHtml(direction.times[dayType.key] || [], notesLegend, false, now, dayType);
         });
       } else {
         html += `<div class="flex justify-between items-center mt-2 mb-2">
-                            <p class="text-gray-700">Najbliższe kursy dzisiaj (${currentDayType.displayName})</p>
-                         </div>`;
-        html += generateTimesGridHtml(direction.times[currentDayType.key] || [], notesLegend, true, now, 5);
+                                <p class="text-gray-700">Najbliższe kursy dzisiaj (${currentDayType.displayName})</p>
+                            </div>`;
+        // W skróconym widoku: zawsze generujemy tylko dla DZISIEJSZEGO typu dnia
+        html += generateTimesGridHtml(direction.times[currentDayType.key] || [], notesLegend, true, now, currentDayType, 5);
       }
 
       if (Object.keys(notesLegend).length > 0) {
@@ -125,8 +127,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const buttonText = isFullView ? 'Zwiń rozkład' : 'Pełny rozkład ->';
       html += `<div class="flex justify-start mt-4">
-                         <button class="toggle-full-schedule-btn" data-route-id="${routeId}" data-full-view="${isFullView}" data-direction-id="${directionId}">${buttonText}</button>
-                     </div>`;
+                               <button class="toggle-full-schedule-btn" data-route-id="${routeId}" data-full-view="${isFullView}" data-direction-id="${directionId}">${buttonText}</button>
+                           </div>`;
       html += `</div>`;
     });
 
@@ -159,64 +161,110 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /**
-   * Generuje siatkę z godzinami odjazdów
+   * Generuje siatkę z godzinami odjazdów, z odpowiednim stylem tła.
+   *
+   * @param {Array} timesArray Tablica obiektów z godzinami i opcjonalnymi datami/notatkami.
+   * @param {Object} notesLegend Obiekt z legendą dla kluczy notatek.
+   * @param {boolean} isShortView Czy to widok skrócony (true) czy pełny (false).
+   * @param {Date} now Aktualna data i czas.
+   * @param {Object} dayTypeForGrid Typ dnia, dla którego obecnie generujemy siatkę (np. {key: 'workdays', displayName: 'Dni Robocze'}).
+   * @param {number|null} limit Opcjonalny limit wyświetlanych kursów w widoku skróconym.
+   * @returns {string} HTML siatki z godzinami.
    */
-  function generateTimesGridHtml(timesArray, notesLegend, useNextDepartureLogic, now, limit = null) {
+  function generateTimesGridHtml(timesArray, notesLegend, isShortView, now, dayTypeForGrid, limit = null) {
     if (!timesArray || timesArray.length === 0) {
       return '<p class="text-blue-600 p-4 rounded-lg border border-blue-200 bg-blue-50/50 backdrop-blur-sm shadow-sm">W tym dniu nie ma kursów</p>';
     }
 
+    const currentDay = now.getDay(); // Dzień tygodnia dzisiaj (0-6)
     const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes();
-    let foundNext = false;
+
+    // Określenie, czy typ dnia dla generowanej siatki jest TYPEM DNIA DZISIEJSZEGO
+    // Np. Jeśli dzisiaj jest sobota (currentDayType.key = 'saturdays')
+    // i generujemy siatkę dla 'saturdays', to jest to isCurrentlyGeneratingTodaySchedule = true.
+    // Jeśli generujemy dla 'workdays', to isCurrentlyGeneratingTodaySchedule = false.
+    const currentDayType = getDayType(now); // Obiekt z kluczem i nazwą typu dnia dzisiaj
+    const isCurrentlyGeneratingTodaySchedule = (dayTypeForGrid.key === currentDayType.key);
+
 
     let departures = timesArray.map(timeObj => {
       const [h, m] = timeObj.time.split(':').map(Number);
+      const totalMinutes = h * 60 + m;
+
+      // "past" ma sens tylko jeśli rozkład dotyczy DNIA DZISIEJSZEGO i czas już minął
+      const past = isCurrentlyGeneratingTodaySchedule && (totalMinutes < currentTimeInMinutes);
+
       return {
-        time: timeObj.time,
-        totalMinutes: h * 60 + m,
-        noteKey: timeObj.noteKey
+        ...timeObj,
+        totalMinutes,
+        past // Określa, czy kurs już się odbył dzisiaj w kontekście generowanego rozkładu
       };
     });
 
-    if (useNextDepartureLogic) {
-      departures = departures
-        .filter(timeObj => timeObj.totalMinutes >= currentTimeInMinutes)
-        .map(timeObj => {
-          let isNext = false;
-          if (!foundNext && timeObj.totalMinutes >= currentTimeInMinutes) {
-            isNext = true;
-            foundNext = true;
-          }
-          return { ...timeObj, isNext };
-        });
+    let departuresToDisplay = [...departures];
+
+    // LOGIKA SORTOWANIA I FILTROWANIA:
+    if (isShortView) { // Widok skrócony: filtrujemy i sortujemy tylko przyszłe kursy dzisiaj
+      // W widoku skróconym zawsze interesują nas tylko kursy z bieżącego typu dnia (dnia dzisiejszego)
+      // i tylko te, które jeszcze się nie odbyły.
+      departuresToDisplay = departuresToDisplay.filter(dep => !dep.past);
+      departuresToDisplay.sort((a, b) => a.totalMinutes - b.totalMinutes); // Sortuj chronologicznie
       if (limit) {
-        departures = departures.slice(0, limit);
+        departuresToDisplay = departuresToDisplay.slice(0, limit); // Ogranicz liczbę
       }
+    } else { // Pełny widok: zawsze wyświetlaj chronologicznie wszystkie kursy dla danego typu dnia
+      departuresToDisplay.sort((a, b) => a.totalMinutes - b.totalMinutes); // Zawsze sortuj chronologicznie
     }
 
-    if (departures.length === 0) {
-      return '<p class="text-blue-600 p-4 rounded-lg border border-blue-200 bg-blue-50/50 backdrop-blur-sm shadow-sm">W tym dniu nie ma już dostępnych kursów dla tego kierunku.</p>';
+    // Znajdź indeks najbliższego przyszłego kursu dla JASNO-CZERWONEGO tła.
+    // Działa to tylko jeśli generujemy rozkład DLA DNIA DZISIEJSZEGO.
+    let firstFutureTodayIdx = -1;
+    if (isCurrentlyGeneratingTodaySchedule) {
+      firstFutureTodayIdx = departuresToDisplay.findIndex(dep => !dep.past);
     }
 
-    const timesHtml = departures.map(time => {
+    const timesHtml = departuresToDisplay.map((time, idx) => {
       let noteHtml = '';
       const tooltip = (time.noteKey && notesLegend[time.noteKey]) ? ` title="${notesLegend[time.noteKey]}"` : '';
       if (time.noteKey && notesLegend[time.noteKey]) {
         noteHtml = `<span class="time-note">${time.noteKey}</span>`;
       }
-      return `<div class="time-box${time.isNext ? ' next-departure' : ''}"${tooltip}>${time.time}${noteHtml}</div>`;
+
+      let bgClass = '';
+      if (isCurrentlyGeneratingTodaySchedule) {
+        // Logika dla rozkładu DLA DNIA DZISIEJSZEGO (np. dzisiaj sobota, patrzymy na rozkład sobót)
+        if (time.past) {
+          bgClass = 'bg-no-background'; // Kurs już się odbył dzisiaj - brak tła
+        } else if (idx === firstFutureTodayIdx && firstFutureTodayIdx !== -1) {
+          bgClass = 'bg-light-red'; // Najbliższy przyszły kurs dzisiaj - jasnoczerwone tło
+        } else {
+          bgClass = 'bg-light-gray'; // Pozostałe przyszłe kursy dzisiaj - jasnoszare tło
+        }
+      } else {
+        // Logika dla rozkładu DLA INNEGO DNIA (niż dzisiaj)
+        // Np. dzisiaj sobota, a patrzymy na rozkład "Dni Roboczych" lub "Niedziel i Świąt".
+        // Wszystkie kursy z tych innych dni ZAWSZE mają jasnoszare tło, bo zakładamy, że się odbędą.
+        bgClass = 'bg-light-gray';
+      }
+
+      return `<div class="time-box ${bgClass}"${tooltip}>${time.time}${noteHtml}</div>`;
     }).join('');
 
     return `<div class="time-grid">${timesHtml}</div>`;
   }
 
   /**
-   * Określa typ dnia
+   * Określa typ dnia (roboczy, sobota, niedziela/święta).
+   * @param {Date} date Obiekt daty.
+   * @returns {{key: string, displayName: string}} Obiekt z kluczem i nazwą typu dnia.
    */
   function getDayType(date) {
     const day = date.getDay();
-    const holidays = []; // Można tu dodać listę świąt w formacie 'YYYY-MM-DD'
-    if (day === 0 || holidays.includes(date.toISOString().slice(0, 10))) {
+    // Można tu dodać listę świąt w formacie 'YYYY-MM-DD'
+    const holidays = [];
+    const dateString = date.toISOString().slice(0, 10); // 'YYYY-MM-DD'
+
+    if (day === 0 || holidays.includes(dateString)) {
       return { key: 'sundays', displayName: 'Niedziele i Święta' };
     }
     if (day === 6) {
@@ -229,15 +277,20 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- LOGIKA ŁADOWANIA KOMUNIKATÓW ---
   const announcementsContainer = document.getElementById('announcements-container');
 
+  /**
+   * Formatuje tekst Markdown na HTML (pogrubienie, nowe linie).
+   * @param {string} text Tekst w formacie Markdown.
+   * @returns {string} Sformatowany tekst HTML.
+   */
   function formatTextWithMarkdown(text) {
     if (!text) return '';
-    let formattedText = text.replace(/\n/g, '<br>');
-    formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    let formattedText = text.replace(/\n/g, '<br>'); // Nowe linie
+    formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Pogrubienie
     return formattedText;
   }
 
   if (announcementsContainer) {
-    fetch('announcements.json')
+    fetch('announcements.json') // Pobierz dane z pliku JSON
       .then(response => {
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         return response.json();
@@ -249,21 +302,23 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
 
-        const TRUNCATE_LENGTH = 250;
+        const TRUNCATE_LENGTH = 250; // Długość tekstu przed obcięciem
         announcements.forEach((announcement, index) => {
           const card = document.createElement('div');
           card.className = 'bg-white p-6 rounded-lg shadow-md flex flex-col';
 
           if (index === 0) {
-            card.style.borderLeft = '3px solid #c2410c';
+            card.style.borderLeft = '3px solid #c2410c'; // Wyróżnij pierwszy komunikat
           }
 
           const formattedFullText = formatTextWithMarkdown(announcement.text);
+          // Usuń formatowanie Markdown do obliczenia długości tekstu
           const plainText = announcement.text.replace(/\*\*([^*]+)\*\*/g, '$1').replace(/\n/g, ' ');
 
           let displayedText = formattedFullText;
           let needsReadMore = false;
 
+          // Sprawdź, czy tekst wymaga obcięcia
           if (plainText.length > TRUNCATE_LENGTH) {
             let cutIndex = plainText.lastIndexOf(' ', TRUNCATE_LENGTH);
             if (cutIndex === -1) cutIndex = TRUNCATE_LENGTH;
@@ -272,13 +327,14 @@ document.addEventListener('DOMContentLoaded', () => {
           }
 
           card.innerHTML = `
-                        <h3 class="font-bold text-xl mb-1">${announcement.title}</h3>
-                        <p class="text-sm text-gray-500 mb-6">${announcement.date}</p>
-                        <div class="announcement-content text-gray-700">${displayedText}</div>
-                        ${needsReadMore ? `<a class="read-more text-orange-700 hover:underline pt-2 cursor-pointer font-semibold mt-4">Czytaj więcej</a>` : ''}
-                    `;
+                                <h3 class="font-bold text-xl mb-1">${announcement.title}</h3>
+                                <p class="text-sm text-gray-500 mb-6">${announcement.date}</p>
+                                <div class="announcement-content text-gray-700">${displayedText}</div>
+                                ${needsReadMore ? `<a class="read-more text-orange-700 hover:underline pt-2 cursor-pointer font-semibold mt-4">Czytaj więcej</a>` : ''}
+                            `;
           announcementsContainer.appendChild(card);
 
+          // Obsługa przycisku "Czytaj więcej"
           if (needsReadMore) {
             const readMoreBtn = card.querySelector('.read-more');
             const contentDiv = card.querySelector('.announcement-content');
@@ -300,4 +356,19 @@ document.addEventListener('DOMContentLoaded', () => {
         announcementsContainer.innerHTML = '<p class="col-span-full text-center text-red-600">Niestety, nie udało się załadować komunikatów.</p>';
       });
   }
+
+  // Obsługa wyświetlania tooltipów na urządzeniach mobilnych
+  document.addEventListener('click', function (e) {
+    const box = e.target.closest('.time-box[title]');
+    if (!box) return;
+
+    if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
+      const note = box.getAttribute('title');
+      if (note) {
+        alert(note);
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }
+  });
 });

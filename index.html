@@ -104,6 +104,31 @@
         background-size: cover;
         background-position: center;
       }
+      /* Styl dla siatki z godzinami, aby adnotacje się mieściły */
+/* Styl dla siatki z godzinami, aby adnotacje się mieściły */
+.time-box {
+    position: relative; /* Potrzebne do pozycjonowania adnotacji */
+    padding-right: 10px; /* Dodatkowy padding, by zrobić miejsce na 'sup' */
+}
+
+/* Styl dla samej adnotacji (np. 's' lub 'D') */
+.time-note {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    font-size: 0.7em; /* Mniejsza czcionka */
+    font-weight: bold;
+    color: #c2410c; /* Kolor pomarańczowy, pasujący do motywu */
+    line-height: 1;
+    cursor: help; /* Kursor podpowiadający, że można najechać */
+}
+
+/* Styl dla legendy pod rozkładem */
+.notes-legend {
+    border-left: 3px solid #e2e8f0;
+    padding-left: 1rem;
+    font-style: italic;
+}
     </style>
   </head>
   <body class="bg-gray-50">

@@ -200,10 +200,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const timesHtml = departures.map(time => {
       let noteHtml = '';
+      const tooltip = (time.noteKey && notesLegend[time.noteKey]) ? ` title="${notesLegend[time.noteKey]}"` : '';
       if (time.noteKey && notesLegend[time.noteKey]) {
-        noteHtml = `<sup class="time-note" title="${notesLegend[time.noteKey]}">${time.noteKey}</sup>`;
+        noteHtml = `<span class="time-note">${time.noteKey}</span>`;
       }
-      return `<div class="time-box ${time.isNext ? 'next-departure' : ''}">${time.time}${noteHtml}</div>`;
+      return `<div class="time-box${time.isNext ? ' next-departure' : ''}"${tooltip}>${time.time}${noteHtml}</div>`;
     }).join('');
 
     return `<div class="time-grid">${timesHtml}</div>`;

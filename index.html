@@ -54,17 +54,24 @@
       }
       .time-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(60px, max-content)); /* każda kolumna dopasowuje się do zawartości */
         gap: 0.75rem;
       }
       .time-box {
-        background-color: #f9f9f9;
-        padding: 0.5rem;
-        border-radius: 6px;
-        text-align: center;
-        font-family: "Roboto Mono", monospace;
-        font-size: 1.1em;
-        border: 1px solid #eee;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        min-width: 0;
+        max-width: 100%;
+        word-break: break-word;
+        white-space: nowrap; /* NIE zawijaj tekstu */
+        gap: 4px;
+        padding-left: 8px;
+        padding-right: 8px;
+        /* width: 100%;  USUŃ TĘ LINIĘ */
+        box-sizing: border-box;
+        overflow: visible; /* NIE przewijaj, pokaż całość */
       }
       .time-box.next-departure {
         background-color: #d4edda; /* zielony */
@@ -104,30 +111,55 @@
         background-size: cover;
         background-position: center;
       }
-      /* Styl dla siatki z godzinami, aby adnotacje się mieściły */
-/* Styl dla siatki z godzinami, aby adnotacje się mieściły */
+/*
+ * ZAKTUALIZOWANE STYLE DLA GODZIN I ADNOTACJI
+ */
+
+/* Ten kontener nie wymaga już specjalnego pozycjonowania. */
 .time-box {
-    position: relative; /* Potrzebne do pozycjonowania adnotacji */
-    padding-right: 10px; /* Dodatkowy padding, by zrobić miejsce na 'sup' */
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: nowrap; /* NIE zawijaj zawartości */
+    min-width: 0;
+    max-width: 100%;
+    word-break: break-word;
+    white-space: nowrap; /* NIE zawijaj tekstu */
+    gap: 4px;
+    padding-left: 8px;
+    padding-right: 8px;
+    width: 100%; /* Rozciągnij box na całą szerokość komórki */
+    box-sizing: border-box;
+    overflow-x: auto; /* Dodaj przewijanie poziome jeśli tekst się nie mieści */
 }
 
-/* Styl dla samej adnotacji (np. 's' lub 'D') */
+/* Nowe style dla adnotacji */
 .time-note {
-    position: absolute;
-    top: 2px;
-    right: 4px;
-    font-size: 0.7em; /* Mniejsza czcionka */
+    /* Rozmiar i waga fonta */
+    font-size: 1em;  /* Taki sam rozmiar jak godzina (dziedziczony z .time-box) */
     font-weight: bold;
+
+    /* Kolor */
     color: #c2410c; /* Kolor pomarańczowy, pasujący do motywu */
-    line-height: 1;
-    cursor: help; /* Kursor podpowiadający, że można najechać */
+    
+    /* Odstęp od godziny */
+    margin-left: 5px; 
+    
+    /* Kursor podpowiadający, że można najechać po więcej informacji */
+    cursor: help; 
+    word-break: break-word; /* łamie długie notatki */
+    white-space: normal; /* pozwala na zawijanie */
+    max-width: 100%;
 }
 
-/* Styl dla legendy pod rozkładem */
+/* Styl dla legendy pod rozkładem (bez zmian, warto go mieć) */
 .notes-legend {
     border-left: 3px solid #e2e8f0;
     padding-left: 1rem;
     font-style: italic;
+}
+.time-box[title] {
+    cursor: help;
 }
     </style>
   </head>

@@ -1,6 +1,6 @@
 // ===================================================================================
 // KOMPLETNY KOD APLIKACJI - script.js
-// Wersja z w pełni naprawioną i ulepszoną logiką pozycjonowania tooltipów.
+// Wersja z odliczaniem dla 5 najbliższych kursów i inteligentnym formatowaniem czasu.
 // ===================================================================================
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
       html += generateDirectionHtml(direction, { routeId, index, now, today, allDayTypes, isFullView });
     });
     detailsContainer.innerHTML = html;
-    setupEventListeners(routeId); // Ustawia listenery dla przycisków i tooltipów
+    setupEventListeners(routeId);
     if (isFullView && scrollToDirection) scrollToElement(scrollToDirection);
   }
 
@@ -105,11 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
   }
 
-  /**
-   * Podpina eventy do dynamicznie tworzonych elementów.
-   */
   function setupEventListeners(routeId) {
-    // Listener dla przycisków "Zwiń/Rozwiń"
     detailsContainer.querySelectorAll('.toggle-full-schedule-btn').forEach(button => {
       button.addEventListener('click', (e) => {
         const currentIsFull = e.target.dataset.fullView === 'true';
@@ -120,12 +116,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     });
-
-    // Listenery dla niestandardowych tooltipów
     const tooltipElement = document.getElementById('custom-tooltip');
     if (tooltipElement) {
       detailsContainer.querySelectorAll('[data-tooltip]').forEach(el => {
-        // Użycie `mouseenter` i `mouseleave` jest bardziej niezawodne niż `mouseover/out`
         el.addEventListener('mouseenter', (e) => showTooltip(e.currentTarget));
         el.addEventListener('mouseleave', hideTooltip);
         el.addEventListener('pointerup', (e) => handleMobileTooltip(e.currentTarget));
@@ -141,80 +134,81 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  /**
+   * NOWOŚĆ: Formatuje minuty na czytelny tekst (np. "za 5 min" lub "za 1h 15m").
+   */
+  function formatMinutesUntil(totalMinutes) {
+    if (totalMinutes < 0) return '';
+    if (totalMinutes === 0) return 'odjeżdża';
+    if (totalMinutes === 1) return 'za 1 min';
+    if (totalMinutes < 60) return `za ${totalMinutes} min`;
+
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+
+    if (minutes === 0) return `za ${hours}h`;
+
+    return `za ${hours}h ${minutes}m`;
+  }
+
   function generateTimesGridHtml(options) {
     const { timesArray, notesLegend, isShortView, now, dayTypeForGrid, limit = null } = options;
     if (!timesArray || timesArray.length === 0) return '<p class="text-blue-600 p-4 rounded-lg border border-blue-200 bg-blue-50/50 backdrop-blur-sm shadow-sm">W tym dniu nie ma kursów</p>';
+
     const today = getDayType(now);
     const isTodaySchedule = dayTypeForGrid.key === today.key;
     const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes();
-    let departures = timesArray.map(timeObj => ({ ...timeObj, totalMinutes: (([h, m]) => h * 60 + m)(timeObj.time.split(':').map(Number)), isPast: isTodaySchedule && (([h, m]) => h * 60 + m)(timeObj.time.split(':').map(Number)) < currentTimeInMinutes })).sort((a, b) => a.totalMinutes - b.totalMinutes);
-    if (isShortView) {
-      departures = departures.filter(dep => !dep.isPast);
-      if (limit) departures = departures.slice(0, limit);
-    }
-    if (departures.length === 0 && isShortView) return '<p class="text-blue-600 p-4 rounded-lg border border-blue-200 bg-blue-50/50 backdrop-blur-sm shadow-sm">W tym dniu nie ma już dostępnych kursów dla tego kierunku.</p>';
-    const firstFutureIndex = isTodaySchedule ? departures.findIndex(dep => !dep.isPast) : -1;
-    const timesHtml = departures.map((time, idx) => {
-      const bgClass = firstFutureIndex === idx && isTodaySchedule ? 'bg-light-red' : (time.isPast ? 'bg-no-background' : 'bg-light-gray');
+
+    const departures = timesArray
+      .map(timeObj => ({ ...timeObj, totalMinutes: (([h, m]) => h * 60 + m)(timeObj.time.split(':').map(Number)), isPast: isTodaySchedule && (([h, m]) => h * 60 + m)(timeObj.time.split(':').map(Number)) < currentTimeInMinutes }))
+      .sort((a, b) => a.totalMinutes - b.totalMinutes);
+
+    // ZMIANA: Identyfikujemy 5 najbliższych kursów
+    const futureDepartures = isTodaySchedule ? departures.filter(dep => !dep.isPast) : [];
+    const nextFiveDepartures = futureDepartures.slice(0, 5);
+    const nextFiveTimes = new Set(nextFiveDepartures.map(d => d.time));
+
+    let departuresToDisplay = isShortView ? nextFiveDepartures : departures;
+
+    if (departuresToDisplay.length === 0 && isShortView) return '<p class="text-blue-600 p-4 rounded-lg border border-blue-200 bg-blue-50/50 backdrop-blur-sm shadow-sm">W tym dniu nie ma już dostępnych kursów dla tego kierunku.</p>';
+
+    const firstFutureIndex = departuresToDisplay.findIndex(dep => !dep.isPast);
+
+    const timesHtml = departuresToDisplay.map((time, idx) => {
+      const isNextFive = nextFiveTimes.has(time.time);
+      const bgClass = (idx === firstFutureIndex && isTodaySchedule) ? 'bg-light-red' : (time.isPast ? 'bg-no-background' : 'bg-light-gray');
       const noteText = (time.noteKey && notesLegend[time.noteKey]) || '';
       const noteHtml = noteText ? `<span class="time-note">${time.noteKey}</span>` : '';
-      let countdownHtml = '', timeBoxContentPrefix = '', tooltipText = noteText;
-      if (isTodaySchedule && idx === firstFutureIndex) {
+
+      let countdownHtml = '';
+      let timeBoxContentPrefix = '';
+      let tooltipText = noteText;
+
+      // ZMIANA: Generujemy odliczanie dla 5 najbliższych kursów
+      if (isTodaySchedule && isNextFive) {
         timeBoxContentPrefix = '<span class="time-icon">⏰</span>';
         const minutesUntil = time.totalMinutes - currentTimeInMinutes;
         if (minutesUntil >= 0) {
-          countdownHtml = `<span class="countdown-text">za ${minutesUntil} min</span>`;
-          tooltipText = [`Odjazd za ${minutesUntil} min`, noteText].filter(Boolean).join(' | ');
+          countdownHtml = `<span class="countdown-text">${formatMinutesUntil(minutesUntil)}</span>`;
+          tooltipText = [formatMinutesUntil(minutesUntil), noteText].filter(Boolean).join(' | ');
         }
       }
       const tooltip = tooltipText ? `data-tooltip="${tooltipText}"` : '';
+
       return `<div class="time-box ${bgClass}" ${tooltip}><div class="time-box-content">${timeBoxContentPrefix}<span class="time-value">${time.time}</span>${noteHtml}</div><div class="countdown-container">${countdownHtml}</div></div>`;
     }).join('');
+
     return `<div class="time-grid">${timesHtml}</div>`;
   }
 
   // --- SEKCJA NARZĘDZIOWA (Daty, Tooltipy) ---
   function getPublicHolidays(year) { const a = year % 19, b = Math.floor(year / 100), c = year % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451); const month = Math.floor((h + l - 7 * m + 114) / 31), day = ((h + l - 7 * m + 114) % 31) + 1; const easterMonday = new Date(year, month - 1, day + 1); const corpusChristi = new Date(year, month - 1, day + 60); const formatDate = (date) => date.toISOString().slice(0, 10); return [`${year}-01-01`, `${year}-01-06`, formatDate(easterMonday), `${year}-05-01`, `${year}-05-03`, formatDate(corpusChristi), `${year}-08-15`, `${year}-11-01`, `${year}-11-11`, `${year}-12-25`, `${year}-12-26`]; }
   function getDayType(date) { const day = date.getDay(); const holidays = getPublicHolidays(date.getFullYear()); const dateString = date.toISOString().slice(0, 10); if (day === 0 || holidays.includes(dateString)) return { key: 'sundays', displayName: 'Niedziele i Święta' }; if (day === 6) return { key: 'saturdays', displayName: 'Soboty' }; return { key: 'workdays', displayName: 'Dni Robocze' }; }
-
-  // --- NOWA, POPRAWIONA LOGIKA TOOLTIPÓW ---
   const tooltipElement = document.getElementById('custom-tooltip');
   let mobileTooltipTimer = null;
-
-  const showTooltip = (target) => {
-    const message = target.dataset.tooltip;
-    if (!message || !tooltipElement) return;
-
-    tooltipElement.textContent = message;
-    tooltipElement.classList.add('visible');
-
-    const targetRect = target.getBoundingClientRect();
-    const tooltipRect = tooltipElement.getBoundingClientRect();
-
-    // Ustaw pozycję horyzontalną, centrując i pilnując krawędzi ekranu
-    const centeredLeft = targetRect.left + (targetRect.width / 2) - (tooltipRect.width / 2);
-    const left = Math.max(10, Math.min(centeredLeft, window.innerWidth - tooltipRect.width - 10));
-    tooltipElement.style.left = `${left}px`;
-
-    // Ustaw pozycję wertykalną (nad lub pod celem)
-    if (targetRect.top < tooltipRect.height + 15) { // Brak miejsca na górze
-      tooltipElement.style.top = `${targetRect.bottom + 8}px`;
-    } else {
-      tooltipElement.style.top = `${targetRect.top - tooltipRect.height - 8}px`;
-    }
-  };
-
-  const hideTooltip = () => {
-    if (tooltipElement) tooltipElement.classList.remove('visible');
-  };
-
-  const handleMobileTooltip = (target) => {
-    if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
-      showTooltip(target);
-      clearTimeout(mobileTooltipTimer);
-      mobileTooltipTimer = setTimeout(hideTooltip, 4000);
-    }
-  };
+  const showTooltip = (target) => { const message = target.dataset.tooltip; if (!message || !tooltipElement) return; tooltipElement.textContent = message; tooltipElement.classList.add('visible'); const targetRect = target.getBoundingClientRect(); const tooltipRect = tooltipElement.getBoundingClientRect(); const centeredLeft = targetRect.left + (targetRect.width / 2) - (tooltipRect.width / 2); const left = Math.max(10, Math.min(centeredLeft, window.innerWidth - tooltipRect.width - 10)); tooltipElement.style.left = `${left}px`; if (targetRect.top < tooltipRect.height + 15) { tooltipElement.style.top = `${targetRect.bottom + 8}px`; } else { tooltipElement.style.top = `${targetRect.top - tooltipRect.height - 8}px`; } };
+  const hideTooltip = () => { if (tooltipElement) tooltipElement.classList.remove('visible'); };
+  const handleMobileTooltip = (target) => { if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) { showTooltip(target); clearTimeout(mobileTooltipTimer); mobileTooltipTimer = setTimeout(hideTooltip, 4000); } };
 
   // --- SEKCJA: LOGIKA KOMUNIKATÓW (bez zmian) ---
   const announcementsContainer = document.getElementById('announcements-container');

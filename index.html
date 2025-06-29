@@ -97,9 +97,11 @@
       /* --- Siatka z godzinami (aktualizacja) --- */
       .time-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+        /* ZMIANA: Lekko zwiększona minimalna szerokość kolumny, aby zmieścić nowy tekst */
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
         gap: 0.75rem;
       }
+
       .time-box {
         display: flex;
         flex-direction: column;
@@ -111,33 +113,45 @@
         transition: background-color 0.3s, color 0.3s;
         min-height: 60px; /* Zapewnia równą wysokość */
       }
+
       .time-box[data-tooltip] {
         cursor: help;
       }
+
       .time-box-content {
         display: flex;
         align-items: baseline;
         justify-content: center;
         gap: 4px;
       }
+
       .time-icon {
         font-size: 0.9em;
       }
+
       .time-value {
         font-weight: bold;
       }
+
       .time-note {
         font-weight: bold;
         color: #c2410c;
         margin-left: 2px;
       }
 
-      /* NOWOŚĆ: Kontener i styl dla tekstowego odliczania */
+      /* ZMIANA: Zaktualizowane style dla tekstowego odliczania */
       .countdown-container {
-        min-height: 1.2em; /* Placeholder utrzymujący wysokość */
-        font-size: 0.8em;
+        min-height: 1.2em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .countdown-text {
+        font-size: 0.75em; /* Mniejsza czcionka, aby się zmieściła */
         color: #4b5563;
-        margin-top: 2px;
+        letter-spacing: -0.5px; /* Zmniejszenie odstępów między literami */
+        margin-top: 3px;
       }
 
       /* Klasy dla tła godzin */
@@ -163,12 +177,9 @@
         margin-top: 1rem;
       }
 
-      /* ZAKTUALIZOWANE STYLE DLA NIESTANDARDOWEGO TOOLTIPA */
+      /* Style dla tooltipa (bez zmian) */
       #custom-tooltip {
-        /* POPRAWKA: Ta właściwość jest kluczowa do poprawnego pozycjonowania */
         position: fixed;
-
-        /* Pozostałe style bez zmian */
         display: block;
         background-color: #2c3e50;
         color: white;

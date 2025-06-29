@@ -10,16 +10,42 @@
     />
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-      /* Dostosowanie Tailwind CSS */
+      /* ================================================================== */
+      /* CSS - WERSJA POPRAWIONA I UPORZĄDKOWANA                        */
+      /* ================================================================== */
+
+      /* --- Style ogólne --- */
       body {
         font-family: "Roboto", sans-serif;
       }
+
+      .shadow-text {
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
+      }
+
+      .hero-background {
+        background-image: linear-gradient(
+            rgba(0, 0, 0, 0.5),
+            rgba(0, 0, 0, 0.5)
+          ),
+          url("img/tlo.jpg");
+        background-size: cover;
+        background-position: center;
+      }
+
+      /* --- Nawigacja mobilna --- */
+      .main-nav.active {
+        display: block !important;
+      }
+
+      /* --- Sekcja Rozkładów Jazdy --- */
       .schedule-selector-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
         gap: 1rem;
         margin-bottom: 2rem;
       }
+
       .schedule-selector-btn {
         background-color: #f0f0f0;
         border: 1px solid #ddd;
@@ -29,14 +55,16 @@
         font-size: 1.1em;
         font-weight: bold;
         cursor: pointer;
-        transition: background-color 0.3s, box-shadow 0.3s;
+        transition: background-color 0.3s, box-shadow 0.3s, color 0.3s;
       }
+
       .schedule-selector-btn:hover,
       .schedule-selector-btn.active {
         background-color: #ea580c;
         color: white;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.20);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       }
+
       .schedule-details-container {
         margin-top: 2rem;
         padding: 1.5rem;
@@ -44,144 +72,124 @@
         border-radius: 8px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
       }
+
+      #schedule-placeholder-text {
+        text-align: center;
+        padding: 25px;
+        font-size: 1rem;
+      }
+
       .schedule-direction {
         margin-bottom: 2rem;
       }
+
       .schedule-direction h4 {
         font-size: 1.2em;
         color: #333;
         margin-bottom: 0.5rem;
       }
- .time-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(60px, max-content)); /* każda kolumna dopasowuje się do zawartości */
-    gap: 0.75rem;
-}
-.time-box {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    flex-wrap: nowrap;
-    min-width: 0;
-    max-width: 100%;
-    word-break: break-word;
-    white-space: nowrap; /* NIE zawijaj tekstu */
-    gap: 4px;
-    padding-left: 8px;
-    padding-right: 8px;
-    box-sizing: border-box;
-    overflow: visible; /* NIE przewijaj, pokaż całość */
-    border-radius: 4px; /* Dodaj zaokrąglone rogi dla lepszego wyglądu */
-    transition: background-color 0.3s ease; /* Płynne przejście koloru tła */
-}
-/* Usunięto .time-box.next-departure, ponieważ jest zastąpione przez nowe klasy */
-.toggle-full-schedule-btn {
-    display: block;
-    padding: 0.4rem 1rem;
-    font-size: 1em;
-    font-weight: bold;
-    color: #ea580c;
-    border: 1px solid #ea580c;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-.toggle-full-schedule-btn:hover {
-    color: white;
-    background-color: #ea580c;
-}
-#schedule-placeholder-text {
-    text-align: center;
-    padding: 25px;
-    font-size: 1rem;
-}
-/* Style dla mobilnej nawigacji */
-.main-nav.active {
-    display: block !important;
-}
-.shadow-text {
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
-}
-.hero-bacgkround {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('img/tlo.jpg');
-    background-size: cover;
-    background-position: center;
-}
-/*
- * ZAKTUALIZOWANE STYLE DLA GODZIN I ADNOTACJI
- */
 
-/* Ten kontener nie wymaga już specjalnego pozycjonowania. */
-.time-box {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    flex-wrap: nowrap; /* NIE zawijaj zawartości */
-    min-width: 0;
-    max-width: 100%;
-    word-break: break-word;
-    white-space: nowrap; /* NIE zawijaj tekstu */
-    gap: 4px;
-    padding-left: 8px;
-    padding-right: 8px;
-    width: 100%; /* Rozciągnij box na całą szerokość komórki */
-    box-sizing: border-box;
-    overflow-x: auto; /* Dodaj przewijanie poziome jeśli tekst się nie mieści */
-}
+      .toggle-full-schedule-btn {
+        display: block;
+        padding: 0.4rem 1rem;
+        font-size: 1em;
+        font-weight: bold;
+        color: #ea580c;
+        border: 1px solid #ea580c;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s, color 0.3s;
+      }
 
-/* Nowe style dla adnotacji */
-.time-note {
-    /* Rozmiar i waga fonta */
-    font-size: 1em; /* Taki sam rozmiar jak godzina (dziedziczony z .time-box) */
-    font-weight: bold;
+      .toggle-full-schedule-btn:hover {
+        color: white;
+        background-color: #ea580c;
+      }
 
-    /* Kolor */
-    color: #c2410c; /* Kolor pomarańczowy, pasujący do motywu */
+      /* --- Siatka z godzinami --- */
+      .time-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(80px, max-content));
+        gap: 0.75rem;
+      }
 
-    /* Odstęp od godziny */
-    margin-left: 5px;
+      .time-box {
+        display: flex;
+        align-items: baseline; /* Lepsze wyrównanie tekstu i adnotacji */
+        justify-content: center;
+        padding: 6px 8px;
+        border-radius: 6px;
+        font-family: "Roboto Mono", monospace; /* Lepszy font dla godzin */
+        font-size: 1em;
+        white-space: nowrap;
+        transition: background-color 0.3s, color 0.3s;
+      }
 
-    /* Kursor podpowiadający, że można najechać po więcej informacji */
-    cursor: help;
-    word-break: break-word; /* łamie długie notatki */
-    white-space: normal; /* pozwala na zawijanie */
-    max-width: 100%;
-}
+      .time-box[title] {
+        cursor: help;
+      }
 
-/* Styl dla legendy pod rozkładem (bez zmian, warto go mieć) */
-.notes-legend {
-    border-left: 3px solid #e2e8f0;
-    padding-left: 1rem;
-    font-style: italic;
-}
-.time-box[title] {
-    cursor: help;
-}
+      /* Klasy dla tła godzin */
+      .bg-no-background {
+        background-color: transparent;
+        color: #a0a0a0;
+        border: 1px solid #e5e5e5;
+      }
 
-/* Nowe klasy dla tła, zgodnie z wymaganiami */
-.bg-no-background {
-    background-color: #f7f7f7; /* Bardzo jasnoszary, prawie biały */
-    color: #a0a0a0;            /* Jaśniejszy szary tekst */
-    /* Opcjonalnie: można dodać opacity, jeśli chcesz jeszcze bardziej stonować */
-    /* opacity: 0.7; */
-}
+      .bg-light-gray {
+        background-color: #f3f4f6;
+        color: #1f2937;
+      }
 
-/* Upewnij się, że masz też te klasy, jeśli jeszcze ich nie masz: */
-.bg-light-gray {
-    background-color: #f6f5f5; /* Jasnoszary */
-    color: #222222;            /* Standardowy, ciemniejszy tekst */
-}
+      .bg-light-red {
+        background-color: #ffedd5;
+        color: #9a3412;
+        font-weight: bold;
+      }
 
-.bg-light-red {
-    background-color: #ffedd5; /* Jasnoczerwony/pomarańczowy */
-    color: #9a3412;            /* Ciemniejszy, kontrastowy tekst */
-}
-.time-box.past-departure {
-    background-color: #f0f0f0; /* Jasnoszary kolor tła */
-    color: #888; /* Opcjonalnie ciemniejszy kolor tekstu */
-}
+      /* Style dla adnotacji przy godzinie */
+      .time-note {
+        font-size: 1em;
+        font-weight: bold;
+        color: #c2410c;
+        margin-left: 5px;
+      }
+
+      /* Styl dla legendy pod rozkładem */
+      .notes-legend {
+        border-left: 3px solid #e2e8f0;
+        padding-left: 1rem;
+        font-style: italic;
+      }
+
+      /* Style dla powiadomień "toast" na mobile */
+      #toast-container {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translate(-50%, 120px);
+        background-color: #2c3e50;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.4s ease, transform 0.4s ease;
+        font-size: 14px;
+        text-align: center;
+        pointer-events: none;
+      }
+
+      #toast-container.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translate(-50%, 0);
+      }
     </style>
   </head>
+
   <body class="bg-gray-50">
     <header class="main-header bg-white shadow-md sticky top-0 z-50">
       <div
@@ -194,50 +202,50 @@
           class="main-nav hidden md:flex absolute md:relative top-full left-0 w-full bg-white md:bg-transparent shadow-md md:shadow-none justify-center flex-1"
         >
           <ul
-        class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-8 p-4 md:p-0 text-right"
+            class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-8 p-4 md:p-0 text-right"
           >
-        <li>
-          <a
-            href="#schedules-section"
-            class="text-gray-600 hover:text-orange-600 pb-1 border-b-2 border-transparent hover:border-orange-600 transition whitespace-nowrap"
-            >Rozkłady Jazdy</a
-          >
-        </li>
-        <li>
-          <a
-            href="#announcements-section"
-            class="text-gray-600 hover:text-orange-600 pb-1 border-b-2 border-transparent hover:border-orange-600 transition whitespace-nowrap"
-            >Komunikaty</a
-          >
-        </li>
-        <li>
-          <a
-            href="#tickets-section"
-            class="text-gray-600 hover:text-orange-600 pb-1 border-b-2 border-transparent hover:border-orange-600 transition whitespace-nowrap"
-            >Bilety & FAQ</a
-          >
-        </li>
-        <li>
-          <a
-            href="#contact-section"
-            class="text-gray-600 hover:text-orange-600 pb-1 border-b-2 border-transparent hover:border-orange-600 transition whitespace-nowrap"
-            >Kontakt</a
-          >
-        </li>
-        <li class="md:hidden">
-          <a
-            href="tel:+48604619863"
-            class="text-lg font-semibold text-orange-600 whitespace-nowrap"
-            >+48 604 619 863</a
-          >
-        </li>
+            <li>
+              <a
+                href="#schedules-section"
+                class="text-gray-600 hover:text-orange-600 pb-1 border-b-2 border-transparent hover:border-orange-600 transition whitespace-nowrap"
+                >Rozkłady Jazdy</a
+              >
+            </li>
+            <li>
+              <a
+                href="#announcements-section"
+                class="text-gray-600 hover:text-orange-600 pb-1 border-b-2 border-transparent hover:border-orange-600 transition whitespace-nowrap"
+                >Komunikaty</a
+              >
+            </li>
+            <li>
+              <a
+                href="#tickets-section"
+                class="text-gray-600 hover:text-orange-600 pb-1 border-b-2 border-transparent hover:border-orange-600 transition whitespace-nowrap"
+                >Bilety & FAQ</a
+              >
+            </li>
+            <li>
+              <a
+                href="#contact-section"
+                class="text-gray-600 hover:text-orange-600 pb-1 border-b-2 border-transparent hover:border-orange-600 transition whitespace-nowrap"
+                >Kontakt</a
+              >
+            </li>
+            <li class="md:hidden">
+              <a
+                href="tel:+48604619863"
+                class="text-lg font-semibold text-orange-600 whitespace-nowrap"
+                >+48 604 619 863</a
+              >
+            </li>
           </ul>
         </nav>
         <div class="contact-info hidden lg:block min-w-[150px] text-right">
           <a
-        href="tel:+48604619863"
-        class="text-lg font-semibold text-orange-600 whitespace-nowrap"
-        >+48 604 619 863</a
+            href="tel:+48604619863"
+            class="text-lg font-semibold text-orange-600 whitespace-nowrap"
+            >+48 604 619 863</a
           >
         </div>
         <button
@@ -252,23 +260,25 @@
     <main>
       <section
         id="hero-section"
-        class="hero-section text-white text-center py-20 bg-cover bg-center hero-bacgkround"
+        class="hero-section text-white text-center py-20 bg-cover bg-center hero-background"
       >
-        <div class="container mx-auto px-4"></div>
+        <div class="container mx-auto px-4">
           <h1 class="text-4xl md:text-5xl font-bold mb-4 shadow-text">
-        MINIBUS-ZP - Podróż każdego dnia
+            MINIBUS-ZP - Podróż każdego dnia
           </h1>
-          <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mt-8 px-4">
-        <a
-          href="#schedules-section"
-          class="button primary bg-white text-orange-600 font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-gray-100 transition w-full sm:w-auto sm:px-4"
-          >Sprawdź rozkład</a
-        >
-        <a
-          href="#announcements-section"
-          class="button secondary bg-orange-500 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-orange-400 transition w-full sm:w-auto sm:px-4"
-          >Zobacz komunikaty</a
-        >
+          <div
+            class="flex flex-col sm:flex-row justify-center items-center gap-4 mt-8 px-4"
+          >
+            <a
+              href="#schedules-section"
+              class="button primary bg-white text-orange-600 font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-gray-100 transition w-full sm:w-auto sm:px-4"
+              >Sprawdź rozkład</a
+            >
+            <a
+              href="#announcements-section"
+              class="button secondary bg-orange-500 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-orange-400 transition w-full sm:w-auto sm:px-4"
+              >Zobacz komunikaty</a
+            >
           </div>
         </div>
       </section>
@@ -279,41 +289,39 @@
       >
         <div class="container mx-auto px-4 max-w-4xl">
           <h2 class="text-3xl font-bold text-center mb-10">
-        Najnowsze komunikaty
+            Najnowsze komunikaty
           </h2>
           <div
-        class="announcements-grid grid grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-8"
-        id="announcements-container"
+            class="announcements-grid grid grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-8"
+            id="announcements-container"
           >
-        <p class="text-center col-span-full text-xl py-20">
-          Ładowanie komunikatów...
-        </p>
+            <p class="text-center col-span-full text-xl py-20">
+              Ładowanie komunikatów...
+            </p>
           </div>
         </div>
       </section>
 
-      <!-- Sekcja Rozkładów Jazdy - ZMODERNIZOWANA -->
       <section
         id="schedules-section"
         class="section schedules-section py-16 bg-gray-100"
       >
         <div class="container mx-auto px-4">
-          <h2 class="text-3xl font-bold text-center mb-8">Rozkłady jazdy na trasach</h2>
-          <p id="schedule-placeholder-text" class="text-blue-600 p-3 mb-4 rounded-lg border border-blue-200 bg-blue-50/50 backdrop-blur-sm shadow-sm">
-            Wybierz trasę, aby wyświetlić rozkład jazdy dla obu kierunków.
+          <h2 class="text-3xl font-bold text-center mb-8">Rozkłady jazdy</h2>
+          <p
+            id="schedule-placeholder-text"
+            class="text-center text-gray-600 p-4 mb-6 rounded-lg border border-gray-200 bg-white shadow-sm"
+          >
+            Wybierz trasę, aby wyświetlić szczegółowy rozkład jazdy.
           </p>
-          <!-- Kontener na przyciski wyboru trasy -->
-          <div id="schedule-selector-container" class="schedule-selector-grid">
-            <!-- Przyciski będą generowane dynamicznie przez JS -->
-          </div>
-
-          <!-- Kontener do wyświetlania szczegółów rozkładu -->
+          <div
+            id="schedule-selector-container"
+            class="schedule-selector-grid"
+          ></div>
           <div
             id="schedule-details-container"
             class="schedule-details-container hidden"
-          >
-            <!-- Rozkład będzie wstrzykiwany dynamicznie przez JS -->
-          </div>
+          ></div>
         </div>
       </section>
 
@@ -330,26 +338,27 @@
               <p>
                 Bilety miesięczne dostępne są w punkcie sprzedaży na Dworcu
                 Dekada w Myślenicach, stanowisko nr 8, od 25. dnia poprzedniego
-                miesiąca. Terminy sprzedaży biletów miesięcznych są publikowane w komunikatach.
+                miesiąca. Terminy sprzedaży biletów miesięcznych są publikowane
+                w komunikatach.
               </p>
             </div>
             <div class="faq-item bg-white p-6 rounded-lg shadow">
               <h3 class="font-bold text-xl mb-2">
                 Czy mogę kupić bilet u kierowcy?
               </h3>
-                <p>
-                Bilety miesięczne dostępne są w punkcie sprzedaży na Dworcu
-                Dekada w Myślenicach. Terminy sprzedaży biletów miesięcznych są publikowane w komunikatach. 
-                </p>
+              <p>
+                Bilety jednorazowe można kupić bezpośrednio u kierowcy. Sprzedaż
+                biletów miesięcznych odbywa się wyłącznie w punkcie sprzedaży na
+                Dworcu Dekada w Myślenicach.
+              </p>
             </div>
             <div class="faq-item bg-white p-6 rounded-lg shadow">
               <h3 class="font-bold text-xl mb-2">
                 Czy są zniżki dla uczniów/studentów?
               </h3>
               <p>
-                Tak, oferujemy zniżki dla uczniów i studentów po okazaniu ważnej
-                legitymacji szkolnej/studenckiej. Ceny biletów miesięcznych ze
-                zniżką podane są w komunikatach lub u kierowcy.
+                Tak, oferujemy zniżki ustawowe dla uczniów i studentów po
+                okazaniu ważnej legitymacji szkolnej/studenckiej.
               </p>
             </div>
             <div class="text-center pt-10">
@@ -434,7 +443,8 @@
       </div>
     </footer>
 
-    <!-- Pliki JS muszą być na końcu, w tej kolejności -->
+    <div id="toast-container"></div>
+
     <script src="schedules.js"></script>
     <script src="script.js"></script>
   </body>

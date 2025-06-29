@@ -35,14 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Dynamiczne wstawienie informacji o płatności kartą
   const paymentInfoContainer = document.getElementById('payment-info-container');
-  if (paymentInfoContainer) {
-    paymentInfoContainer.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-            </svg>
-            <span>We wszystkich naszych busach zapłacisz kartą.</span>
-        `;
-  }
 
   if (typeof schedulesData !== 'undefined' && selectorContainer && detailsContainer) {
     // Generowanie przycisków wyboru trasy
@@ -50,23 +42,23 @@ document.addEventListener('DOMContentLoaded', () => {
       const route = schedulesData[routeId];
       const button = document.createElement('button');
       button.className = 'schedule-selector-btn';
+
       button.innerHTML = route.routeName;
+
       button.dataset.routeId = routeId;
       selectorContainer.appendChild(button);
     });
 
-    // Obsługa kliknięcia w trasę
+    // Obsługa kliknięcia w trasę (reszta bez zmian)
     selectorContainer.addEventListener('click', (e) => {
       const button = e.target.closest('.schedule-selector-btn');
       if (!button) return;
-
       const routeId = button.dataset.routeId;
       document.querySelectorAll('.schedule-selector-btn').forEach(btn => btn.classList.remove('active'));
       button.classList.add('active');
       renderSchedule(routeId, false);
       placeholderText.classList.add('hidden');
       detailsContainer.classList.remove('hidden');
-
       const targetPosition = detailsContainer.getBoundingClientRect().top + window.pageYOffset - 70;
       window.scrollTo({ top: targetPosition, behavior: 'smooth' });
     });
@@ -77,6 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /**
    * Główna funkcja renderująca widok rozkładu.
    */
+  // ZASTĄP TĘ FUNKCJĘ W SWOIM KODZIE
   function renderSchedule(routeId, isFullView, scrollToDirection = null) {
     const route = schedulesData[routeId];
     const now = new Date();
@@ -87,14 +80,15 @@ document.addEventListener('DOMContentLoaded', () => {
       { key: 'sundays', displayName: 'Niedziele i Święta' }
     ];
 
-    let html = ''; // Zaczynamy od pustego stringa (bez daty ważności)
+    let html = '';
 
     route.directions.forEach((direction, index) => {
-      html += generateDirectionHtml(direction, { routeId, index, now, today, allDayTypes, isFullView });
+      // Przekazujemy całą trasę, aby mieć dostęp do 'acceptsCard' w funkcji podrzędnej
+      html += generateDirectionHtml(direction, route, { index, now, today, allDayTypes, isFullView });
     });
 
     detailsContainer.innerHTML = html;
-    setupEventListeners(routeId); // Ustawia listenery dla przycisków i tooltipów
+    setupEventListeners(routeId);
     if (isFullView && scrollToDirection) {
       scrollToElement(scrollToDirection);
     }
@@ -103,24 +97,21 @@ document.addEventListener('DOMContentLoaded', () => {
   /**
    * Funkcja pomocnicza generująca HTML dla pojedynczego kierunku.
    */
-  function generateDirectionHtml(direction, context) {
-    const { routeId, index, now, today, allDayTypes, isFullView } = context;
-    const directionId = `${routeId}-${direction.directionName.replace(/[^a-zA-Z0-9]/g, '-')}-${index}`;
+  // ZASTĄP RÓWNIEŻ TĘ FUNKCJĘ
+  function generateDirectionHtml(direction, route, context) {
+    const { index, now, today, allDayTypes, isFullView } = context;
+    const directionId = `${route.routeName.replace(/\s/g, '-')}-${direction.directionName.replace(/[^a-zA-Z0-9]/g, '-')}-${index}`;
     const notesLegend = direction.notes || {};
-    let directionHtml = '';
+    let directionGridsHtml = '';
 
     if (isFullView) {
       allDayTypes.forEach(dayType => {
-        directionHtml += `
-                    <p class="mt-6 mb-2 text-gray-700">${dayType.displayName}</p>
-                    ${generateTimesGridHtml({ timesArray: direction.times[dayType.key] || [], notesLegend, isShortView: false, now, dayTypeForGrid: dayType })}
-                `;
+        directionGridsHtml += `<p class="mt-6 mb-2 text-gray-700">${dayType.displayName}</p>
+                              ${generateTimesGridHtml({ timesArray: direction.times[dayType.key] || [], notesLegend, isShortView: false, now, dayTypeForGrid: dayType })}`;
       });
     } else {
-      directionHtml += `
-                <div class="flex justify-between items-center mt-2 mb-2"><p class="text-gray-700">Najbliższe kursy dzisiaj (${today.displayName})</p></div>
-                ${generateTimesGridHtml({ timesArray: direction.times[today.key] || [], notesLegend, isShortView: true, now, dayTypeForGrid: today, limit: 5 })}
-            `;
+      directionGridsHtml += `<div class="flex justify-between items-center mt-2 mb-2"><p class="text-gray-700">Najbliższe kursy dzisiaj (${today.displayName})</p></div>
+                          ${generateTimesGridHtml({ timesArray: direction.times[today.key] || [], notesLegend, isShortView: true, now, dayTypeForGrid: today, limit: 5 })}`;
     }
 
     let legendHtml = '';
@@ -132,18 +123,31 @@ document.addEventListener('DOMContentLoaded', () => {
       legendHtml += '</div>';
     }
 
+    // POPRAWKA: Informacja o płatności jest generowana tutaj, jeśli 'acceptsCard' jest true
+    let paymentInfoHtml = '';
+    if (route.acceptsCard) {
+      paymentInfoHtml = `
+        <div class="payment-info-subtle">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+            </svg>
+            <span>płatność kartą dostępna</span>
+        </div>`;
+    }
+
     const buttonText = isFullView ? 'Zwiń rozkład' : 'Pełny rozkład ->';
     return `
-            ${index > 0 ? '<hr class="my-6 border-gray-300">' : ''}
-            <div class="schedule-direction" id="${directionId}">
-                <h4 class="font-bold text-xl flex items-center gap-2">
-                    <span class="inline-block align-middle text-orange-600" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="5" width="18" height="12" rx="3" fill="#c2410c" stroke="#c2410c" /><rect x="6" y="8" width="4" height="4" rx="1" fill="#fff" /><rect x="14" y="8" width="4" height="4" rx="1" fill="#fff" /><circle cx="7.5" cy="17" r="1.5" fill="#1e293b"/><circle cx="16.5" cy="17" r="1.5" fill="#1e293b"/></svg></span>
-                    ${direction.directionName}
-                </h4>
-                ${directionHtml}
-                ${legendHtml}
-                <div class="flex justify-start mt-4"><button class="toggle-full-schedule-btn" data-route-id="${routeId}" data-full-view="${isFullView}" data-direction-id="${directionId}">${buttonText}</button></div>
-            </div>`;
+        ${index > 0 ? '<hr class="my-6 border-gray-300">' : ''}
+        <div class="schedule-direction" id="${directionId}">
+            ${paymentInfoHtml} 
+            <h4 class="font-bold text-xl flex items-center gap-2">
+                <span class="inline-block align-middle text-orange-600" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="5" width="18" height="12" rx="3" fill="#c2410c" stroke="#c2410c" /><rect x="6" y="8" width="4" height="4" rx="1" fill="#fff" /><rect x="14" y="8" width="4" height="4" rx="1" fill="#fff" /><circle cx="7.5" cy="17" r="1.5" fill="#1e293b"/><circle cx="16.5" cy="17" r="1.5" fill="#1e293b"/></svg></span>
+                ${direction.directionName}
+            </h4>
+            ${directionGridsHtml}
+            ${legendHtml}
+            <div class="flex justify-start mt-4"><button class="toggle-full-schedule-btn" data-route-id="${route.routeName}" data-full-view="${isFullView}" data-direction-id="${directionId}">${buttonText}</button></div>
+        </div>`;
   }
 
   /**

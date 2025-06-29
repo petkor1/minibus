@@ -183,6 +183,34 @@
         opacity: 1;
         visibility: visible;
       }
+
+      .schedule-selector-btn {
+        background-color: #f0f0f0;
+        border: 1px solid #ddd;
+        padding: 1rem;
+        border-radius: 8px;
+        text-align: center; /* Wyrównanie tekstu wraca do text-align */
+        font-size: 1.1em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s, box-shadow 0.3s, color 0.3s;
+      }
+      .payment-info-subtle {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start; /* POPRAWKA: Wyrównuje do lewej strony */
+        gap: 0.5rem;
+        color: #6b7280;
+        font-size: 0.9em;
+        margin-top: 0.5rem; /* Zmieniony margines dla lepszego wyglądu pod nagłówkiem */
+        margin-bottom: 1rem;
+      }
+
+      /* Dostosowanie rozmiaru ikony wewnątrz tego elementu */
+      .payment-info-subtle svg {
+        width: 1.25rem; /* 20px */
+        height: 1.25rem;
+      }
     </style>
   </head>
 
@@ -302,8 +330,6 @@
       >
         <div class="container mx-auto px-4">
           <h2 class="text-3xl font-bold text-center mb-8">Rozkłady jazdy</h2>
-
-          <div id="payment-info-container"></div>
 
           <p
             id="schedule-placeholder-text"

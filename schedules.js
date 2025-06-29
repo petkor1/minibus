@@ -33,6 +33,7 @@ const schedulesData = {
     "myslenice-biertowice": {
         routeName: "Myślenice <-> Biertowice",
         validFrom: "01.07.2025",
+        acceptsCard: true,
         directions: [{
             directionName: "Myślenice → Biertowice",
             times: {

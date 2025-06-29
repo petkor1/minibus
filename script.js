@@ -1,6 +1,6 @@
 // ===================================================================================
 // KOMPLETNY KOD APLIKACJI - script.js
-// Wersja z odliczaniem dla 5 najbliższych kursów i inteligentnym formatowaniem czasu.
+// Wersja z poprawionym, przyjaznym tekstem w tooltipach.
 // ===================================================================================
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
       { key: 'saturdays', displayName: 'Soboty' },
       { key: 'sundays', displayName: 'Niedziele i Święta' }
     ];
-    let html = `<p class="text-sm text-gray-500 mb-4">Rozkład jazdy ważny od: ${route.validFrom}</p>`;
+    let html = ``;
     route.directions.forEach((direction, index) => {
       html += generateDirectionHtml(direction, { routeId, index, now, today, allDayTypes, isFullView });
     });
@@ -135,69 +135,83 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /**
-   * NOWOŚĆ: Formatuje minuty na czytelny tekst (np. "za 5 min" lub "za 1h 15m").
+   * Formatuje minuty na KRÓTKI tekst (np. "za 5 min", "za 1h 15m") dla etykiety pod godziną.
    */
-  function formatMinutesUntil(totalMinutes) {
+  function formatMinutesUntilShort(totalMinutes) {
     if (totalMinutes < 0) return '';
-    if (totalMinutes === 0) return 'odjeżdża';
+    if (totalMinutes < 1) return 'teraz';
     if (totalMinutes === 1) return 'za 1 min';
     if (totalMinutes < 60) return `za ${totalMinutes} min`;
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    if (minutes === 0) return `za ${hours}h`;
+    return `za ${hours}h ${minutes}m`;
+  }
+
+  /**
+   * NOWOŚĆ: Formatuje minuty na PEŁNY, PRZYJAZNY tekst (np. "Odjazd za 5 minut") dla tooltipa.
+   */
+  function formatMinutesUntilFriendly(totalMinutes) {
+    if (totalMinutes < 0) return '';
+    if (totalMinutes < 1) return 'Odjeżdża teraz';
+    if (totalMinutes === 1) return 'Odjazd za 1 minutę';
+
+    if (totalMinutes < 60) {
+      const lastDigit = totalMinutes % 10;
+      const lastTwoDigits = totalMinutes % 100;
+      if (lastDigit >= 2 && lastDigit <= 4 && !(lastTwoDigits >= 12 && lastTwoDigits <= 14)) {
+        return `Odjazd za ${totalMinutes} minuty`;
+      }
+      return `Odjazd za ${totalMinutes} minut`;
+    }
 
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
+    let hourWord = 'godzin';
+    if (hours === 1) hourWord = 'godzinę';
+    if (hours >= 2 && hours <= 4) hourWord = 'godziny';
 
-    if (minutes === 0) return `za ${hours}h`;
+    if (minutes === 0) return `Odjazd za ${hours} ${hourWord}`;
 
-    return `za ${hours}h ${minutes}m`;
+    return `Odjazd za ${hours} ${hourWord} i ${minutes} min`;
   }
 
   function generateTimesGridHtml(options) {
     const { timesArray, notesLegend, isShortView, now, dayTypeForGrid, limit = null } = options;
     if (!timesArray || timesArray.length === 0) return '<p class="text-blue-600 p-4 rounded-lg border border-blue-200 bg-blue-50/50 backdrop-blur-sm shadow-sm">W tym dniu nie ma kursów</p>';
-
     const today = getDayType(now);
     const isTodaySchedule = dayTypeForGrid.key === today.key;
     const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes();
-
-    const departures = timesArray
-      .map(timeObj => ({ ...timeObj, totalMinutes: (([h, m]) => h * 60 + m)(timeObj.time.split(':').map(Number)), isPast: isTodaySchedule && (([h, m]) => h * 60 + m)(timeObj.time.split(':').map(Number)) < currentTimeInMinutes }))
-      .sort((a, b) => a.totalMinutes - b.totalMinutes);
-
-    // ZMIANA: Identyfikujemy 5 najbliższych kursów
+    const departures = timesArray.map(timeObj => ({ ...timeObj, totalMinutes: (([h, m]) => h * 60 + m)(timeObj.time.split(':').map(Number)), isPast: isTodaySchedule && (([h, m]) => h * 60 + m)(timeObj.time.split(':').map(Number)) < currentTimeInMinutes })).sort((a, b) => a.totalMinutes - b.totalMinutes);
     const futureDepartures = isTodaySchedule ? departures.filter(dep => !dep.isPast) : [];
     const nextFiveDepartures = futureDepartures.slice(0, 5);
     const nextFiveTimes = new Set(nextFiveDepartures.map(d => d.time));
-
     let departuresToDisplay = isShortView ? nextFiveDepartures : departures;
-
     if (departuresToDisplay.length === 0 && isShortView) return '<p class="text-blue-600 p-4 rounded-lg border border-blue-200 bg-blue-50/50 backdrop-blur-sm shadow-sm">W tym dniu nie ma już dostępnych kursów dla tego kierunku.</p>';
-
     const firstFutureIndex = departuresToDisplay.findIndex(dep => !dep.isPast);
 
     const timesHtml = departuresToDisplay.map((time, idx) => {
       const isNextFive = nextFiveTimes.has(time.time);
-      const bgClass = (idx === firstFutureIndex && isTodaySchedule) ? 'bg-light-red' : (time.isPast ? 'bg-no-background' : 'bg-light-gray');
+      const bgClass = (idx === firstFutureIndex && isTodaySchedule && isShortView) ? 'bg-light-red' : (time.isPast ? 'bg-no-background' : 'bg-light-gray');
       const noteText = (time.noteKey && notesLegend[time.noteKey]) || '';
       const noteHtml = noteText ? `<span class="time-note">${time.noteKey}</span>` : '';
+      let countdownHtml = '', timeBoxContentPrefix = '', tooltipText = noteText;
 
-      let countdownHtml = '';
-      let timeBoxContentPrefix = '';
-      let tooltipText = noteText;
-
-      // ZMIANA: Generujemy odliczanie dla 5 najbliższych kursów
       if (isTodaySchedule && isNextFive) {
         timeBoxContentPrefix = '<span class="time-icon">⏰</span>';
         const minutesUntil = time.totalMinutes - currentTimeInMinutes;
         if (minutesUntil >= 0) {
-          countdownHtml = `<span class="countdown-text">${formatMinutesUntil(minutesUntil)}</span>`;
-          tooltipText = [formatMinutesUntil(minutesUntil), noteText].filter(Boolean).join(' | ');
+          // POPRAWKA: Używamy dwóch różnych funkcji formatujących
+          const shortCountdownText = formatMinutesUntilShort(minutesUntil);
+          const friendlyCountdownText = formatMinutesUntilFriendly(minutesUntil);
+
+          countdownHtml = `<span class="countdown-text">${shortCountdownText}</span>`;
+          tooltipText = noteText ? `${friendlyCountdownText} (${noteText})` : friendlyCountdownText;
         }
       }
       const tooltip = tooltipText ? `data-tooltip="${tooltipText}"` : '';
-
       return `<div class="time-box ${bgClass}" ${tooltip}><div class="time-box-content">${timeBoxContentPrefix}<span class="time-value">${time.time}</span>${noteHtml}</div><div class="countdown-container">${countdownHtml}</div></div>`;
     }).join('');
-
     return `<div class="time-grid">${timesHtml}</div>`;
   }
 

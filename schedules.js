@@ -141,6 +141,7 @@ const schedulesData = {
     "myslenice-poreba": {
         routeName: "Myślenice <-> Poręba",
         validFrom: "01.07.2025",
+        acceptsCard: true,
         directions: [{
             directionName: "Myślenice → Poręba",
             notes: { "s": "kursuje w dni szkolne", "g": "kursuje do Górnej Poręby" },

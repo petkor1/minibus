@@ -1,6 +1,6 @@
 // ===================================================================================
 // KOMPLETNY KOD APLIKACJI - script.js
-// Wersja z przeprojektowanym filtrem (lepszy UX, przyciski Filtruj/Wyczyść).
+// Wersja z ulepszonym, zwijanym filtrem i poprawkami UX.
 // ===================================================================================
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -57,11 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const route = schedulesData[routeId];
     const now = new Date();
     const today = getDayType(now);
-    const allDayTypes = [
-      { key: 'workdays', displayName: 'Dni Robocze' },
-      { key: 'saturdays', displayName: 'Soboty' },
-      { key: 'sundays', displayName: 'Niedziele i Święta' }
-    ];
+    const allDayTypes = [{ key: 'workdays', displayName: 'Dni Robocze' }, { key: 'saturdays', displayName: 'Soboty' }, { key: 'sundays', displayName: 'Niedziele i Święta' }];
     let html = '';
     route.directions.forEach((direction, index) => {
       html += generateDirectionHtml(direction, route, { index, now, today, allDayTypes, isFullView, routeId });
@@ -116,7 +112,17 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    // NOWOŚĆ: Przebudowana logika obsługi filtra
+    // NOWOŚĆ: Logika dla zwijanego filtra
+    detailsContainer.querySelectorAll('.filter-toggle-btn').forEach(toggleBtn => {
+      toggleBtn.addEventListener('click', () => {
+        toggleBtn.classList.toggle('active');
+        const filterContainer = toggleBtn.nextElementSibling;
+        if (filterContainer) {
+          filterContainer.classList.toggle('visible');
+        }
+      });
+    });
+
     detailsContainer.querySelectorAll('.time-filter-form').forEach(form => {
       const handleFilter = () => {
         const directionId = form.dataset.directionId;
@@ -134,7 +140,8 @@ document.addEventListener('DOMContentLoaded', () => {
           });
           const gridContainer = document.getElementById(`grid-${directionId}`);
           if (gridContainer) {
-            gridContainer.innerHTML = generateTimesGridHtml({ timesArray: filteredTimes, notesLegend: directionData.notes || {}, isShortView: true, now, dayTypeForGrid: today });
+            const customTitle = `Odjazdy między ${fromHour.toString().padStart(2, '0')}:00 a ${toHour.toString().padStart(2, '0')}:00`;
+            gridContainer.innerHTML = generateTimesGridHtml({ timesArray: filteredTimes, notesLegend: directionData.notes || {}, isShortView: true, now, dayTypeForGrid: today, customTitle: customTitle });
           }
         }
       };
@@ -165,32 +172,42 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // NOWOŚĆ: Ulepszony HTML dla formularza filtra
   function generateFilterHtml(directionId) {
     let optionsHtml = '';
     for (let i = 0; i <= 23; i++) {
-      optionsHtml += `<option value="${i}">${i.toString().padStart(2, '0')}:00</option>`;
+      const hour = i.toString().padStart(2, '0');
+      optionsHtml += `<option value="${i}">${hour}:00</option>`;
     }
     return `
-            <form class="time-filter-form" data-direction-id="${directionId}">
-                <p class="filter-title">Pokaż odjazdy:</p>
-                <div class="filter-content">
-                    <div class="filter-inputs">
-                        <div class="filter-group">
-                            <label for="from-hour-${directionId}">Od</label>
-                            <select name="from-hour" id="from-hour-${directionId}">${optionsHtml}</select>
+        <div class="filter-section">
+            <button type="button" class="filter-toggle-btn">
+                <span>Filtruj odjazdy</span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+            </button>
+            <div class="filter-container">
+                <form class="time-filter-form" data-direction-id="${directionId}">
+                    <fieldset class="time-filter-fieldset">
+                        <legend class="filter-legend">Zakres godzin</legend>
+                        <div class="filter-content">
+                            <div class="filter-inputs">
+                                <div class="filter-group">
+                                    <label for="from-hour-${directionId}">Od</label>
+                                    <select name="from-hour" id="from-hour-${directionId}">${optionsHtml}</select>
+                                </div>
+                                <div class="filter-group">
+                                    <label for="to-hour-${directionId}">Do</label>
+                                    <select name="to-hour" id="to-hour-${directionId}">${optionsHtml.replace('value="0"', 'value="24" selected')}</select>
+                                </div>
+                            </div>
+                            <div class="filter-actions">
+                                <button type="submit" class="filter-button">Filtruj</button>
+                                <button type="reset" class="reset-button">Wyczyść</button>
+                            </div>
                         </div>
-                        <div class="filter-group">
-                            <label for="to-hour-${directionId}">Do</label>
-                            <select name="to-hour" id="to-hour-${directionId}">${optionsHtml.replace('value="0"', 'value="24" selected')}</select>
-                        </div>
-                    </div>
-                    <div class="filter-actions">
-                        <button type="submit" class="filter-button">Filtruj</button>
-                        <button type="reset" class="reset-button">Wyczyść</button>
-                    </div>
-                </div>
-            </form>`;
+                    </fieldset>
+                </form>
+            </div>
+        </div>`;
   }
 
   // Pozostała część pliku bez zmian
@@ -203,7 +220,61 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   function formatMinutesUntilShort(totalMinutes) { if (totalMinutes < 0) return ''; if (totalMinutes < 1) return 'teraz'; if (totalMinutes === 1) return 'za 1 min'; if (totalMinutes < 60) return `za ${totalMinutes} min`; const hours = Math.floor(totalMinutes / 60); const minutes = totalMinutes % 60; if (minutes === 0) return `za ${hours}h`; return `za ${hours}h ${minutes}m`; }
   function formatMinutesUntilFriendly(totalMinutes) { if (totalMinutes < 0) return ''; if (totalMinutes < 1) return 'Odjeżdża teraz'; if (totalMinutes === 1) return 'Odjazd za 1 minutę'; if (totalMinutes < 60) { const lastDigit = totalMinutes % 10; const lastTwoDigits = totalMinutes % 100; if (lastDigit >= 2 && lastDigit <= 4 && !(lastTwoDigits >= 12 && lastTwoDigits <= 14)) { return `Odjazd za ${totalMinutes} minuty`; } return `Odjazd za ${totalMinutes} minut`; } const hours = Math.floor(totalMinutes / 60); const minutes = totalMinutes % 60; let hourWord = 'godzin'; if (hours === 1) hourWord = 'godzinę'; if (hours >= 2 && hours <= 4) hourWord = 'godziny'; if (minutes === 0) return `Odjazd za ${hours} ${hourWord}`; return `Odjazd za ${hours} ${hourWord} i ${minutes} min`; }
-  function generateTimesGridHtml(options) { const { timesArray, notesLegend, isShortView, now, dayTypeForGrid, limit = null } = options; if (!timesArray || timesArray.length === 0) { return '<p class="text-blue-600 p-4 rounded-lg border border-blue-200 bg-blue-50/50 backdrop-blur-sm shadow-sm">Brak kursów w wybranym zakresie.</p>'; } const today = getDayType(now); const isTodaySchedule = dayTypeForGrid.key === today.key; const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes(); const departures = timesArray.map(timeObj => ({ ...timeObj, totalMinutes: (([h, m]) => h * 60 + m)(timeObj.time.split(':').map(Number)), isPast: isTodaySchedule && (([h, m]) => h * 60 + m)(timeObj.time.split(':').map(Number)) < currentTimeInMinutes })).sort((a, b) => a.totalMinutes - b.totalMinutes); let departuresToDisplay = isShortView ? departures.filter(dep => !dep.isPast) : departures; if (isShortView && limit) { departuresToDisplay = departuresToDisplay.slice(0, limit); } if (departuresToDisplay.length === 0) { return '<p class="text-blue-600 p-4 rounded-lg border border-blue-200 bg-blue-50/50 backdrop-blur-sm shadow-sm">Brak przyszłych kursów w wybranym zakresie.</p>'; } const futureDepartures = isTodaySchedule ? departures.filter(dep => !dep.isPast) : []; const nextFiveDepartures = futureDepartures.slice(0, 5); const nextFiveTimes = new Set(nextFiveDepartures.map(d => d.time)); const firstFutureIndex = departuresToDisplay.findIndex(dep => !dep.isPast); const timesHtml = departuresToDisplay.map((time, idx) => { const isNextFive = nextFiveTimes.has(time.time); const bgClass = (idx === firstFutureIndex && isTodaySchedule) ? 'bg-light-red' : (time.isPast ? 'bg-no-background' : 'bg-light-gray'); const noteText = (time.noteKey && notesLegend[time.noteKey]) || ''; const noteHtml = noteText ? `<span class="time-note">${time.noteKey}</span>` : ''; let countdownHtml = '', timeBoxContentPrefix = '', tooltipText = noteText; if (isTodaySchedule && isNextFive) { timeBoxContentPrefix = '<span class="time-icon">⏰</span>'; const minutesUntil = time.totalMinutes - currentTimeInMinutes; if (minutesUntil >= 0) { const shortCountdownText = formatMinutesUntilShort(minutesUntil); const friendlyCountdownText = formatMinutesUntilFriendly(minutesUntil); countdownHtml = `<span class="countdown-text">${shortCountdownText}</span>`; tooltipText = noteText ? `${friendlyCountdownText} (${noteText})` : friendlyCountdownText; } } const tooltip = tooltipText ? `data-tooltip="${tooltipText}"` : ''; return `<div class="time-box ${bgClass}" ${tooltip}><div class="time-box-content">${timeBoxContentPrefix}<span class="time-value">${time.time}</span>${noteHtml}</div><div class="countdown-container">${countdownHtml}</div></div>`; }).join(''); return `<div class="time-grid">${timesHtml}</div>`; }
+
+  // NOWOŚĆ: Funkcja przyjmuje teraz `customTitle`
+  function generateTimesGridHtml(options) {
+    const { timesArray, notesLegend, isShortView, now, dayTypeForGrid, limit = null, customTitle = null } = options;
+
+    let titleHtml = '';
+    if (customTitle) {
+      titleHtml = `<div class="flex justify-between items-center mt-2 mb-2"><p class="text-gray-700">${customTitle}</p></div>`;
+    } else if (isShortView && limit) {
+      // Przywrócono domyślny tytuł dla widoku skróconego
+      const today = getDayType(now);
+      titleHtml = `<div class="flex justify-between items-center mt-2 mb-2"><p class="text-gray-700">Najbliższe kursy dzisiaj (${today.displayName})</p></div>`;
+    }
+
+    if (!timesArray || timesArray.length === 0) {
+      return `${titleHtml}<p class="text-blue-600 p-4 rounded-lg border border-blue-200 bg-blue-50/50 backdrop-blur-sm shadow-sm">Brak kursów w wybranym zakresie.</p>`;
+    }
+    const today = getDayType(now);
+    const isTodaySchedule = dayTypeForGrid.key === today.key;
+    const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes();
+    const departures = timesArray.map(timeObj => ({ ...timeObj, totalMinutes: (([h, m]) => h * 60 + m)(timeObj.time.split(':').map(Number)), isPast: isTodaySchedule && (([h, m]) => h * 60 + m)(timeObj.time.split(':').map(Number)) < currentTimeInMinutes })).sort((a, b) => a.totalMinutes - b.totalMinutes);
+    let departuresToDisplay = isShortView ? departures.filter(dep => !dep.isPast) : departures;
+    if (isShortView && limit) {
+      departuresToDisplay = departuresToDisplay.slice(0, limit);
+    }
+    if (departuresToDisplay.length === 0) {
+      return `${titleHtml}<p class="text-blue-600 p-4 rounded-lg border border-blue-200 bg-blue-50/50 backdrop-blur-sm shadow-sm">Brak przyszłych kursów w wybranym zakresie.</p>`;
+    }
+    const futureDepartures = isTodaySchedule ? departures.filter(dep => !dep.isPast) : [];
+    const nextFiveDepartures = futureDepartures.slice(0, 5);
+    const nextFiveTimes = new Set(nextFiveDepartures.map(d => d.time));
+    const firstFutureIndex = departuresToDisplay.findIndex(dep => !dep.isPast);
+    const timesHtml = departuresToDisplay.map((time, idx) => {
+      const isNextFive = nextFiveTimes.has(time.time);
+      const bgClass = (idx === firstFutureIndex && isTodaySchedule) ? 'bg-light-red' : (time.isPast ? 'bg-no-background' : 'bg-light-gray');
+      const noteText = (time.noteKey && notesLegend[time.noteKey]) || '';
+      const noteHtml = noteText ? `<span class="time-note">${time.noteKey}</span>` : '';
+      let countdownHtml = '', timeBoxContentPrefix = '', tooltipText = noteText;
+      if (isTodaySchedule && isNextFive) {
+        timeBoxContentPrefix = '<span class="time-icon">⏰</span>';
+        const minutesUntil = time.totalMinutes - currentTimeInMinutes;
+        if (minutesUntil >= 0) {
+          const shortCountdownText = formatMinutesUntilShort(minutesUntil);
+          const friendlyCountdownText = formatMinutesUntilFriendly(minutesUntil);
+          countdownHtml = `<span class="countdown-text">${shortCountdownText}</span>`;
+          tooltipText = noteText ? `${friendlyCountdownText} (${noteText})` : friendlyCountdownText;
+        }
+      }
+      const tooltip = tooltipText ? `data-tooltip="${tooltipText}"` : '';
+      return `<div class="time-box ${bgClass}" ${tooltip}><div class="time-box-content">${timeBoxContentPrefix}<span class="time-value">${time.time}</span>${noteHtml}</div><div class="countdown-container">${countdownHtml}</div></div>`;
+    }).join('');
+    return `${titleHtml}<div class="time-grid">${timesHtml}</div>`;
+  }
+
+  // --- Pozostałe funkcje pomocnicze bez zmian ---
   function getPublicHolidays(year) { const a = year % 19, b = Math.floor(year / 100), c = year % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451); const month = Math.floor((h + l - 7 * m + 114) / 31), day = ((h + l - 7 * m + 114) % 31) + 1; const easterMonday = new Date(year, month - 1, day + 1); const corpusChristi = new Date(year, month - 1, day + 60); const formatDate = (date) => date.toISOString().slice(0, 10); return [`${year}-01-01`, `${year}-01-06`, formatDate(easterMonday), `${year}-05-01`, `${year}-05-03`, formatDate(corpusChristi), `${year}-08-15`, `${year}-11-01`, `${year}-11-11`, `${year}-12-25`, `${year}-12-26`]; }
   function getDayType(date) { const day = date.getDay(); const holidays = getPublicHolidays(date.getFullYear()); const dateString = date.toISOString().slice(0, 10); if (day === 0 || holidays.includes(dateString)) return { key: 'sundays', displayName: 'Niedziele i Święta' }; if (day === 6) return { key: 'saturdays', displayName: 'Soboty' }; return { key: 'workdays', displayName: 'Dni Robocze' }; }
   const tooltipElement = document.getElementById('custom-tooltip');

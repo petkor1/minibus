@@ -234,6 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /**
    * Generuje siatkę z godzinami odjazdów.
+   * Wersja z poprawionym podświetlaniem najbliższego kursu w pełnym widoku.
    */
   function generateTimesGridHtml(options) {
     const { timesArray, notesLegend, isShortView, now, dayTypeForGrid, limit = null } = options;
@@ -259,11 +260,17 @@ document.addEventListener('DOMContentLoaded', () => {
       return '<p class="text-blue-600 p-4 rounded-lg border border-blue-200 bg-blue-50/50 backdrop-blur-sm shadow-sm">W tym dniu nie ma już dostępnych kursów dla tego kierunku.</p>';
     }
 
+    // Ten indeks będzie teraz poprawnie wskazywał najbliższy kurs zarówno w widoku pełnym, jak i skróconym
     const firstFutureIndex = departuresToDisplay.findIndex(dep => !dep.isPast);
 
     const timesHtml = departuresToDisplay.map((time, idx) => {
       const isNextFive = nextFiveTimes.has(time.time);
-      const bgClass = (idx === firstFutureIndex && isTodaySchedule && isShortView) ? 'bg-light-red' : (time.isPast ? 'bg-no-background' : 'bg-light-gray');
+
+      // ====================================================================================
+      // POPRAWKA: Usunięto warunek '&& isShortView' z logiki nadawania klasy 'bg-light-red'
+      // ====================================================================================
+      const bgClass = (idx === firstFutureIndex && isTodaySchedule) ? 'bg-light-red' : (time.isPast ? 'bg-no-background' : 'bg-light-gray');
+
       const noteText = (time.noteKey && notesLegend[time.noteKey]) || '';
       const noteHtml = noteText ? `<span class="time-note">${time.noteKey}</span>` : '';
 
@@ -277,7 +284,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (minutesUntil >= 0) {
           const shortCountdownText = formatMinutesUntilShort(minutesUntil);
           const friendlyCountdownText = formatMinutesUntilFriendly(minutesUntil);
-
           countdownHtml = `<span class="countdown-text">${shortCountdownText}</span>`;
           tooltipText = noteText ? `${friendlyCountdownText} (${noteText})` : friendlyCountdownText;
         }
@@ -285,10 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const tooltip = tooltipText ? `data-tooltip="${tooltipText}"` : '';
 
-      return `<div class="time-box ${bgClass}" ${tooltip}>
-                        <div class="time-box-content">${timeBoxContentPrefix}<span class="time-value">${time.time}</span>${noteHtml}</div>
-                        <div class="countdown-container">${countdownHtml}</div>
-                    </div>`;
+      return `<div class="time-box ${bgClass}" ${tooltip}><div class="time-box-content">${timeBoxContentPrefix}<span class="time-value">${time.time}</span>${noteHtml}</div><div class="countdown-container">${countdownHtml}</div></div>`;
     }).join('');
 
     return `<div class="time-grid">${timesHtml}</div>`;

@@ -10,10 +10,10 @@ const schedulesData = {
             directionName: "Myślenice → Dobczyce",
             times: {
                 workdays: [
-                    { time: "05:30" }, { time: "05:45" }, { time: "06:00" }, { time: "06:15" }, { time: "06:30" }, { time: "06:45" }, { time: "07:00" }, { time: "07:15" }, { time: "07:30" }, { time: "07:45" }, { time: "08:00" }, { time: "08:15" }, { time: "08:30" }, { time: "08:45" }, { time: "09:00" }, { time: "09:15" }, { time: "09:30" }, { time: "09:45" }, { time: "10:00" }, { time: "10:15" }, { time: "10:30" }, { time: "10:45" }, { time: "11:00" }, { time: "11:15" }, { time: "11:30" }, { time: "11:45" }, { time: "12:00" }, { time: "12:15" }, { time: "12:30" }, { time: "12:45" }, { time: "13:00" }, { time: "13:15" }, { time: "13:30" }, { time: "13:45" }, { time: "14:00" }, { time: "14:15" }, { time: "14:30" }, { time: "14:45" }, { time: "15:00" }, { time: "15:15" }, { time: "15:30" }, { time: "15:45" }, { time: "16:00" }, { time: "16:15" }, { time: "17:00" }, { time: "17:15" }, { time: "17:30" }, { time: "17:45" }, { time: "18:00" }, { time: "18:15" }, { time: "19:00" }, { time: "19:30" }, { time: "20:15" }, { time: "22:15" }
+                    { time: "05:30" }, { time: "05:45" }, { time: "06:00" }, { time: "06:15" }, { time: "06:30" }, { time: "06:45" }, { time: "07:00" }, { time: "07:15" }, { time: "07:30" }, { time: "07:45" }, { time: "08:00" }, { time: "08:15" }, { time: "08:30" }, { time: "08:45" }, { time: "09:00" }, { time: "09:15" }, { time: "09:30" }, { time: "09:45" }, { time: "10:00" }, { time: "10:15" }, { time: "10:30" }, { time: "10:45" }, { time: "11:00" }, { time: "11:15" }, { time: "11:30" }, { time: "11:45" }, { time: "12:00" }, { time: "12:15" }, { time: "12:30" }, { time: "12:45" }, { time: "13:00" }, { time: "13:15" }, { time: "13:30" }, { time: "13:45" }, { time: "14:00" }, { time: "14:15" }, { time: "14:30" }, { time: "14:45" }, { time: "15:00" }, { time: "15:15" }, { time: "15:30" }, { time: "15:45" }, { time: "16:00" }, { time: "16:05" }, { time: "16:15" }, { time: "16:30" }, { time: "16:35" }, { time: "17:00" }, { time: "17:15" }, { time: "17:30" }, { time: "17:45" }, { time: "18:00" }, { time: "18:15" }, { time: "19:00" }, { time: "19:30" }, { time: "20:15" }, { time: "22:15" }
                 ],
                 saturdays: [
-                    { time: "05:45" }, { time: "06:45" }, { time: "07:45" }, { time: "08:45" }, { time: "09:45" }, { time: "10:45" }, { time: "11:45" }, { time: "12:45" }, { time: "13:45" }, { time: "14:45" }, { time: "15:45" }, { time: "16:45" }, { time: "17:15" }, { time: "18:00" }, { time: "19:00" }, { time: "20:00" }, { time: "22:10" }, { time: "22:10" }, { time: "22:11" }, { time: "22:12" }, { time: "22:13" }
+                    { time: "05:45" }, { time: "06:45" }, { time: "07:45" }, { time: "08:45" }, { time: "09:45" }, { time: "10:45" }, { time: "11:45" }, { time: "12:45" }, { time: "13:45" }, { time: "14:45" }, { time: "15:45" }, { time: "16:00" }, { time: "16:05" }, { time: "16:15" }, { time: "16:30" }, { time: "16:35" }, { time: "17:15" }, { time: "18:00" }, { time: "19:00" }, { time: "20:00" }, { time: "22:10" }, { time: "22:10" }, { time: "22:11" }, { time: "22:12" }, { time: "22:13" }
                 ],
                 sundays: []
             }
@@ -21,10 +21,10 @@ const schedulesData = {
             directionName: "Dobczyce → Myślenice",
             times: {
                 workdays: [
-                    { time: "05:15" }, { time: "05:30" }, { time: "05:45" }, { time: "06:00" }, { time: "06:15" }, { time: "06:30" }, { time: "06:45" }, { time: "07:00" }, { time: "07:15" }, { time: "07:30" }, { time: "07:45" }, { time: "08:00" }, { time: "08:15" }, { time: "08:30" }, { time: "08:45" }, { time: "09:00" }, { time: "09:15" }, { time: "09:30" }, { time: "09:45" }, { time: "10:00" }, { time: "10:15" }, { time: "10:30" }, { time: "10:45" }, { time: "11:00" }, { time: "11:15" }, { time: "11:30" }, { time: "11:45" }, { time: "12:00" }, { time: "12:15" }, { time: "12:30" }, { time: "12:45" }, { time: "13:00" }, { time: "13:15" }, { time: "13:30" }, { time: "13:45" }, { time: "14:00" }, { time: "14:15" }, { time: "14:30" }, { time: "14:45" }, { time: "15:00" }, { time: "15:15" }, { time: "15:30" }, { time: "15:45" }, { time: "16:00" }, { time: "16:15" }, { time: "16:45" }, { time: "17:00" }, { time: "17:15" }, { time: "17:30" }, { time: "18:00" }, { time: "18:30" }, { time: "19:00" }, { time: "19:30" }, { time: "21:15" }
+                    { time: "05:15" }, { time: "05:30" }, { time: "05:45" }, { time: "06:00" }, { time: "06:15" }, { time: "06:30" }, { time: "06:45" }, { time: "07:00" }, { time: "07:15" }, { time: "07:30" }, { time: "07:45" }, { time: "08:00" }, { time: "08:15" }, { time: "08:30" }, { time: "08:45" }, { time: "09:00" }, { time: "09:15" }, { time: "09:30" }, { time: "09:45" }, { time: "10:00" }, { time: "10:15" }, { time: "10:30" }, { time: "10:45" }, { time: "11:00" }, { time: "11:15" }, { time: "11:30" }, { time: "11:45" }, { time: "12:00" }, { time: "12:15" }, { time: "12:30" }, { time: "12:45" }, { time: "13:00" }, { time: "13:15" }, { time: "13:30" }, { time: "13:45" }, { time: "14:00" }, { time: "14:15" }, { time: "14:30" }, { time: "14:45" }, { time: "15:00" }, { time: "15:15" }, { time: "15:30" }, { time: "15:45" }, { time: "16:00" }, { time: "16:05" }, { time: "16:15" }, { time: "16:30" }, { time: "16:35" }, { time: "16:45" }, { time: "17:00" }, { time: "17:15" }, { time: "17:30" }, { time: "18:00" }, { time: "18:30" }, { time: "19:00" }, { time: "19:30" }, { time: "21:15" }
                 ],
                 saturdays: [
-                    { time: "05:15" }, { time: "06:15" }, { time: "06:45" }, { time: "07:15" }, { time: "07:45" }, { time: "08:15" }, { time: "08:45" }, { time: "09:15" }, { time: "10:15" }, { time: "11:15" }, { time: "12:15" }, { time: "13:15" }, { time: "14:15" }, { time: "15:15" }, { time: "16:15" }, { time: "17:30" }, { time: "18:30" }, { time: "19:30" }
+                    { time: "05:15" }, { time: "06:15" }, { time: "06:45" }, { time: "07:15" }, { time: "07:45" }, { time: "08:15" }, { time: "08:45" }, { time: "09:15" }, { time: "10:15" }, { time: "11:15" }, { time: "12:15" }, { time: "13:15" }, { time: "14:15" }, { time: "15:15" }, { time: "16:00" }, { time: "16:05" }, { time: "16:15" }, { time: "16:30" }, { time: "16:35" }, { time: "17:30" }, { time: "18:30" }, { time: "19:30" }
                 ],
                 sundays: []
             }
@@ -35,29 +35,29 @@ const schedulesData = {
         validFrom: "01.07.2025",
         acceptsCard: true,
         directions: [{
-            directionName: "Myślenice → Biertowice",
+            directionName: "z Myślenic do Biertowic",
             times: {
                 workdays: [
-                    { time: "05:35" }, { time: "06:35" }, { time: "07:05" }, { time: "08:05" }, { time: "09:05" }, { time: "10:05" }, { time: "11:05" }, { time: "12:05" }, { time: "13:05" }, { time: "14:05" }, { time: "15:05" }, { time: "16:05" }, { time: "17:05" }, { time: "18:05" }, { time: "19:05" }, { time: "20:05" }
+                    { time: "05:35" }, { time: "06:05" }, { time: "06:35" }, { time: "07:05" }, { time: "07:35" }, { time: "08:05" }, { time: "08:35" }, { time: "09:05" }, { time: "09:35" }, { time: "10:05" }, { time: "10:35" }, { time: "11:05" }, { time: "11:35" }, { time: "12:05" }, { time: "12:35" }, { time: "13:05" }, { time: "12:35" }, { time: "14:05" }, { time: "14:35" }, { time: "15:05" }, { time: "15:35" }, { time: "16:00" }, { time: "16:05" }, { time: "16:15" }, { time: "16:30" }, { time: "16:35" }, { time: "17:05" }, { time: "18:05" }, { time: "18:35" }, { time: "19:05" }, { time: "20:05" }
                 ],
                 saturdays: [
-                    { time: "05:35" }, { time: "06:35" }, { time: "07:35" }, { time: "08:35" }, { time: "09:35" }, { time: "10:35" }, { time: "12:05" }, { time: "13:05" }, { time: "14:05" }, { time: "15:05" }, { time: "16:05" }, { time: "17:05" }, { time: "18:05" }, { time: "19:05" }, { time: "20:05" }
+                    { time: "05:35" }, { time: "06:35" }, { time: "07:35" }, { time: "08:35" }, { time: "09:35" }, { time: "10:35" }, { time: "12:05" }, { time: "13:05" }, { time: "14:05" }, { time: "15:05" }, { time: "16:00" }, { time: "16:05" }, { time: "16:15" }, { time: "16:30" }, { time: "16:35" }, { time: "17:05" }, { time: "18:05" }
                 ],
                 sundays: [
-                    { time: "05:35" }, { time: "06:35" }, { time: "07:35" }, { time: "09:35" }, { time: "12:05" }, { time: "13:05" }, { time: "14:05" }, { time: "16:05" }, { time: "18:05" }
+                    { time: "05:35" }, { time: "07:35" }, { time: "09:35" }, { time: "12:05" }, { time: "14:05" }, { time: "16:00" }, { time: "16:05" }, { time: "16:15" }, { time: "16:30" }, { time: "16:35" }, { time: "18:05" }
                 ]
             }
         }, {
-            directionName: "Biertowice → Myślenice",
+            directionName: "z Biertowic do Myślenic",
             times: {
                 workdays: [
-                    { time: "05:00" }, { time: "05:45" }, { time: "06:15" }, { time: "07:15" }, { time: "07:45" }, { time: "08:15" }, { time: "09:15" }, { time: "10:15" }, { time: "11:15" }, { time: "12:15" }, { time: "13:15" }, { time: "14:15" }, { time: "15:15" }, { time: "16:15" }, { time: "17:15" }, { time: "18:45" }, { time: "19:45" }, { time: "20:45" }
+                    { time: "05:00" }, { time: "05:45" }, { time: "06:15" }, { time: "06:45" }, { time: "07:15" }, { time: "07:45" }, { time: "08:15" }, { time: "08:45" }, { time: "09:15" }, { time: "09:45" }, { time: "10:15" }, { time: "10:45" }, { time: "11:15" }, { time: "11:45" }, { time: "12:15" }, { time: "12:45" }, { time: "13:15" }, { time: "13:45" }, { time: "14:15" }, { time: "14:45" }, { time: "15:15" }, { time: "15:45" }, { time: "16:00" }, { time: "16:05" }, { time: "16:15" }, { time: "16:30" }, { time: "16:35" }, { time: "16:45" }, { time: "17:15" }, { time: "17:45" }, { time: "18:45" }, { time: "19:45" }, { time: "20:45" }
                 ],
                 saturdays: [
-                    { time: "05:00" }, { time: "06:15" }, { time: "07:15" }, { time: "08:15" }, { time: "09:15" }, { time: "10:15" }, { time: "11:45" }, { time: "12:45" }, { time: "13:45" }, { time: "14:45" }, { time: "15:45" }, { time: "16:45" }, { time: "17:45" }, { time: "18:45" }, { time: "19:45" }, { time: "20:45" }
+                    { time: "05:00" }, { time: "06:15" }, { time: "07:15" }, { time: "08:15" }, { time: "09:15" }, { time: "10:45" }, { time: "11:45" }, { time: "12:45" }, { time: "13:45" }, { time: "14:45" }, { time: "15:45" }, { time: "16:00" }, { time: "16:05" }, { time: "16:15" }, { time: "16:30" }, { time: "16:35" }, { time: "18:45" }
                 ],
                 sundays: [
-                    { time: "06:15" }, { time: "07:15" }, { time: "08:15" }, { time: "09:15" }, { time: "10:45" }, { time: "11:45" }, { time: "12:45" }, { time: "13:45" }, { time: "14:45" }, { time: "15:45" }, { time: "16:45" }, { time: "17:45" }, { time: "18:45" }
+                    { time: "06:15" }, { time: "08:15" }, { time: "10:45" }, { time: "12:45" }, { time: "14:45" }, { time: "16:00" }, { time: "16:05" }, { time: "16:15" }, { time: "16:30" }, { time: "16:35" }, { time: "18:45" }
                 ]
             }
         }]
@@ -69,10 +69,10 @@ const schedulesData = {
             directionName: "Gdów → Dobczyce",
             times: {
                 workdays: [
-                    { time: "05:30" }, { time: "06:30" }, { time: "07:30" }, { time: "08:30" }, { time: "09:30" }, { time: "10:30" }, { time: "11:30" }, { time: "12:30" }, { time: "13:30" }, { time: "14:30" }, { time: "15:00" }, { time: "16:00" }, { time: "17:00" }, { time: "18:00" }, { time: "19:00" }
+                    { time: "05:30" }, { time: "06:30" }, { time: "07:30" }, { time: "08:30" }, { time: "09:30" }, { time: "10:30" }, { time: "11:30" }, { time: "12:30" }, { time: "13:30" }, { time: "14:30" }, { time: "15:00" }, { time: "16:00" }, { time: "16:05" }, { time: "16:15" }, { time: "16:30" }, { time: "16:35" }, { time: "17:00" }, { time: "18:00" }, { time: "19:00" }
                 ],
                 saturdays: [
-                    { time: "07:30" }, { time: "08:30" }, { time: "09:30" }, { time: "10:30" }, { time: "12:30" }, { time: "14:30" }, { time: "16:30" }
+                    { time: "07:30" }, { time: "08:30" }, { time: "09:30" }, { time: "10:30" }, { time: "12:30" }, { time: "14:30" }, { time: "16:00" }, { time: "16:05" }, { time: "16:15" }, { time: "16:30" }, { time: "16:35" }
                 ],
                 sundays: []
             }
@@ -80,10 +80,10 @@ const schedulesData = {
             directionName: "Dobczyce → Gdów",
             times: {
                 workdays: [
-                    { time: "06:35" }, { time: "07:05" }, { time: "08:35" }, { time: "09:35" }, { time: "10:35" }, { time: "11:05" }, { time: "12:35" }, { time: "13:35" }, { time: "14:05" }, { time: "15:35" }, { time: "16:35" }, { time: "17:35" }, { time: "18:35" }, { time: "19:35" }
+                    { time: "06:35" }, { time: "07:05" }, { time: "08:35" }, { time: "09:35" }, { time: "10:35" }, { time: "11:05" }, { time: "12:35" }, { time: "13:35" }, { time: "14:05" }, { time: "15:35" }, { time: "16:00" }, { time: "16:05" }, { time: "16:15" }, { time: "16:30" }, { time: "16:35" }, { time: "17:35" }, { time: "18:35" }, { time: "19:35" }
                 ],
                 saturdays: [
-                    { time: "07:05" }, { time: "08:05" }, { time: "09:05" }, { time: "10:05" }, { time: "12:05" }, { time: "14:05" }, { time: "16:05" }
+                    { time: "07:05" }, { time: "08:05" }, { time: "09:05" }, { time: "10:05" }, { time: "12:05" }, { time: "14:05" }, { time: "16:00" }, { time: "16:05" }, { time: "16:15" }, { time: "16:30" }, { time: "16:35" }
                 ],
                 sundays: []
             }
@@ -93,21 +93,21 @@ const schedulesData = {
         routeName: "Myślenice <-> Krzyszkowice",
         validFrom: "01.07.2025",
         directions: [{
-            directionName: "Myślenice → Krzyszkowice",
+            directionName: "z Myślenic do Krzyszkowic",
             notes: { "s": "kursuje w dni szkolne" },
             times: {
                 workdays: [
-                    { time: "05:00" }, { time: "06:55" }, { time: "08:30" }, { time: "10:00" }, { time: "12:00" }, { time: "13:30" }, { time: "14:30" }, { time: "15:30" }, { time: "17:15" }, { time: "18:15" }, { time: "19:30", noteKey: "s" }
+                    { time: "06:55" }, { time: "08:30" }, { time: "10:00" }, { time: "12:00" }, { time: "13:30" }, { time: "14:30" }, { time: "15:30" }, { time: "16:00" }, { time: "16:05" }, { time: "16:15" }, { time: "16:30" }, { time: "16:35" }, { time: "17:15" }, { time: "18:15" }, { time: "19:30" }
                 ],
                 saturdays: [],
                 sundays: []
             }
         }, {
-            directionName: "Krzyszkowice → Myślenice",
+            directionName: "z Krzyszkowie do Myślenic",
             notes: { "s": "kursuje w dni szkolne" },
             times: {
                 workdays: [
-                    { time: "05:22" }, { time: "06:22" }, { time: "07:17" }, { time: "08:52" }, { time: "10:22" }, { time: "12:22" }, { time: "13:52" }, { time: "14:52" }, { time: "15:52" }, { time: "17:37" }, { time: "18:37", noteKey: "s" }, { time: "19:00" }
+                    { time: "05:22" }, { time: "06:22" }, { time: "07:17" }, { time: "08:52" }, { time: "10:22" }, { time: "12:22" }, { time: "13:52" }, { time: "14:52" }, { time: "15:52" }, { time: "16:00" }, { time: "16:05" }, { time: "16:15" }, { time: "16:30" }, { time: "16:35" }, { time: "17:37" }, { time: "18:37" }
                 ],
                 saturdays: [],
                 sundays: []
@@ -121,9 +121,9 @@ const schedulesData = {
             directionName: "Myślenice → Gdów",
             times: {
                 workdays: [
-                    { time: "06:15" }, { time: "06:45" }, { time: "07:45" }, { time: "10:15" }, { time: "11:45" }, { time: "12:15" }, { time: "13:15" }, { time: "15:15" }, { time: "18:15" }
+                    { time: "06:15" }, { time: "06:45" }, { time: "07:45" }, { time: "10:15" }, { time: "11:45" }, { time: "12:15" }, { time: "13:15" }, { time: "15:15" }, { time: "16:00" }, { time: "16:05" }, { time: "16:15" }, { time: "16:30" }, { time: "16:35" }, { time: "18:15" }
                 ],
-                saturdays: [{ time: "06:45" }, { time: "09:45" }, { time: "13:45" }],
+                saturdays: [{ time: "06:45" }, { time: "09:45" }, { time: "13:45" }, { time: "16:00" }, { time: "16:05" }, { time: "16:15" }, { time: "16:30" }, { time: "16:35" }],
                 sundays: []
             }
         }, {
@@ -131,9 +131,9 @@ const schedulesData = {
             notes: { "D": "kurs do Dobczyc" },
             times: {
                 workdays: [
-                    { time: "05:30" }, { time: "07:00" }, { time: "07:30", noteKey: "D" }, { time: "08:30", noteKey: "D" }, { time: "11:00" }, { time: "12:30", noteKey: "D" }, { time: "13:00" }, { time: "14:30", noteKey: "D" }, { time: "16:00" }, { time: "19:00" }
+                    { time: "05:30" }, { time: "07:00" }, { time: "07:30" }, { time: "08:30" }, { time: "11:00" }, { time: "12:30" }, { time: "13:00" }, { time: "14:30" }, { time: "16:00" }, { time: "16:05" }, { time: "16:15" }, { time: "16:30" }, { time: "16:35" }, { time: "19:00" }
                 ],
-                saturdays: [{ time: "07:30" }, { time: "10:30" }, { time: "14:30", noteKey: "D" }],
+                saturdays: [{ time: "07:30" }, { time: "10:30" }, { time: "14:30" }, { time: "16:00" }, { time: "16:05" }, { time: "16:15" }, { time: "16:30" }, { time: "16:35" }],
                 sundays: []
             }
         }]
@@ -143,31 +143,31 @@ const schedulesData = {
         validFrom: "01.07.2025",
         acceptsCard: true,
         directions: [{
-            directionName: "Myślenice → Poręba",
-            notes: { "s": "kursuje w dni szkolne", "g": "kursuje do Górnej Poręby" },
+            directionName: "z Myślenic do Poręby",
+            notes: { "s": "kursuje w dni szkolne" },
             times: {
                 workdays: [
-                    { time: "05:30" }, { time: "06:15" }, { time: "06:45" }, { time: "07:15" }, { time: "07:45" }, { time: "08:15" }, { time: "08:45" }, { time: "09:15" }, { time: "09:45" }, { time: "10:15" }, { time: "11:15" }, { time: "11:45" }, { time: "12:15" }, { time: "13:15" }, { time: "13:45" }, { time: "14:15" }, { time: "14:45" }, { time: "15:15" }, { time: "15:45" }, { time: "16:15" }, { time: "16:45" }, { time: "17:15" }, { time: "17:45" }, { time: "18:15" }, { time: "18:45", noteKey: "s" }, { time: "19:15" }, { time: "20:15" }, { time: "21:15" }, { time: "22:15" }
+                    { time: "05:30" }, { time: "06:15" }, { time: "06:45" }, { time: "07:15" }, { time: "07:45" }, { time: "08:15" }, { time: "08:45" }, { time: "09:15" }, { time: "09:45" }, { time: "10:15" }, { time: "10:45" }, { time: "11:15" }, { time: "11:45" }, { time: "12:15" }, { time: "12:45" }, { time: "13:15" }, { time: "13:45" }, { time: "14:15" }, { time: "14:45" }, { time: "15:15" }, { time: "15:45" }, { time: "16:15" }, { time: "16:45" }, { time: "17:15" }, { time: "17:45" }, { time: "18:15" }, { time: "18:45", noteKey: "s" }, { time: "19:15" }, { time: "20:15" }, { time: "21:15" }, { time: "22:15" }
                 ],
                 saturdays: [
-                    { time: "05:30" }, { time: "06:45" }, { time: "07:45" }, { time: "08:45" }, { time: "09:45" }, { time: "12:15" }, { time: "13:15" }, { time: "14:15" }, { time: "15:15" }, { time: "16:15" }, { time: "17:15" }, { time: "18:15" }, { time: "19:15" }, { time: "20:15" }, { time: "21:15" }
+                    { time: "05:30" }, { time: "06:45" }, { time: "07:45" }, { time: "08:45" }, { time: "09:45" }, { time: "11:15" }, { time: "12:15" }, { time: "13:15" }, { time: "14:15" }, { time: "15:15" }, { time: "16:15" }, { time: "17:15" }, { time: "19:15" }, { time: "20:15" }, { time: "21:15" }
                 ],
                 sundays: [
-                    { time: "05:15" }, { time: "06:45" }, { time: "07:45" }, { time: "08:45" }, { time: "09:45" }, { time: "11:15" }, { time: "12:15" }, { time: "13:15" }, { time: "14:15" }, { time: "15:15" }, { time: "16:15" }, { time: "17:15" }, { time: "18:15" }, { time: "19:15" }, { time: "20:15" }
+                    { time: "06:45" }, { time: "08:45" }, { time: "11:15" }, { time: "13:15" }, { time: "15:15" }, { time: "17:15" }, { time: "19:15" }, { time: "20:15" }, { time: "21:15" }
                 ]
             }
         }, {
-            directionName: "Poręba → Myślenice",
-            notes: { "s": "kursuje w dni szkolne", "g": "kursuje do Górnej Poręby" },
+            directionName: "z Poręby do Myślenic",
+            notes: { "s": "kursuje w dni szkolne" },
             times: {
                 workdays: [
                     { time: "05:00" }, { time: "05:15" }, { time: "05:45" }, { time: "06:15" }, { time: "06:45" }, { time: "07:15" }, { time: "07:45" }, { time: "08:15" }, { time: "08:45" }, { time: "09:15" }, { time: "09:45" }, { time: "10:15" }, { time: "10:45" }, { time: "11:15" }, { time: "11:45" }, { time: "12:15" }, { time: "12:45" }, { time: "13:15" }, { time: "13:45" }, { time: "14:15" }, { time: "14:45" }, { time: "15:15" }, { time: "15:45" }, { time: "16:15" }, { time: "16:45" }, { time: "17:15" }, { time: "17:45" }, { time: "18:15" }, { time: "18:45" }, { time: "19:45" }, { time: "20:45" }, { time: "21:35" }
                 ],
                 saturdays: [
-                    { time: "05:15" }, { time: "06:15" }, { time: "07:15" }, { time: "08:15" }, { time: "09:15" }, { time: "10:15" }, { time: "11:15" }, { time: "12:45" }, { time: "13:15" }, { time: "14:15" }, { time: "15:15" }, { time: "16:15" }, { time: "17:15" }, { time: "18:15" }, { time: "19:15" }, { time: "20:15" }
+                    { time: "05:15" }, { time: "06:15" }, { time: "07:15" }, { time: "08:15" }, { time: "09:15" }, { time: "10:15" }, { time: "11:45" }, { time: "12:45" }, { time: "13:45" }, { time: "14:45" }, { time: "15:45" }, { time: "16:45" }, { time: "17:45" }, { time: "19:45" }, { time: "20:45" }
                 ],
                 sundays: [
-                    { time: "05:15" }, { time: "06:15" }, { time: "07:15" }, { time: "08:15" }, { time: "09:15" }, { time: "10:45" }, { time: "11:45" }, { time: "12:45" }, { time: "13:45" }, { time: "14:45" }, { time: "15:45" }, { time: "16:45" }, { time: "17:45" }, { time: "18:45" }, { time: "19:45" }, { time: "20:45" }
+                    { time: "05:15" }, { time: "07:15" }, { time: "09:15" }, { time: "11:45" }, { time: "13:45" }, { time: "15:45" }, { time: "17:45" }, { time: "19:45" }, { time: "20:45" }
                 ]
             }
         }]
@@ -176,29 +176,29 @@ const schedulesData = {
         routeName: "Myślenice <-> Jasienica",
         validFrom: "01.07.2025",
         directions: [{
-            directionName: "Myślenice → Jasienica",
+            directionName: "z Myślenic do Jasienicy",
             times: {
                 workdays: [
                     { time: "05:35" }, { time: "06:35" }, { time: "07:35" }, { time: "08:35" }, { time: "09:35" }, { time: "10:35" }, { time: "11:35" }, { time: "12:35" }, { time: "13:35" }, { time: "14:35" }, { time: "15:35" }, { time: "16:35" }, { time: "17:35" }, { time: "18:05" }, { time: "19:05" }, { time: "20:05" }, { time: "21:15" }, { time: "22:00" }
                 ],
                 saturdays: [
-                    { time: "05:35" }, { time: "06:35" }, { time: "07:35" }, { time: "08:35" }, { time: "09:35" }, { time: "10:35" }, { time: "11:05" }, { time: "12:05" }, { time: "13:05" }, { time: "14:05" }, { time: "15:05" }, { time: "16:05" }, { time: "17:05" }, { time: "18:05" }, { time: "19:05" }, { time: "20:05" }, { time: "21:15" }
+                    { time: "05:35" }, { time: "06:35" }, { time: "07:35" }, { time: "08:35" }, { time: "09:35" }, { time: "10:35" }, { time: "12:05" }, { time: "13:05" }, { time: "14:05" }, { time: "15:05" }, { time: "16:05" }, { time: "17:05" }
                 ],
                 sundays: [
-                    { time: "05:35" }, { time: "06:35" }, { time: "07:35" }, { time: "08:35" }, { time: "09:35" }, { time: "10:35" }, { time: "11:05" }, { time: "12:05" }, { time: "13:05" }, { time: "14:05" }, { time: "15:05" }, { time: "16:05" }
+                    { time: "05:35" }, { time: "07:35" }, { time: "09:35" }, { time: "12:05" }, { time: "14:05" }, { time: "16:05" }
                 ]
             }
         }, {
-            directionName: "Jasienica → Myślenice",
+            directionName: "z Jasienicy do Myślenic",
             times: {
                 workdays: [
-                    { time: "05:12" }, { time: "05:57" }, { time: "06:27" }, { time: "07:27" }, { time: "08:27" }, { time: "09:27" }, { time: "10:27" }, { time: "11:27" }, { time: "12:27" }, { time: "13:27" }, { time: "14:27" }, { time: "15:27" }, { time: "16:27" }, { time: "17:27" }, { time: "18:27" }, { time: "19:27" }, { time: "20:27" }, { time: "21:27" }
+                    { time: "05:12" }, { time: "05:57" }, { time: "06:27" }, { time: "06:57" }, { time: "07:27" }, { time: "07:57" }, { time: "08:27" }, { time: "08:57" }, { time: "09:27" }, { time: "09:57" }, { time: "10:27" }, { time: "10:57" }, { time: "11:27" }, { time: "11:57" }, { time: "12:27" }, { time: "12:57" }, { time: "13:27" }, { time: "13:57" }, { time: "14:27" }, { time: "14:57" }, { time: "15:27" }, { time: "15:57" }, { time: "16:27" }, { time: "16:57" }, { time: "17:27" }, { time: "17:57" }, { time: "18:57" }, { time: "19:57" }, { time: "20:57" }
                 ],
                 saturdays: [
-                    { time: "05:12" }, { time: "06:27" }, { time: "07:27" }, { time: "08:27" }, { time: "09:27" }, { time: "10:57" }, { time: "11:57" }, { time: "12:57" }, { time: "13:57" }, { time: "14:57" }, { time: "15:57" }, { time: "16:57" }, { time: "17:57" }, { time: "18:57" }, { time: "19:57" }, { time: "20:57" }
+                    { time: "05:12" }, { time: "06:27" }, { time: "07:27" }, { time: "08:27" }, { time: "09:27" }, { time: "10:57" }, { time: "11:57" }, { time: "12:57" }, { time: "13:57" }, { time: "14:57" }, { time: "15:57" }, { time: "16:57" }
                 ],
                 sundays: [
-                    { time: "05:12" }, { time: "06:27" }, { time: "07:27" }, { time: "08:27" }, { time: "09:27" }, { time: "10:57" }, { time: "11:57" }, { time: "12:57" }, { time: "13:57" }, { time: "14:57" }, { time: "15:57" }, { time: "16:57" }
+                    { time: "06:27" }, { time: "08:27" }, { time: "10:57" }, { time: "12:57" }, { time: "14:57" }, { time: "16:57" }
                 ]
             }
         }]
@@ -207,50 +207,46 @@ const schedulesData = {
         routeName: "Bieńkowice - Sieraków - Dobczyce - Skrzynka - Kędzierzynka",
         validFrom: "01.07.2025",
         directions: [{
-            directionName: "Bieńkowice → Dobczyce",
-            notes: { "f": "kursuje w dni robocze", "s": "kursuje w sobotę" },
+            directionName: "z Bieńkowic do Dobczyc",
             times: {
                 workdays: [
-                    { time: "06:05", noteKey: "f" }, { time: "07:15", noteKey: "f" }, { time: "09:05", noteKey: "f" }, { time: "11:30", noteKey: "f" }, { time: "13:00", noteKey: "f" }, { time: "14:10", noteKey: "f" }, { time: "15:40", noteKey: "f" }
+                    { time: "06:05" }, { time: "07:15" }, { time: "09:05" }, { time: "11:30" }, { time: "13:00" }, { time: "14:10" }, { time: "15:40" }
                 ],
                 saturdays: [
-                    { time: "07:15", noteKey: "s" }, { time: "09:05", noteKey: "s" }, { time: "11:30", noteKey: "s" }, { time: "13:00", noteKey: "s" }
+                    { time: "07:15" }, { time: "09:05" }, { time: "11:30" }, { time: "13:00" }
                 ],
                 sundays: []
             }
         }, {
-            directionName: "Dobczyce → Kędzierzynka",
-            notes: { "f": "kursuje w dni robocze", "s": "kursuje w sobotę" },
+            directionName: "z Dobczyc do Kędzierzynki",
             times: {
                 workdays: [
-                    { time: "06:25", noteKey: "f" }, { time: "07:35", noteKey: "f" }, { time: "09:25", noteKey: "f" }, { time: "11:50", noteKey: "f" }, { time: "13:20", noteKey: "f" }, { time: "14:30", noteKey: "f" }, { time: "16:00", noteKey: "f" }
+                    { time: "06:25" }, { time: "07:35" }, { time: "09:25" }, { time: "11:50" }, { time: "13:20" }, { time: "14:30" }, { time: "16:00" }
                 ],
                 saturdays: [
-                    { time: "07:35", noteKey: "s" }, { time: "09:25", noteKey: "s" }, { time: "11:50", noteKey: "s" }, { time: "13:20", noteKey: "s" }
+                    { time: "07:35" }, { time: "09:25" }, { time: "11:50" }, { time: "13:20" }
                 ],
                 sundays: []
             }
         }, {
-            directionName: "Kędzierzynka → Dobczyce",
-            notes: { "f": "kursuje w dni robocze", "s": "kursuje w sobotę" },
+            directionName: " Kędzierzynki do Dobczyc",
             times: {
                 workdays: [
-                    { time: "06:40", noteKey: "f" }, { time: "08:10", noteKey: "f" }, { time: "10:10", noteKey: "f" }, { time: "12:05", noteKey: "f" }, { time: "13:35", noteKey: "f" }, { time: "14:50", noteKey: "f" }, { time: "16:20", noteKey: "f" }
+                    { time: "06:40" }, { time: "08:10" }, { time: "10:10" }, { time: "12:05" }, { time: "13:35" }, { time: "14:50" }, { time: "16:20" }
                 ],
                 saturdays: [
-                    { time: "08:10", noteKey: "s" }, { time: "10:10", noteKey: "s" }, { time: "12:05", noteKey: "s" }, { time: "13:35", noteKey: "s" }
+                    { time: "08:10" }, { time: "10:10" }, { time: "12:05" }, { time: "13:35" }
                 ],
                 sundays: []
             }
         }, {
-            directionName: "Dobczyce → Bieńkowice",
-            notes: { "f": "kursuje w dni robocze", "s": "kursuje w sobotę" },
+            directionName: "z Dobczyc do Bieńkowic",
             times: {
                 workdays: [
-                    { time: "06:52", noteKey: "f" }, { time: "08:22", noteKey: "f" }, { time: "10:22", noteKey: "f" }, { time: "12:17", noteKey: "f" }, { time: "13:47", noteKey: "f" }, { time: "15:02", noteKey: "f" }, { time: "16:32", noteKey: "f" }
+                    { time: "06:52" }, { time: "08:22" }, { time: "10:22" }, { time: "12:17" }, { time: "13:47" }, { time: "15:02" }, { time: "16:32" }
                 ],
                 saturdays: [
-                    { time: "08:22", noteKey: "s" }, { time: "10:22", noteKey: "s" }, { time: "12:17", noteKey: "s" }, { time: "13:47", noteKey: "s" }
+                    { time: "08:22" }, { time: "10:22" }, { time: "12:17" }, { time: "13:47" }
                 ],
                 sundays: []
             }

@@ -158,7 +158,6 @@ const schedulesData = {
             }
         }, {
             directionName: "z Poręby do Myślenic",
-            notes: { "s": "kursuje w dni szkolne" },
             times: {
                 workdays: [
                     { time: "05:00" }, { time: "05:15" }, { time: "05:45" }, { time: "06:15" }, { time: "06:45" }, { time: "07:15" }, { time: "07:45" }, { time: "08:15" }, { time: "08:45" }, { time: "09:15" }, { time: "09:45" }, { time: "10:15" }, { time: "10:45" }, { time: "11:15" }, { time: "11:45" }, { time: "12:15" }, { time: "12:45" }, { time: "13:15" }, { time: "13:45" }, { time: "14:15" }, { time: "14:45" }, { time: "15:15" }, { time: "15:45" }, { time: "16:15" }, { time: "16:45" }, { time: "17:15" }, { time: "17:45" }, { time: "18:15" }, { time: "18:45" }, { time: "19:45" }, { time: "20:45" }, { time: "21:35" }

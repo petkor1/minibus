@@ -1,6 +1,21 @@
-/* --- Style ogólne --- */
+/* ================================================================== */
+/* CSS - WERSJA Z PRZEPROJEKTOWANYM FILTREM I OPTYMALIZACJĄ         */
+/* ================================================================== */
+
+:root {
+  --color-primary: #ea580c;
+  --color-primary-dark: #c2410c;
+  --color-text-base: #374151;
+  --color-text-muted: #6b7280;
+  --color-surface: #ffffff;
+  --color-background: #f9fafb;
+  --color-border: #e5e7eb;
+  --border-radius-md: 8px;
+  --border-radius-sm: 6px;
+}
 body {
   font-family: "Roboto", sans-serif;
+  color: var(--color-text-base);
 }
 .hero-background {
   background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
@@ -20,10 +35,10 @@ body {
   margin-bottom: 2rem;
 }
 .schedule-selector-btn {
-  background-color: #f0f0f0;
-  border: 1px solid #ddd;
+  background-color: #f3f4f6;
+  border: 1px solid var(--color-border);
   padding: 1rem;
-  border-radius: 8px;
+  border-radius: var(--border-radius-md);
   text-align: center;
   font-size: 1.1em;
   font-weight: bold;
@@ -32,49 +47,134 @@ body {
 }
 .schedule-selector-btn:hover,
 .schedule-selector-btn.active {
-  background-color: #ea580c;
-  color: white;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background-color: var(--color-primary);
+  color: var(--color-surface);
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 .schedule-details-container {
-  margin-top: 2rem;
+  margin-top: 1.5rem;
   padding: 1.5rem;
-  background-color: #ffffff;
-  border-radius: 8px;
+  background-color: var(--color-surface);
+  border-radius: var(--border-radius-md);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 .schedule-direction {
   margin-bottom: 2rem;
 }
+
+/* ZMIANA: Główny przycisk akcji ma teraz solidne tło */
 .toggle-full-schedule-btn {
-  display: block;
-  padding: 0.4rem 1rem;
+  padding: 0.5rem 1.25rem;
   font-size: 1em;
   font-weight: bold;
-  color: #ea580c;
-  border: 1px solid #ea580c;
-  border-radius: 6px;
+  color: var(--color-surface);
+  background-color: var(--color-primary);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--border-radius-sm);
   cursor: pointer;
   transition: background-color 0.3s, color 0.3s;
 }
 .toggle-full-schedule-btn:hover {
-  color: white;
-  background-color: #ea580c;
+  background-color: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
 }
 
-/* NOWOŚĆ: Style dla informacji o płatności kartą */
-#payment-info-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem; /* Odstęp między ikoną a tekstem */
-  background-color: #eef2ff; /* Jasnoniebieskie tło */
-  color: #4338ca; /* Ciemnoniebieski tekst */
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  border: 1px solid #c7d2fe;
-  margin-bottom: 1.5rem; /* Odstęp od reszty */
+/* NOWOŚĆ: Przebudowane, w pełni responsywne style dla filtra */
+.time-filter-form {
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  padding: 1rem;
+  margin-top: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+.filter-title {
   font-weight: 500;
+  color: var(--color-text-base);
+  margin-bottom: 1rem;
+  display: block;
+}
+.filter-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.filter-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.filter-group label {
+  font-weight: 500;
+  color: var(--color-text-muted);
+  font-size: 0.9em;
+}
+.filter-group select {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid #d1d5db;
+  background-color: var(--color-surface);
+  font-size: 0.9em;
+}
+.filter-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+/* Przycisk "Filtruj" jako akcja drugorzędna */
+.filter-button {
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius-sm);
+  border: 2px solid var(--color-primary);
+  background-color: transparent;
+  color: var(--color-primary);
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+.filter-button:hover {
+  background-color: var(--color-primary);
+  color: var(--color-surface);
+}
+
+/* Przycisk "Wyczyść" jako link tekstowy */
+.reset-button {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 0.9em;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+.reset-button:hover {
+  color: var(--color-primary);
+}
+
+/* Media query dla większych ekranów */
+@media (min-width: 500px) {
+  .filter-content {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+  .filter-inputs {
+    display: flex;
+    gap: 1rem;
+  }
+  .filter-group {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+  }
 }
 
 /* Siatka z godzinami */
@@ -89,7 +189,7 @@ body {
   justify-content: center;
   align-items: center;
   padding: 8px 4px;
-  border-radius: 6px;
+  border-radius: var(--border-radius-sm);
   font-family: "Roboto Mono", monospace;
   transition: background-color 0.3s, color 0.3s;
   min-height: 60px;
@@ -111,7 +211,7 @@ body {
 }
 .time-note {
   font-weight: bold;
-  color: #c2410c;
+  color: var(--color-primary-dark);
   margin-left: 2px;
 }
 .countdown-container {
@@ -122,30 +222,43 @@ body {
 }
 .countdown-text {
   font-size: 0.75em;
-  color: #4b5563;
+  color: var(--color-text-muted);
   letter-spacing: -0.5px;
   margin-top: 3px;
 }
 .bg-no-background {
   background-color: transparent;
   color: #a1a1aa;
-  border: 1px solid #e5e5e5;
+  border: 1px solid var(--color-border);
 }
 .bg-light-gray {
   background-color: #f3f4f6;
-  color: #1f2937;
+  color: var(--color-text-base);
 }
 .bg-light-red {
   background-color: #ffedd5;
   color: #9a3412;
 }
 
-/* Tooltipy i legenda */
+/* Informacje i legendy */
+.payment-info-subtle {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  color: var(--color-text-muted);
+  font-size: 0.9em;
+  margin-top: 0.5rem;
+}
+.payment-info-subtle svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
 .notes-legend {
-  border-left: 3px solid #e2e8f0;
+  border-left: 3px solid var(--color-border);
   padding-left: 1rem;
   font-style: italic;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
 }
 #custom-tooltip {
   position: fixed;
@@ -153,7 +266,7 @@ body {
   background-color: #2c3e50;
   color: white;
   padding: 8px 12px;
-  border-radius: 6px;
+  border-radius: var(--border-radius-sm);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   z-index: 1000;
   font-size: 14px;
@@ -167,32 +280,4 @@ body {
 #custom-tooltip.visible {
   opacity: 1;
   visibility: visible;
-}
-
-.schedule-selector-btn {
-  background-color: #f0f0f0;
-  border: 1px solid #ddd;
-  padding: 1rem;
-  border-radius: 8px;
-  text-align: center; /* Wyrównanie tekstu wraca do text-align */
-  font-size: 1.1em;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s, box-shadow 0.3s, color 0.3s;
-}
-.payment-info-subtle {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start; /* POPRAWKA: Wyrównuje do lewej strony */
-  gap: 0.5rem;
-  color: #6b7280;
-  font-size: 0.9em;
-  margin-top: 0.5rem; /* Zmieniony margines dla lepszego wyglądu pod nagłówkiem */
-  margin-bottom: 1rem;
-}
-
-/* Dostosowanie rozmiaru ikony wewnątrz tego elementu */
-.payment-info-subtle svg {
-  width: 1.25rem; /* 20px */
-  height: 1.25rem;
 }

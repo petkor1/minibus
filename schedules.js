@@ -7,24 +7,24 @@ const schedulesData = {
         routeName: "Myślenice <-> Dobczyce",
         validFrom: "01.07.2025",
         directions: [{
-            directionName: "Myślenice → Dobczyce",
+            directionName: "z Myślenic do Dobczyc",
             times: {
                 workdays: [
-                    { time: "05:30" }, { time: "05:45" }, { time: "06:00" }, { time: "06:15" }, { time: "06:30" }, { time: "06:45" }, { time: "07:00" }, { time: "07:15" }, { time: "07:30" }, { time: "07:45" }, { time: "08:00" }, { time: "08:15" }, { time: "08:30" }, { time: "08:45" }, { time: "09:00" }, { time: "09:15" }, { time: "09:30" }, { time: "09:45" }, { time: "10:00" }, { time: "10:15" }, { time: "10:30" }, { time: "10:45" }, { time: "11:00" }, { time: "11:15" }, { time: "11:30" }, { time: "11:45" }, { time: "12:00" }, { time: "12:15" }, { time: "12:30" }, { time: "12:45" }, { time: "13:00" }, { time: "13:15" }, { time: "13:30" }, { time: "13:45" }, { time: "14:00" }, { time: "14:15" }, { time: "14:30" }, { time: "14:45" }, { time: "15:00" }, { time: "15:15" }, { time: "15:30" }, { time: "15:45" }, { time: "16:00" }, { time: "16:05" }, { time: "16:15" }, { time: "16:30" }, { time: "16:35" }, { time: "17:00" }, { time: "17:15" }, { time: "17:30" }, { time: "17:45" }, { time: "18:00" }, { time: "18:15" }, { time: "19:00" }, { time: "19:30" }, { time: "20:15" }, { time: "22:15" }
+                    { time: "05:30" }, { time: "05:45" }, { time: "06:00" }, { time: "06:15" }, { time: "06:30" }, { time: "06:45" }, { time: "07:00" }, { time: "07:15" }, { time: "07:30" }, { time: "07:45" }, { time: "08:00" }, { time: "08:15" }, { time: "08:30" }, { time: "08:45" }, { time: "09:00" }, { time: "09:15" }, { time: "09:30" }, { time: "09:45" }, { time: "10:00" }, { time: "10:15" }, { time: "10:30" }, { time: "10:45" }, { time: "11:00" }, { time: "11:15" }, { time: "11:30" }, { time: "11:45" }, { time: "12:00" }, { time: "12:15" }, { time: "12:30" }, { time: "12:45" }, { time: "13:00" }, { time: "13:15" }, { time: "13:30" }, { time: "13:45" }, { time: "14:00" }, { time: "14:15" }, { time: "14:30" }, { time: "14:45" }, { time: "15:00" }, { time: "15:15" }, { time: "15:30" }, { time: "15:45" }, { time: "16:00" }, { time: "16:15" }, { time: "16:30" }, { time: "16:45" }, { time: "17:00" }, { time: "17:15" }, { time: "17:30" }, { time: "17:45" }, { time: "18:00" }, { time: "18:15" }, { time: "18:45" }, { time: "19:00" }, { time: "19:30" }, { time: "20:15" }, { time: "22:15" }
                 ],
                 saturdays: [
-                    { time: "05:45" }, { time: "06:45" }, { time: "07:45" }, { time: "08:45" }, { time: "09:45" }, { time: "10:45" }, { time: "11:45" }, { time: "12:45" }, { time: "13:45" }, { time: "14:45" }, { time: "15:45" }, { time: "16:00" }, { time: "16:05" }, { time: "16:15" }, { time: "16:30" }, { time: "16:35" }, { time: "17:15" }, { time: "18:00" }, { time: "19:00" }, { time: "20:00" }, { time: "22:10" }, { time: "22:10" }, { time: "22:11" }, { time: "22:12" }, { time: "22:13" }
+                    { time: "05:45" }, { time: "06:45" }, { time: "07:15" }, { time: "07:45" }, { time: "08:15" }, { time: "08:45" }, { time: "09:15" }, { time: "09:45" }, { time: "10:15" }, { time: "10:45" }, { time: "11:15" }, { time: "11:45" }, { time: "12:15" }, { time: "12:45" }, { time: "13:15" }, { time: "13:45" }, { time: "14:15" }, { time: "14:45" }, { time: "15:15" }, { time: "15:45" }, { time: "16:15" }, { time: "17:15" }, { time: "18:00" }, { time: "19:00" }, { time: "20:00" }
                 ],
                 sundays: []
             }
         }, {
-            directionName: "Dobczyce → Myślenice",
+            directionName: "z Dobczyc do Myślenic",
             times: {
                 workdays: [
-                    { time: "05:15" }, { time: "05:30" }, { time: "05:45" }, { time: "06:00" }, { time: "06:15" }, { time: "06:30" }, { time: "06:45" }, { time: "07:00" }, { time: "07:15" }, { time: "07:30" }, { time: "07:45" }, { time: "08:00" }, { time: "08:15" }, { time: "08:30" }, { time: "08:45" }, { time: "09:00" }, { time: "09:15" }, { time: "09:30" }, { time: "09:45" }, { time: "10:00" }, { time: "10:15" }, { time: "10:30" }, { time: "10:45" }, { time: "11:00" }, { time: "11:15" }, { time: "11:30" }, { time: "11:45" }, { time: "12:00" }, { time: "12:15" }, { time: "12:30" }, { time: "12:45" }, { time: "13:00" }, { time: "13:15" }, { time: "13:30" }, { time: "13:45" }, { time: "14:00" }, { time: "14:15" }, { time: "14:30" }, { time: "14:45" }, { time: "15:00" }, { time: "15:15" }, { time: "15:30" }, { time: "15:45" }, { time: "16:00" }, { time: "16:05" }, { time: "16:15" }, { time: "16:30" }, { time: "16:35" }, { time: "16:45" }, { time: "17:00" }, { time: "17:15" }, { time: "17:30" }, { time: "18:00" }, { time: "18:30" }, { time: "19:00" }, { time: "19:30" }, { time: "21:15" }
+                    { time: "05:15" }, { time: "05:30" }, { time: "05:45" }, { time: "06:00" }, { time: "06:15" }, { time: "06:30" }, { time: "06:45" }, { time: "07:00" }, { time: "07:15" }, { time: "07:30" }, { time: "07:45" }, { time: "08:00" }, { time: "08:15" }, { time: "08:30" }, { time: "08:45" }, { time: "09:00" }, { time: "09:15" }, { time: "09:30" }, { time: "09:45" }, { time: "10:00" }, { time: "10:15" }, { time: "10:30" }, { time: "10:45" }, { time: "11:00" }, { time: "11:15" }, { time: "11:30" }, { time: "11:45" }, { time: "12:00" }, { time: "12:15" }, { time: "12:30" }, { time: "12:45" }, { time: "13:00" }, { time: "13:15" }, { time: "13:30" }, { time: "13:45" }, { time: "14:00" }, { time: "14:15" }, { time: "14:30" }, { time: "14:45" }, { time: "15:00" }, { time: "15:15" }, { time: "15:30" }, { time: "15:45" }, { time: "16:00" }, { time: "16:15" }, { time: "16:30" }, { time: "16:45" }, { time: "17:00" }, { time: "17:15" }, { time: "17:30" }, { time: "17:45" }, { time: "18:15" }, { time: "18:30" }, { time: "19:15" }, { time: "19:30" }, { time: "21:15" }
                 ],
                 saturdays: [
-                    { time: "05:15" }, { time: "06:15" }, { time: "06:45" }, { time: "07:15" }, { time: "07:45" }, { time: "08:15" }, { time: "08:45" }, { time: "09:15" }, { time: "10:15" }, { time: "11:15" }, { time: "12:15" }, { time: "13:15" }, { time: "14:15" }, { time: "15:15" }, { time: "16:00" }, { time: "16:05" }, { time: "16:15" }, { time: "16:30" }, { time: "16:35" }, { time: "17:30" }, { time: "18:30" }, { time: "19:30" }
+                    { time: "05:15" }, { time: "06:15" }, { time: "06:45" }, { time: "07:15" }, { time: "07:45" }, { time: "08:15" }, { time: "08:45" }, { time: "09:15" }, { time: "09:45" }, { time: "10:15" }, { time: "10:45" }, { time: "11:15" }, { time: "11:45" }, { time: "12:15" }, { time: "12:45" }, { time: "13:15" }, { time: "13:45" }, { time: "14:15" }, { time: "14:45" }, { time: "15:15" }, { time: "15:45" }, { time: "16:45" }, { time: "17:30" }, { time: "18:30" }, { time: "19:30" }
                 ],
                 sundays: []
             }
@@ -66,24 +66,24 @@ const schedulesData = {
         routeName: "Gdów <-> Dobczyce",
         validFrom: "01.07.2025",
         directions: [{
-            directionName: "Gdów → Dobczyce",
+            directionName: "z Gdowa do Dobczyc",
             times: {
                 workdays: [
-                    { time: "05:30" }, { time: "06:30" }, { time: "07:30" }, { time: "08:30" }, { time: "09:30" }, { time: "10:30" }, { time: "11:30" }, { time: "12:30" }, { time: "13:30" }, { time: "14:30" }, { time: "15:00" }, { time: "16:00" }, { time: "16:05" }, { time: "16:15" }, { time: "16:30" }, { time: "16:35" }, { time: "17:00" }, { time: "18:00" }, { time: "19:00" }
+                    { time: "05:30" }, { time: "06:30" }, { time: "07:00" }, { time: "07:30" }, { time: "08:00" }, { time: "08:30" }, { time: "09:00" }, { time: "09:30" }, { time: "10:00" }, { time: "10:30" }, { time: "11:00" }, { time: "11:30" }, { time: "12:00" }, { time: "12:30" }, { time: "13:00" }, { time: "13:30" }, { time: "14:00" }, { time: "14:30" }, { time: "15:00" }, { time: "15:30" }, { time: "16:00" }, { time: "17:00" }, { time: "18:00" }, { time: "19:00" }
                 ],
                 saturdays: [
-                    { time: "07:30" }, { time: "08:30" }, { time: "09:30" }, { time: "10:30" }, { time: "12:30" }, { time: "14:30" }, { time: "16:00" }, { time: "16:05" }, { time: "16:15" }, { time: "16:30" }, { time: "16:35" }
+                    { time: "07:30" }, { time: "08:30" }, { time: "09:30" }, { time: "10:30" }, { time: "12:30" }, { time: "14:30" }, { time: "16:30" }
                 ],
                 sundays: []
             }
         }, {
-            directionName: "Dobczyce → Gdów",
+            directionName: "z Dobczyc do Gdowa",
             times: {
                 workdays: [
-                    { time: "06:35" }, { time: "07:05" }, { time: "08:35" }, { time: "09:35" }, { time: "10:35" }, { time: "11:05" }, { time: "12:35" }, { time: "13:35" }, { time: "14:05" }, { time: "15:35" }, { time: "16:00" }, { time: "16:05" }, { time: "16:15" }, { time: "16:30" }, { time: "16:35" }, { time: "17:35" }, { time: "18:35" }, { time: "19:35" }
+                    { time: "06:35" }, { time: "07:05" }, { time: "07:35" }, { time: "08:05" }, { time: "08:35" }, { time: "09:05" }, { time: "09:35" }, { time: "10:05" }, { time: "10:35" }, { time: "11:05" }, { time: "11:35" }, { time: "12:05" }, { time: "12:35" }, { time: "13:05" }, { time: "13:35" }, { time: "14:05" }, { time: "14:35" }, { time: "15:05" }, { time: "15:35" }, { time: "16:35" }, { time: "17:35" }, { time: "18:35" }, { time: "19:35" }
                 ],
                 saturdays: [
-                    { time: "07:05" }, { time: "08:05" }, { time: "09:05" }, { time: "10:05" }, { time: "12:05" }, { time: "14:05" }, { time: "16:00" }, { time: "16:05" }, { time: "16:15" }, { time: "16:30" }, { time: "16:35" }
+                    { time: "07:05" }, { time: "08:05" }, { time: "09:05" }, { time: "10:05" }, { time: "12:05" }, { time: "14:05" }, { time: "16:05" }
                 ],
                 sundays: []
             }
@@ -118,22 +118,22 @@ const schedulesData = {
         routeName: "Myślenice <-> Gdów",
         validFrom: "01.07.2025",
         directions: [{
-            directionName: "Myślenice → Gdów",
+            directionName: "z Myślenic do Gdowa",
             times: {
                 workdays: [
-                    { time: "06:15" }, { time: "06:45" }, { time: "07:45" }, { time: "10:15" }, { time: "11:45" }, { time: "12:15" }, { time: "13:15" }, { time: "15:15" }, { time: "16:00" }, { time: "16:05" }, { time: "16:15" }, { time: "16:30" }, { time: "16:35" }, { time: "18:15" }
+                    { time: "06:15" }, { time: "06:45" }, { time: "07:45" }, { time: "10:15" }, { time: "11:45" }, { time: "12:15" }, { time: "13:45" }, { time: "15:15" }, { time: "18:15" }
                 ],
-                saturdays: [{ time: "06:45" }, { time: "09:45" }, { time: "13:45" }, { time: "16:00" }, { time: "16:05" }, { time: "16:15" }, { time: "16:30" }, { time: "16:35" }],
+                saturdays: [{ time: "06:45" }, { time: "09:45" }, { time: "13:45" }],
                 sundays: []
             }
         }, {
-            directionName: "Gdów → Myślenice",
+            directionName: "z Gdowa do Myślenic",
             notes: { "D": "kurs do Dobczyc" },
             times: {
                 workdays: [
-                    { time: "05:30" }, { time: "07:00" }, { time: "07:30" }, { time: "08:30" }, { time: "11:00" }, { time: "12:30" }, { time: "13:00" }, { time: "14:30" }, { time: "16:00" }, { time: "16:05" }, { time: "16:15" }, { time: "16:30" }, { time: "16:35" }, { time: "19:00" }
+                    { time: "05:30" }, { time: "07:00" }, { time: "07:30", noteKey: "D" }, { time: "08:30", noteKey: "D" }, { time: "11:00" }, { time: "12:30", noteKey: "D" }, { time: "13:00" }, { time: "14:30" }, { time: "16:00" }, { time: "19:00" }
                 ],
-                saturdays: [{ time: "07:30" }, { time: "10:30" }, { time: "14:30" }, { time: "16:00" }, { time: "16:05" }, { time: "16:15" }, { time: "16:30" }, { time: "16:35" }],
+                saturdays: [{ time: "07:30" }, { time: "10:30" }, { time: "14:30", noteKey: "D" }],
                 sundays: []
             }
         }]

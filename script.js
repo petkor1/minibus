@@ -1,6 +1,6 @@
 // ===================================================================================
 // KOMPLETNY KOD APLIKACJI - script.js
-// Wersja z inteligentnym przełącznikiem kierunków (zakładki lub lista rozwijana).
+// Wersja z inteligentnym przełącznikiem kierunków (Segmented Button lub Dropdown).
 // ===================================================================================
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isFullView && scrollToDirection) scrollToElement(scrollToDirection);
   }
 
-  // ### ZMIANA 1: Inteligentny przełącznik - zakładki lub lista rozwijana ###
+  // ### ZMIANA: Inteligentny przełącznik - Segmented Button lub Dropdown ###
   function generateDirectionSwitcherHtml(directions, routeId, activeIndex) {
     if (directions.length <= 1) return '';
 
@@ -122,32 +122,43 @@ document.addEventListener('DOMContentLoaded', () => {
         return `<option value="${index}" ${isSelected}>${direction.directionName}</option>`;
       }).join('');
 
-      const selectClasses = "block w-full appearance-none rounded-md border-gray-300 bg-white py-3 pl-3 pr-10 text-base font-medium text-gray-800 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500";
+      const selectClasses = "block w-full appearance-none rounded-md border-gray-300 bg-white py-2 pl-3 pr-10 text-base text-gray-800 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500";
       const selectStyle = `background-image: url(&quot;data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e&quot;); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em;`;
+      const iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                          </svg>`;
 
-      return `<div class="direction-switcher-dropdown mb-6">
-                    <label for="direction-select" class="sr-only">Wybierz kierunek</label>
-                    <select id="direction-select" data-route-id="${routeId}" class="${selectClasses}" style="${selectStyle}">
-                        ${optionsHtml}
-                    </select>
+      return `<div class="direction-switcher-dropdown mb-6 rounded-lg border border-gray-200 bg-gray-50 p-3">
+                    <div class="flex items-center gap-3">
+                        ${iconHtml}
+                        <label for="direction-select" class="text-sm font-medium text-gray-700 whitespace-nowrap">Kierunek:</label>
+                        <select id="direction-select" data-route-id="${routeId}" class="${selectClasses}" style="${selectStyle}">
+                            ${optionsHtml}
+                        </select>
+                    </div>
                 </div>`;
     }
 
-    // Dla 2 kierunków, użyj zakładek
+    // Dla 2 kierunków, użyj Segmented Button (bez ikony)
     const buttonsHtml = directions.map((direction, index) => {
       const isActive = index === activeIndex;
-      const activeClasses = 'bg-orange-600 text-white shadow';
-      const inactiveClasses = 'bg-gray-200 text-gray-600 hover:bg-gray-300';
+      const activeClasses = 'bg-orange-100 text-orange-700 border-orange-500 z-10';
+      const inactiveClasses = 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300';
+      const roundingClasses = index === 0 ? 'rounded-l-lg' : 'rounded-r-lg';
+
       return `<button 
                     type="button" 
-                    class="direction-tab-btn flex-1 px-4 py-3 text-sm font-semibold transition-colors ${isActive ? activeClasses : inactiveClasses}"
+                    class="direction-tab-btn relative -ml-px flex-1 inline-flex items-center justify-center border px-4 py-3 text-sm font-semibold transition-colors focus:z-20 ${isActive ? activeClasses : inactiveClasses} ${roundingClasses}"
                     data-route-id="${routeId}"
                     data-direction-index="${index}">
                     ${direction.directionName}
                 </button>`;
     }).join('');
 
-    return `<div class="direction-switcher flex rounded-lg overflow-hidden mb-6">${buttonsHtml}</div>`;
+    return `<div class="direction-switcher isolate inline-flex rounded-lg shadow-sm mb-6 w-full">
+                <span class="sr-only">Wybierz kierunek</span>
+                ${buttonsHtml}
+            </div>`;
   }
 
   function generateDirectionHtml(direction, route, activeSchedule, context) {
@@ -215,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ### ZMIANA 2: Dodano listener dla listy rozwijanej ###
+  // ### ZMIANA: Przywrócono listener dla listy rozwijanej ###
   function setupEventListeners(routeId, activeSchedule) {
     detailsContainer.querySelectorAll('.toggle-full-schedule-btn').forEach(button => {
       button.addEventListener('click', (e) => {

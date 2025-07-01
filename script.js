@@ -1,6 +1,6 @@
 // ===================================================================================
 // KOMPLETNY KOD APLIKACJI - script.js
-// Wersja z nową logiką filtra, opcją "teraz" i przyciskiem resetowania.
+// Wersja z filtrem w postaci suwaka godzinowego.
 // ===================================================================================
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -100,18 +100,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const directionId = `${routeId}-${direction.directionName.replace(/[^a-zA-Z0-9]/g, '-')}-${index}`;
     let directionGridsHtml, filterHtml = '';
 
-    const initialTimes = (direction.times[today.key] || []).filter(timeObj => {
-      const [hour, minute] = timeObj.time.split(':').map(Number);
-      const timeInMinutes = hour * 60 + minute;
-      const nowInMinutes = now.getHours() * 60 + now.getMinutes();
-      return timeInMinutes >= nowInMinutes;
-    });
-
     if (!isFullView) {
-      filterHtml = generateFilterHtml(directionId);
-      const initialTitle = `Najbliższe kursy (${today.displayName})`;
+      filterHtml = generateFilterHtml(directionId, now);
+      const initialTimes = (direction.times[today.key] || []).filter(timeObj => {
+        const [hour, minute] = timeObj.time.split(':').map(Number);
+        return (hour * 60 + minute) >= (now.getHours() * 60 + now.getMinutes());
+      });
       directionGridsHtml = `<div id="grid-${directionId}">
-                          ${generateTimesGridHtml({ timesArray: initialTimes, notesLegend: direction.notes || {}, isShortView: true, now, dayTypeForGrid: today, limit: 5, customTitle: initialTitle })}
+                          ${generateTimesGridHtml({ timesArray: initialTimes, notesLegend: direction.notes || {}, isShortView: true, now, dayTypeForGrid: today, limit: 5 })}
                       </div>`;
     } else {
       directionGridsHtml = `<div id="grid-${directionId}">`;
@@ -129,10 +125,10 @@ document.addEventListener('DOMContentLoaded', () => {
     return `${index > 0 ? '<hr class="my-6 border-gray-300">' : ''}<div class="schedule-direction" id="${directionId}" data-direction-index="${index}"><h4 class="font-bold text-xl flex items-center gap-2"><span class="inline-block align-middle text-orange-600" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="5" width="18" height="12" rx="3" fill="#c2410c" stroke="#c2410c" /><rect x="6" y="8" width="4" height="4" rx="1" fill="#fff" /><rect x="14" y="8" width="4" height="4" rx="1" fill="#fff" /><circle cx="7.5" cy="17" r="1.5" fill="#1e293b"/><circle cx="16.5" cy="17" r="1.5" fill="#1e293b"/></svg></span>${direction.directionName}</h4>${filterHtml}${directionGridsHtml}${legendHtml}<div class="flex justify-start mt-4"><button class="toggle-full-schedule-btn" data-route-id="${route.routeName}" data-full-view="${isFullView}" data-direction-id="${directionId}">${isFullView ? 'Zwiń rozkład' : 'Pełny rozkład ->'}</button></div></div>`;
   }
 
-  function applyTimeFilter(form, routeId, activeSchedule) {
-    const directionId = form.dataset.directionId;
-    const fromHourValue = form.querySelector('select[name="from-hour"]').value;
-    const toHourValue = form.querySelector('select[name="to-hour"]').value;
+  // ### ZMIANA 1: Nowa funkcja do obsługi filtra suwakowego ###
+  function applyTimeFilter(slider, routeId, activeSchedule) {
+    const directionId = slider.dataset.directionId;
+    const fromHour = parseInt(slider.value, 10);
 
     const directionData = activeSchedule.directions.find(d => `${routeId}-${d.directionName.replace(/[^a-zA-Z0-9]/g, '-')}-${activeSchedule.directions.indexOf(d)}` === directionId);
     if (!directionData) return;
@@ -143,57 +139,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const gridContainer = document.getElementById(`grid-${directionId}`);
     if (!gridContainer) return;
 
-    const nowInMinutes = now.getHours() * 60 + now.getMinutes();
-    const fromHour = (fromHourValue === 'now') ? now.getHours() : parseInt(fromHourValue, 10);
-    const toHour = toHourValue ? parseInt(toHourValue, 10) : null;
+    // Po ruszeniu suwakiem zawsze pokazujemy wszystkie kursy od wybranej godziny
+    const filteredTimes = allTimesForToday.filter(timeObj => {
+      const [hour] = timeObj.time.split(':').map(Number);
+      return hour >= fromHour;
+    });
 
-    let filteredTimes = [];
-    let customTitle = '';
-    let limit = null;
-
-    if (fromHourValue !== 'now' && toHour) {
-      filteredTimes = allTimesForToday.filter(timeObj => {
-        const [hour] = timeObj.time.split(':').map(Number);
-        return hour >= fromHour && hour < toHour;
-      });
-      customTitle = `Odjazdy (${today.displayName}) od ${fromHour.toString().padStart(2, '0')}:00 do ${toHour.toString().padStart(2, '0')}:00`;
-    }
-    else if (fromHourValue !== 'now' && !toHour) {
-      filteredTimes = allTimesForToday.filter(timeObj => {
-        const [hour] = timeObj.time.split(':').map(Number);
-        return hour >= fromHour;
-      });
-      customTitle = `Odjazdy (${today.displayName}) od ${fromHour.toString().padStart(2, '0')}:00`;
-    }
-    // ### POPRAWKA: Dodano "od teraz" do tytułu dla jasności ###
-    else if (fromHourValue === 'now' && toHour) {
-      filteredTimes = allTimesForToday.filter(timeObj => {
-        const [hour, minute] = timeObj.time.split(':').map(Number);
-        const timeInMinutes = hour * 60 + minute;
-        return timeInMinutes >= nowInMinutes && hour < toHour;
-      });
-      customTitle = `Odjazdy (${today.displayName}) od teraz do ${toHour.toString().padStart(2, '0')}:00`;
-    }
-    else {
-      filteredTimes = allTimesForToday.filter(timeObj => {
-        const [hour, minute] = timeObj.time.split(':').map(Number);
-        return (hour * 60 + minute) >= nowInMinutes;
-      });
-      customTitle = `Najbliższe kursy (${today.displayName})`;
-      limit = 5;
-    }
+    const customTitle = `Odjazdy (${today.displayName}) od ${fromHour.toString().padStart(2, '0')}:00`;
 
     gridContainer.innerHTML = generateTimesGridHtml({
       timesArray: filteredTimes,
       notesLegend: directionData.notes || {},
-      isShortView: true,
-      limit: limit,
+      isShortView: false, // Pokazujemy jako pełną siatkę
+      limit: null, // Bez limitu
       now,
       dayTypeForGrid: today,
       customTitle
     });
   }
 
+  // ### ZMIANA 2: Nowe listenery dla suwaka ###
   function setupEventListeners(routeId, activeSchedule) {
     detailsContainer.querySelectorAll('.toggle-full-schedule-btn').forEach(button => {
       button.addEventListener('click', (e) => {
@@ -206,20 +171,16 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    detailsContainer.querySelectorAll('.time-filter-form').forEach(form => {
-      form.addEventListener('change', () => {
-        applyTimeFilter(form, routeId, activeSchedule);
-      });
-    });
+    // NOWY LISTENER DLA SUWAKA
+    detailsContainer.querySelectorAll('.time-slider').forEach(slider => {
+      const label = document.getElementById(`slider-label-${slider.dataset.directionId}`);
 
-    detailsContainer.querySelectorAll('.reset-filter-btn').forEach(button => {
-      button.addEventListener('click', () => {
-        const form = button.closest('.time-filter-form');
-        if (form) {
-          form.querySelector('select[name="from-hour"]').value = 'now';
-          form.querySelector('select[name="to-hour"]').value = '';
-          form.dispatchEvent(new Event('change', { bubbles: true }));
+      // Zdarzenie 'input' - reaguje na każdą zmianę suwaka
+      slider.addEventListener('input', () => {
+        if (label) {
+          label.innerHTML = `Pokaż odjazdy od: <span class="font-bold text-orange-600">${slider.value.padStart(2, '0')}:00</span>`;
         }
+        applyTimeFilter(slider, routeId, activeSchedule);
       });
     });
 
@@ -233,52 +194,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // ### ZMIANA: NOWA, KOMPAKTOWA STRUKTURA FILTRA ###
-  function generateFilterHtml(directionId) {
-    let fromOptionsHtml = `<option value="now" selected>teraz</option>`;
-    for (let i = 0; i <= 23; i++) {
-      fromOptionsHtml += `<option value="${i}">${i.toString().padStart(2, '0')}:00</option>`;
-    }
-    let toOptionsHtml = '<option value="" selected>---</option>';
-    for (let i = 1; i <= 24; i++) {
-      toOptionsHtml += `<option value="${i}">${i > 23 ? '24' : i.toString().padStart(2, '0')}:00</option>`;
-    }
+  // ### ZMIANA 3: Nowy HTML dla filtra suwakowego ###
+  function generateFilterHtml(directionId, now) {
+    const currentHour = now.getHours();
+    const initialLabel = `Najbliższe kursy (<span class="font-normal">przesuń, aby filtrować</span>):`;
 
-    const selectStyle = `background-image: url(&quot;data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e&quot;); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.25em;`;
+    // Klasy Tailwind do stylizacji suwaka
+    const sliderClasses = "w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:bg-orange-600 [&::-webkit-slider-thumb]:rounded-full [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:bg-orange-600 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-none";
 
-    // Definicja klas dla selecta i labelki
-    const selectClasses = "block w-full appearance-none rounded-md border-0 bg-white py-1.5 pl-3 pr-8 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-orange-600 sm:text-sm";
-    const labelClasses = "absolute -top-2 left-2 z-10 inline-block bg-gray-100 rounded-sm border-0 px-1 text-xs font-medium text-gray-500";
-
-    const fromHtml = `
-        <div class="relative w-24">
-            <label for="from-hour-${directionId}" class="${labelClasses}">od</label>
-            <select name="from-hour" id="from-hour-${directionId}" class="${selectClasses}" style="${selectStyle}">
-                ${fromOptionsHtml}
-            </select>
-        </div>`;
-
-    const toHtml = `
-        <div class="relative w-24">
-            <label for="to-hour-${directionId}" class="${labelClasses}">do</label>
-            <select name="to-hour" id="to-hour-${directionId}" class="${selectClasses}" style="${selectStyle}">
-                ${toOptionsHtml}
-            </select>
-        </div>`;
-
-    const resetButtonHtml = `
-        <button type="button" class="reset-filter-btn self-end pb-1 text-gray-400 hover:text-orange-600 transition-colors" title="Wyczyść filtry">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-        </button>`;
-
-    return `<div class="filter-section mt-4 mb-6">
-              <form class="time-filter-form flex items-start flex-wrap gap-x-3 gap-y-4" data-direction-id="${directionId}">
-                ${fromHtml}
-                ${toHtml}
-                ${resetButtonHtml}
-              </form>
+    return `<div class="filter-section mt-6 mb-6">
+              <div class="time-slider-container">
+                <label for="time-slider-${directionId}" class="block mb-3 text-sm font-medium text-gray-700" id="slider-label-${directionId}">
+                  ${initialLabel}
+                </label>
+                <input type="range" id="time-slider-${directionId}" data-direction-id="${directionId}" class="time-slider ${sliderClasses}" min="4" max="23" value="${currentHour}">
+              </div>
             </div>`;
   }
 
@@ -287,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function formatMinutesUntilFriendly(totalMinutes) { if (totalMinutes < 0) return ''; if (totalMinutes < 1) return 'Odjeżdża teraz'; if (totalMinutes === 1) return 'Odjazd za 1 minutę'; if (totalMinutes < 60) { const lastDigit = totalMinutes % 10; const lastTwoDigits = totalMinutes % 100; if (lastDigit >= 2 && lastDigit <= 4 && !(lastTwoDigits >= 12 && lastTwoDigits <= 14)) { return `Odjazd za ${totalMinutes} minuty`; } return `Odjazd za ${totalMinutes} minut`; } const hours = Math.floor(totalMinutes / 60); const minutes = totalMinutes % 60; let hourWord = 'godzin'; if (hours === 1) hourWord = 'godzinę'; if (hours >= 2 && hours <= 4) hourWord = 'godziny'; if (minutes === 0) return `Odjazd za ${hours} ${hourWord}`; return `Odjazd za ${hours} ${hourWord} i ${minutes} min`; }
 
   function generateTimesGridHtml(options) {
-    const { timesArray, notesLegend, isShortView, now, dayTypeForGrid, limit = null, customTitle = null, showAllInRange = false } = options;
+    const { timesArray, notesLegend, isShortView, now, dayTypeForGrid, limit = null, customTitle = null } = options;
     let titleHtml = '';
     if (customTitle) {
       titleHtml = `<div class="schedule-grid-header mb-3"><span class="text-base font-medium text-gray-800">${customTitle}</span></div>`;
@@ -332,6 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const tooltip = tooltipText ? `data-tooltip="${tooltipText}"` : '';
       return `<div class="time-box ${bgClass}" ${tooltip}><div class="time-box-content">${timeBoxContentPrefix}<span class="time-value">${time.time}</span>${noteHtml}</div><div class="countdown-container">${countdownHtml}</div></div>`;
     }).join('');
+    // Usunięto pusty div, który mógł powodować problemy
     return `${titleHtml}<div class="time-grid">${timesHtml}</div>`;
   }
 

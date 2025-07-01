@@ -95,6 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isFullView && scrollToDirection) scrollToElement(scrollToDirection);
   }
 
+  // ### POPRAWKA: Usunięto limit 5 kursów dla widoku początkowego ###
   function generateDirectionHtml(direction, route, activeSchedule, context) {
     const { index, now, today, allDayTypes, isFullView, routeId } = context;
     const directionId = `${routeId}-${direction.directionName.replace(/[^a-zA-Z0-9]/g, '-')}-${index}`;
@@ -106,9 +107,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const [hour, minute] = timeObj.time.split(':').map(Number);
         return (hour * 60 + minute) >= (now.getHours() * 60 + now.getMinutes());
       });
-      const initialTitle = `Najbliższe kursy (${today.displayName})`;
+      const currentTimeFormatted = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+      const initialTitle = `Odjazdy (${today.displayName}) od ${currentTimeFormatted}`;
       directionGridsHtml = `<div id="grid-${directionId}">
-                          ${generateTimesGridHtml({ timesArray: initialTimes, notesLegend: direction.notes || {}, isShortView: true, now, dayTypeForGrid: today, limit: 5, customTitle: initialTitle })}
+                          ${generateTimesGridHtml({ timesArray: initialTimes, notesLegend: direction.notes || {}, isShortView: false, now, dayTypeForGrid: today, limit: null, customTitle: initialTitle })}
                       </div>`;
     } else {
       directionGridsHtml = `<div id="grid-${directionId}">`;
@@ -174,7 +176,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       slider.addEventListener('input', () => {
         if (labelContainer) {
-          // Po ruszeniu suwakiem, etykieta jest aktualizowana, a podpowiedź znika.
           labelContainer.innerHTML = `
                 <span class="block text-sm font-medium text-gray-700">
                     Odjazdy od: <span class="font-bold text-orange-600">${slider.value.padStart(2, '0')}:00</span>
@@ -195,13 +196,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // ### POPRAWKA: Zmieniono etykietę początkową dla spójności ###
   function generateFilterHtml(directionId, now) {
     const currentHour = now.getHours();
     const currentMinutes = now.getMinutes().toString().padStart(2, '0');
     const currentTimeFormatted = `${currentHour.toString().padStart(2, '0')}:${currentMinutes}`;
 
-    // Etykieta z aktualną godziną i podpowiedzią
     const initialLabel = `
         <span class="block text-sm font-medium text-gray-700">
             Odjazdy od: <span class="font-bold text-orange-600">${currentTimeFormatted}</span>

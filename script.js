@@ -233,6 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // ### ZMIANA: NOWA, KOMPAKTOWA STRUKTURA FILTRA ###
   function generateFilterHtml(directionId) {
     let fromOptionsHtml = `<option value="now" selected>teraz</option>`;
     for (let i = 0; i <= 23; i++) {
@@ -243,24 +244,40 @@ document.addEventListener('DOMContentLoaded', () => {
       toOptionsHtml += `<option value="${i}">${i > 23 ? '24' : i.toString().padStart(2, '0')}:00</option>`;
     }
 
-    const selectClasses = "block w-20 appearance-none rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50";
-    const selectStyle = `background-image: url(&quot;data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e&quot;); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em;`;
+    const selectStyle = `background-image: url(&quot;data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e&quot;); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.25em;`;
+
+    // Definicja klas dla selecta i labelki
+    const selectClasses = "block w-full appearance-none rounded-md border-0 bg-white py-1.5 pl-3 pr-8 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-orange-600 sm:text-sm";
+    const labelClasses = "absolute -top-2 left-2 z-10 inline-block bg-gray-100 rounded-sm border-0 px-1 text-xs font-medium text-gray-500";
+
+    const fromHtml = `
+        <div class="relative w-24">
+            <label for="from-hour-${directionId}" class="${labelClasses}">od</label>
+            <select name="from-hour" id="from-hour-${directionId}" class="${selectClasses}" style="${selectStyle}">
+                ${fromOptionsHtml}
+            </select>
+        </div>`;
+
+    const toHtml = `
+        <div class="relative w-24">
+            <label for="to-hour-${directionId}" class="${labelClasses}">do</label>
+            <select name="to-hour" id="to-hour-${directionId}" class="${selectClasses}" style="${selectStyle}">
+                ${toOptionsHtml}
+            </select>
+        </div>`;
+
+    const resetButtonHtml = `
+        <button type="button" class="reset-filter-btn self-end pb-1 text-gray-400 hover:text-orange-600 transition-colors" title="Wyczyść filtry">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>`;
 
     return `<div class="filter-section mt-4 mb-6">
-              <form class="time-filter-form flex items-center flex-wrap gap-x-4 gap-y-3" data-direction-id="${directionId}">
-                <div class="filter-group flex items-center gap-x-2">
-                  <label for="from-hour-${directionId}" class="text-sm font-medium text-gray-600 whitespace-nowrap">od</label>
-                  <select name="from-hour" id="from-hour-${directionId}" class="${selectClasses}" style="${selectStyle}">${fromOptionsHtml}</select>
-                </div>
-                <div class="filter-group flex items-center gap-x-2">
-                  <label for="to-hour-${directionId}" class="text-sm font-medium text-gray-600">do</label>
-                  <select name="to-hour" id="to-hour-${directionId}" class="${selectClasses}" style="${selectStyle}">${toOptionsHtml}</select>
-                </div>
-                <button type="button" class="reset-filter-btn text-gray-400 hover:text-orange-600 transition-colors" title="Wyczyść filtry">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
+              <form class="time-filter-form flex items-start flex-wrap gap-x-3 gap-y-4" data-direction-id="${directionId}">
+                ${fromHtml}
+                ${toHtml}
+                ${resetButtonHtml}
               </form>
             </div>`;
   }

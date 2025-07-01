@@ -374,7 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!timesArray || timesArray.length === 0) {
       if (isInitialLoad) {
-        return messageBoxHtml('Na dziś nie ma już więcej kursów. Sprawdź rozkład na inny dzień, korzystając z przycisków powyżej.');
+        return messageBoxHtml('Na dziś nie ma już więcej kursów. Sprawdź pełny rozkład.');
       }
       return messageBoxHtml('Brak kursów w wybranym zakresie.');
     }

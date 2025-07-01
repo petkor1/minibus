@@ -95,24 +95,25 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isFullView && scrollToDirection) scrollToElement(scrollToDirection);
   }
 
+  // ### POPRAWKA: Przywrócono generowanie tytułu dla widoku początkowego ###
   function generateDirectionHtml(direction, route, activeSchedule, context) {
     const { index, now, today, allDayTypes, isFullView, routeId } = context;
     const directionId = `${routeId}-${direction.directionName.replace(/[^a-zA-Z0-9]/g, '-')}-${index}`;
     let directionGridsHtml, filterHtml = '';
 
-    const currentHour = now.getHours();
     // Domyślnie pokazujemy od aktualnej godziny, limit 5
     const initialTimes = (direction.times[today.key] || []).filter(timeObj => {
-      const [hour] = timeObj.time.split(':').map(Number);
-      const timeInMinutes = hour * 60 + timeObj.time.split(':')[1] * 1;
+      const [hour, minute] = timeObj.time.split(':').map(Number);
+      const timeInMinutes = hour * 60 + minute;
       const nowInMinutes = now.getHours() * 60 + now.getMinutes();
       return timeInMinutes >= nowInMinutes;
     });
 
     if (!isFullView) {
       filterHtml = generateFilterHtml(directionId);
+      const initialTitle = `Najbliższe kursy (${today.displayName})`; // <-- Dodano tytuł dla stanu początkowego
       directionGridsHtml = `<div id="grid-${directionId}">
-                          ${generateTimesGridHtml({ timesArray: initialTimes, notesLegend: direction.notes || {}, isShortView: true, now, dayTypeForGrid: today, limit: 5 })}
+                          ${generateTimesGridHtml({ timesArray: initialTimes, notesLegend: direction.notes || {}, isShortView: true, now, dayTypeForGrid: today, limit: 5, customTitle: initialTitle })}
                       </div>`;
     } else {
       directionGridsHtml = `<div id="grid-${directionId}">`;
@@ -130,7 +131,6 @@ document.addEventListener('DOMContentLoaded', () => {
     return `${index > 0 ? '<hr class="my-6 border-gray-300">' : ''}<div class="schedule-direction" id="${directionId}" data-direction-index="${index}"><h4 class="font-bold text-xl flex items-center gap-2"><span class="inline-block align-middle text-orange-600" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="5" width="18" height="12" rx="3" fill="#c2410c" stroke="#c2410c" /><rect x="6" y="8" width="4" height="4" rx="1" fill="#fff" /><rect x="14" y="8" width="4" height="4" rx="1" fill="#fff" /><circle cx="7.5" cy="17" r="1.5" fill="#1e293b"/><circle cx="16.5" cy="17" r="1.5" fill="#1e293b"/></svg></span>${direction.directionName}</h4>${filterHtml}${directionGridsHtml}${legendHtml}<div class="flex justify-start mt-4"><button class="toggle-full-schedule-btn" data-route-id="${route.routeName}" data-full-view="${isFullView}" data-direction-id="${directionId}">${isFullView ? 'Zwiń rozkład' : 'Pełny rozkład ->'}</button></div></div>`;
   }
 
-  // ### ZMIANA 1: Nowa, rozbudowana logika filtrowania ###
   function applyTimeFilter(form, routeId, activeSchedule) {
     const directionId = form.dataset.directionId;
     const fromHourValue = form.querySelector('select[name="from-hour"]').value;
@@ -153,7 +153,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let customTitle = '';
     let limit = null;
 
-    // 1. Wybrano zakres ("od" i "do")
     if (fromHourValue !== 'now' && toHour) {
       filteredTimes = allTimesForToday.filter(timeObj => {
         const [hour] = timeObj.time.split(':').map(Number);
@@ -161,7 +160,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       customTitle = `Odjazdy (${today.displayName}) od ${fromHour.toString().padStart(2, '0')}:00 do ${toHour.toString().padStart(2, '0')}:00`;
     }
-    // 2. Wybrano tylko "od"
     else if (fromHourValue !== 'now' && !toHour) {
       filteredTimes = allTimesForToday.filter(timeObj => {
         const [hour] = timeObj.time.split(':').map(Number);
@@ -169,7 +167,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       customTitle = `Odjazdy (${today.displayName}) od ${fromHour.toString().padStart(2, '0')}:00`;
     }
-    // 3. Wybrano tylko "do" (a "od" jest "teraz")
     else if (fromHourValue === 'now' && toHour) {
       filteredTimes = allTimesForToday.filter(timeObj => {
         const [hour, minute] = timeObj.time.split(':').map(Number);
@@ -178,7 +175,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       customTitle = `Odjazdy (${today.displayName}) do ${toHour.toString().padStart(2, '0')}:00`;
     }
-    // 4. Stan domyślny ("teraz" i "---")
     else {
       filteredTimes = allTimesForToday.filter(timeObj => {
         const [hour, minute] = timeObj.time.split(':').map(Number);
@@ -199,7 +195,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ### ZMIANA 2: Dodano obsługę przycisku resetowania ###
   function setupEventListeners(routeId, activeSchedule) {
     detailsContainer.querySelectorAll('.toggle-full-schedule-btn').forEach(button => {
       button.addEventListener('click', (e) => {
@@ -218,14 +213,12 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    // NOWY LISTENER DLA PRZYCISKU RESET
     detailsContainer.querySelectorAll('.reset-filter-btn').forEach(button => {
       button.addEventListener('click', () => {
         const form = button.closest('.time-filter-form');
         if (form) {
           form.querySelector('select[name="from-hour"]').value = 'now';
           form.querySelector('select[name="to-hour"]').value = '';
-          // Ręczne wywołanie zdarzenia 'change', aby odświeżyć widok
           form.dispatchEvent(new Event('change', { bubbles: true }));
         }
       });
@@ -241,20 +234,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // ### ZMIANA 3: Dodano opcję "teraz" i przycisk resetowania do HTML ###
   function generateFilterHtml(directionId) {
-    // Dodajemy opcję "teraz" na początku
     let fromOptionsHtml = `<option value="now" selected>teraz</option>`;
     for (let i = 0; i <= 23; i++) {
       fromOptionsHtml += `<option value="${i}">${i.toString().padStart(2, '0')}:00</option>`;
     }
-    // Zmieniono domyślny tekst
     let toOptionsHtml = '<option value="" selected>---</option>';
     for (let i = 1; i <= 24; i++) {
       toOptionsHtml += `<option value="${i}">${i > 23 ? '24' : i.toString().padStart(2, '0')}:00</option>`;
     }
 
-    const selectClasses = "block w-20 appearance-none rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50";
+    const selectClasses = "block w-24 appearance-none rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50";
     const selectStyle = `background-image: url(&quot;data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e&quot;); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em;`;
 
     return `<div class="filter-section mt-4 mb-6">
@@ -284,7 +274,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const { timesArray, notesLegend, isShortView, now, dayTypeForGrid, limit = null, customTitle = null, showAllInRange = false } = options;
     let titleHtml = '';
     if (customTitle) {
-      // Zmieniono klasę dla spójności
       titleHtml = `<div class="schedule-grid-header mb-3"><span class="text-base font-medium text-gray-800">${customTitle}</span></div>`;
     }
 
@@ -296,7 +285,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes();
     const departures = timesArray.map(timeObj => ({ ...timeObj, totalMinutes: (([h, m]) => h * 60 + m)(timeObj.time.split(':').map(Number)), isPast: isTodaySchedule && (([h, m]) => h * 60 + m)(timeObj.time.split(':').map(Number)) < currentTimeInMinutes })).sort((a, b) => a.totalMinutes - b.totalMinutes);
 
-    // Jeśli jest limit, stosujemy go do posortowanej tablicy
     let departuresToDisplay = limit ? departures.slice(0, limit) : departures;
 
     if (departuresToDisplay.length === 0) {

@@ -106,8 +106,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const [hour, minute] = timeObj.time.split(':').map(Number);
         return (hour * 60 + minute) >= (now.getHours() * 60 + now.getMinutes());
       });
+      const initialTitle = `Najbliższe kursy (${today.displayName})`;
       directionGridsHtml = `<div id="grid-${directionId}">
-                          ${generateTimesGridHtml({ timesArray: initialTimes, notesLegend: direction.notes || {}, isShortView: true, now, dayTypeForGrid: today, limit: 5 })}
+                          ${generateTimesGridHtml({ timesArray: initialTimes, notesLegend: direction.notes || {}, isShortView: true, now, dayTypeForGrid: today, limit: 5, customTitle: initialTitle })}
                       </div>`;
     } else {
       directionGridsHtml = `<div id="grid-${directionId}">`;
@@ -125,7 +126,6 @@ document.addEventListener('DOMContentLoaded', () => {
     return `${index > 0 ? '<hr class="my-6 border-gray-300">' : ''}<div class="schedule-direction" id="${directionId}" data-direction-index="${index}"><h4 class="font-bold text-xl flex items-center gap-2"><span class="inline-block align-middle text-orange-600" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="5" width="18" height="12" rx="3" fill="#c2410c" stroke="#c2410c" /><rect x="6" y="8" width="4" height="4" rx="1" fill="#fff" /><rect x="14" y="8" width="4" height="4" rx="1" fill="#fff" /><circle cx="7.5" cy="17" r="1.5" fill="#1e293b"/><circle cx="16.5" cy="17" r="1.5" fill="#1e293b"/></svg></span>${direction.directionName}</h4>${filterHtml}${directionGridsHtml}${legendHtml}<div class="flex justify-start mt-4"><button class="toggle-full-schedule-btn" data-route-id="${route.routeName}" data-full-view="${isFullView}" data-direction-id="${directionId}">${isFullView ? 'Zwiń rozkład' : 'Pełny rozkład ->'}</button></div></div>`;
   }
 
-  // ### ZMIANA 1: Nowa funkcja do obsługi filtra suwakowego ###
   function applyTimeFilter(slider, routeId, activeSchedule) {
     const directionId = slider.dataset.directionId;
     const fromHour = parseInt(slider.value, 10);
@@ -139,7 +139,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const gridContainer = document.getElementById(`grid-${directionId}`);
     if (!gridContainer) return;
 
-    // Po ruszeniu suwakiem zawsze pokazujemy wszystkie kursy od wybranej godziny
     const filteredTimes = allTimesForToday.filter(timeObj => {
       const [hour] = timeObj.time.split(':').map(Number);
       return hour >= fromHour;
@@ -150,15 +149,14 @@ document.addEventListener('DOMContentLoaded', () => {
     gridContainer.innerHTML = generateTimesGridHtml({
       timesArray: filteredTimes,
       notesLegend: directionData.notes || {},
-      isShortView: false, // Pokazujemy jako pełną siatkę
-      limit: null, // Bez limitu
+      isShortView: false,
+      limit: null,
       now,
       dayTypeForGrid: today,
       customTitle
     });
   }
 
-  // ### ZMIANA 2: Nowe listenery dla suwaka ###
   function setupEventListeners(routeId, activeSchedule) {
     detailsContainer.querySelectorAll('.toggle-full-schedule-btn').forEach(button => {
       button.addEventListener('click', (e) => {
@@ -171,14 +169,17 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    // NOWY LISTENER DLA SUWAKA
     detailsContainer.querySelectorAll('.time-slider').forEach(slider => {
-      const label = document.getElementById(`slider-label-${slider.dataset.directionId}`);
+      const labelContainer = document.getElementById(`slider-label-${slider.dataset.directionId}`);
 
-      // Zdarzenie 'input' - reaguje na każdą zmianę suwaka
       slider.addEventListener('input', () => {
-        if (label) {
-          label.innerHTML = `Pokaż odjazdy od: <span class="font-bold text-orange-600">${slider.value.padStart(2, '0')}:00</span>`;
+        if (labelContainer) {
+          // Po ruszeniu suwakiem, etykieta jest aktualizowana, a podpowiedź znika.
+          labelContainer.innerHTML = `
+                <span class="block text-sm font-medium text-gray-700">
+                    Odjazdy od: <span class="font-bold text-orange-600">${slider.value.padStart(2, '0')}:00</span>
+                </span>
+            `;
         }
         applyTimeFilter(slider, routeId, activeSchedule);
       });
@@ -194,19 +195,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // ### ZMIANA 3: Nowy HTML dla filtra suwakowego ###
+  // ### POPRAWKA: Zmieniono etykietę początkową dla spójności ###
   function generateFilterHtml(directionId, now) {
     const currentHour = now.getHours();
-    const initialLabel = `Najbliższe kursy (<span class="font-normal">przesuń, aby filtrować</span>):`;
+    const currentMinutes = now.getMinutes().toString().padStart(2, '0');
+    const currentTimeFormatted = `${currentHour.toString().padStart(2, '0')}:${currentMinutes}`;
 
-    // Klasy Tailwind do stylizacji suwaka
+    // Etykieta z aktualną godziną i podpowiedzią
+    const initialLabel = `
+        <span class="block text-sm font-medium text-gray-700">
+            Odjazdy od: <span class="font-bold text-orange-600">${currentTimeFormatted}</span>
+        </span>
+        <span class="block text-xs text-gray-500">
+            (przesuń, aby zmienić godzinę)
+        </span>
+    `;
+
     const sliderClasses = "w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:bg-orange-600 [&::-webkit-slider-thumb]:rounded-full [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:bg-orange-600 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-none";
 
     return `<div class="filter-section mt-6 mb-6">
               <div class="time-slider-container">
-                <label for="time-slider-${directionId}" class="block mb-3 text-sm font-medium text-gray-700" id="slider-label-${directionId}">
+                <div class="mb-2" id="slider-label-${directionId}">
                   ${initialLabel}
-                </label>
+                </div>
                 <input type="range" id="time-slider-${directionId}" data-direction-id="${directionId}" class="time-slider ${sliderClasses}" min="4" max="23" value="${currentHour}">
               </div>
             </div>`;
@@ -262,7 +273,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const tooltip = tooltipText ? `data-tooltip="${tooltipText}"` : '';
       return `<div class="time-box ${bgClass}" ${tooltip}><div class="time-box-content">${timeBoxContentPrefix}<span class="time-value">${time.time}</span>${noteHtml}</div><div class="countdown-container">${countdownHtml}</div></div>`;
     }).join('');
-    // Usunięto pusty div, który mógł powodować problemy
     return `${titleHtml}<div class="time-grid">${timesHtml}</div>`;
   }
 

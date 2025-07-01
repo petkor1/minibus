@@ -95,13 +95,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isFullView && scrollToDirection) scrollToElement(scrollToDirection);
   }
 
-  // ### POPRAWKA: Przywrócono generowanie tytułu dla widoku początkowego ###
   function generateDirectionHtml(direction, route, activeSchedule, context) {
     const { index, now, today, allDayTypes, isFullView, routeId } = context;
     const directionId = `${routeId}-${direction.directionName.replace(/[^a-zA-Z0-9]/g, '-')}-${index}`;
     let directionGridsHtml, filterHtml = '';
 
-    // Domyślnie pokazujemy od aktualnej godziny, limit 5
     const initialTimes = (direction.times[today.key] || []).filter(timeObj => {
       const [hour, minute] = timeObj.time.split(':').map(Number);
       const timeInMinutes = hour * 60 + minute;
@@ -111,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!isFullView) {
       filterHtml = generateFilterHtml(directionId);
-      const initialTitle = `Najbliższe kursy (${today.displayName})`; // <-- Dodano tytuł dla stanu początkowego
+      const initialTitle = `Najbliższe kursy (${today.displayName})`;
       directionGridsHtml = `<div id="grid-${directionId}">
                           ${generateTimesGridHtml({ timesArray: initialTimes, notesLegend: direction.notes || {}, isShortView: true, now, dayTypeForGrid: today, limit: 5, customTitle: initialTitle })}
                       </div>`;
@@ -167,13 +165,14 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       customTitle = `Odjazdy (${today.displayName}) od ${fromHour.toString().padStart(2, '0')}:00`;
     }
+    // ### POPRAWKA: Dodano "od teraz" do tytułu dla jasności ###
     else if (fromHourValue === 'now' && toHour) {
       filteredTimes = allTimesForToday.filter(timeObj => {
         const [hour, minute] = timeObj.time.split(':').map(Number);
         const timeInMinutes = hour * 60 + minute;
         return timeInMinutes >= nowInMinutes && hour < toHour;
       });
-      customTitle = `Odjazdy (${today.displayName}) do ${toHour.toString().padStart(2, '0')}:00`;
+      customTitle = `Odjazdy (${today.displayName}) od teraz do ${toHour.toString().padStart(2, '0')}:00`;
     }
     else {
       filteredTimes = allTimesForToday.filter(timeObj => {
@@ -244,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
       toOptionsHtml += `<option value="${i}">${i > 23 ? '24' : i.toString().padStart(2, '0')}:00</option>`;
     }
 
-    const selectClasses = "block w-24 appearance-none rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50";
+    const selectClasses = "block w-20 appearance-none rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50";
     const selectStyle = `background-image: url(&quot;data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e&quot;); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em;`;
 
     return `<div class="filter-section mt-4 mb-6">

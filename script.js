@@ -1,6 +1,6 @@
 // ===================================================================================
 // KOMPLETNY KOD APLIKACJI - script.js
-// Wersja z ulepszonym, zwijanym filtrem i poprawkami UX.
+// Wersja finalna, naprawiająca wszystkie zgłoszone błędy i regresje.
 // ===================================================================================
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -27,6 +27,25 @@ document.addEventListener('DOMContentLoaded', () => {
   const selectorContainer = document.getElementById('schedule-selector-container');
   const detailsContainer = document.getElementById('schedule-details-container');
   const placeholderText = document.getElementById('schedule-placeholder-text');
+
+  function getActiveSchedule(route) {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    if (route.variants) {
+      const activeVariant = route.variants.find(variant => {
+        const from = new Date(variant.validFrom);
+        const to = new Date(variant.validTo);
+        from.setHours(0, 0, 0, 0);
+        to.setHours(0, 0, 0, 0);
+        return now >= from && now <= to;
+      });
+      if (activeVariant) return activeVariant;
+    }
+    if (route.directions) {
+      return { type: 'standardowy', directions: route.directions };
+    }
+    return null;
+  }
 
   if (typeof schedulesData !== 'undefined' && selectorContainer && detailsContainer) {
     Object.keys(schedulesData).forEach(routeId => {
@@ -55,19 +74,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderSchedule(routeId, isFullView, scrollToDirection = null) {
     const route = schedulesData[routeId];
+    const activeSchedule = getActiveSchedule(route);
+    if (!activeSchedule) {
+      detailsContainer.innerHTML = '<p class="text-center text-red-600 p-4">Dla tej trasy nie znaleziono aktywnego rozkładu jazdy na dzień dzisiejszy.</p>';
+      return;
+    }
     const now = new Date();
     const today = getDayType(now);
     const allDayTypes = [{ key: 'workdays', displayName: 'Dni Robocze' }, { key: 'saturdays', displayName: 'Soboty' }, { key: 'sundays', displayName: 'Niedziele i Święta' }];
     let html = '';
-    route.directions.forEach((direction, index) => {
-      html += generateDirectionHtml(direction, route, { index, now, today, allDayTypes, isFullView, routeId });
+    const nonStandardTypes = ['wakacyjny', 'feriowy', 'świąteczny'];
+    if (activeSchedule.type && nonStandardTypes.includes(activeSchedule.type.toLowerCase())) {
+      html += `<div class="schedule-variant-info-subtle"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg><span>Obowiązuje rozkład: <strong>${activeSchedule.type}</strong></span></div>`;
+    }
+    activeSchedule.directions.forEach((direction, index) => {
+      html += generateDirectionHtml(direction, route, activeSchedule, { index, now, today, allDayTypes, isFullView, routeId });
     });
     detailsContainer.innerHTML = html;
-    setupEventListeners(routeId);
+    setupEventListeners(routeId, activeSchedule);
     if (isFullView && scrollToDirection) scrollToElement(scrollToDirection);
   }
 
-  function generateDirectionHtml(direction, route, context) {
+  function generateDirectionHtml(direction, route, activeSchedule, context) {
     const { index, now, today, allDayTypes, isFullView, routeId } = context;
     const directionId = `${routeId}-${direction.directionName.replace(/[^a-zA-Z0-9]/g, '-')}-${index}`;
     let directionGridsHtml, filterHtml = '';
@@ -79,8 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       directionGridsHtml = `<div id="grid-${directionId}">`;
       allDayTypes.forEach(dayType => {
-        directionGridsHtml += `<p class="mt-6 mb-2 text-gray-700">${dayType.displayName}</p>
-                                  ${generateTimesGridHtml({ timesArray: direction.times[dayType.key] || [], notesLegend: direction.notes || {}, isShortView: false, now, dayTypeForGrid: dayType })}`;
+        directionGridsHtml += `<p class="mt-6 mb-2 text-gray-700">${dayType.displayName}</p>${generateTimesGridHtml({ timesArray: direction.times[dayType.key] || [], notesLegend: direction.notes || {}, isShortView: false, now, dayTypeForGrid: dayType })}`;
       });
       directionGridsHtml += `</div>`;
     }
@@ -90,17 +117,16 @@ document.addEventListener('DOMContentLoaded', () => {
       for (const key in direction.notes) legendHtml += `<p class="text-sm text-gray-600"><span class="font-bold">${key}</span> - ${direction.notes[key]}</p>`;
       legendHtml += '</div>';
     }
-    let paymentInfoHtml = route.acceptsCard ? `<div class="payment-info-subtle"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg><span>zapłacisz kartą</span></div>` : '';
     return `
             ${index > 0 ? '<hr class="my-6 border-gray-300">' : ''}
-            <div class="schedule-direction" id="${directionId}">
+            <div class="schedule-direction" id="${directionId}" data-direction-index="${index}">
                 <h4 class="font-bold text-xl flex items-center gap-2"><span class="inline-block align-middle text-orange-600" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="5" width="18" height="12" rx="3" fill="#c2410c" stroke="#c2410c" /><rect x="6" y="8" width="4" height="4" rx="1" fill="#fff" /><rect x="14" y="8" width="4" height="4" rx="1" fill="#fff" /><circle cx="7.5" cy="17" r="1.5" fill="#1e293b"/><circle cx="16.5" cy="17" r="1.5" fill="#1e293b"/></svg></span>${direction.directionName}</h4>
-                ${paymentInfoHtml}${filterHtml}${directionGridsHtml}${legendHtml}
+                ${filterHtml}${directionGridsHtml}${legendHtml}
                 <div class="flex justify-start mt-4"><button class="toggle-full-schedule-btn" data-route-id="${route.routeName}" data-full-view="${isFullView}" data-direction-id="${directionId}">${isFullView ? 'Zwiń rozkład' : 'Pełny rozkład ->'}</button></div>
             </div>`;
   }
 
-  function setupEventListeners(routeId) {
+  function setupEventListeners(routeId, activeSchedule) {
     detailsContainer.querySelectorAll('.toggle-full-schedule-btn').forEach(button => {
       button.addEventListener('click', (e) => {
         const currentIsFull = e.target.dataset.fullView === 'true';
@@ -112,24 +138,21 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    // NOWOŚĆ: Logika dla zwijanego filtra
     detailsContainer.querySelectorAll('.filter-toggle-btn').forEach(toggleBtn => {
       toggleBtn.addEventListener('click', () => {
         toggleBtn.classList.toggle('active');
         const filterContainer = toggleBtn.nextElementSibling;
-        if (filterContainer) {
-          filterContainer.classList.toggle('visible');
-        }
+        if (filterContainer) filterContainer.classList.toggle('visible');
       });
     });
 
     detailsContainer.querySelectorAll('.time-filter-form').forEach(form => {
-      const handleFilter = () => {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
         const directionId = form.dataset.directionId;
         const fromHour = parseInt(form.querySelector('select[name="from-hour"]').value, 10);
         const toHour = parseInt(form.querySelector('select[name="to-hour"]').value, 10);
-        const route = schedulesData[routeId];
-        const directionData = route.directions.find(d => `${routeId}-${d.directionName.replace(/[^a-zA-Z0-9]/g, '-')}-${route.directions.indexOf(d)}` === directionId);
+        const directionData = activeSchedule.directions.find(d => `${routeId}-${d.directionName.replace(/[^a-zA-Z0-9]/g, '-')}-${activeSchedule.directions.indexOf(d)}` === directionId);
         if (directionData) {
           const now = new Date();
           const today = getDayType(now);
@@ -141,20 +164,15 @@ document.addEventListener('DOMContentLoaded', () => {
           const gridContainer = document.getElementById(`grid-${directionId}`);
           if (gridContainer) {
             const customTitle = `Odjazdy między ${fromHour.toString().padStart(2, '0')}:00 a ${toHour.toString().padStart(2, '0')}:00`;
-            gridContainer.innerHTML = generateTimesGridHtml({ timesArray: filteredTimes, notesLegend: directionData.notes || {}, isShortView: true, now, dayTypeForGrid: today, customTitle: customTitle });
+            gridContainer.innerHTML = generateTimesGridHtml({ timesArray: filteredTimes, notesLegend: directionData.notes || {}, isShortView: true, now, dayTypeForGrid: today, customTitle: customTitle, showAllInRange: true });
           }
         }
-      };
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        handleFilter();
       });
-      form.addEventListener('reset', (e) => {
+      form.addEventListener('reset', () => {
         setTimeout(() => {
           const directionId = form.dataset.directionId;
           const gridContainer = document.getElementById(`grid-${directionId}`);
-          const route = schedulesData[routeId];
-          const directionData = route.directions.find(d => `${routeId}-${d.directionName.replace(/[^a-zA-Z0-9]/g, '-')}-${route.directions.indexOf(d)}` === directionId);
+          const directionData = activeSchedule.directions.find(d => `${routeId}-${d.directionName.replace(/[^a-zA-Z0-9]/g, '-')}-${activeSchedule.directions.indexOf(d)}` === directionId);
           if (gridContainer && directionData) {
             gridContainer.innerHTML = generateTimesGridHtml({ timesArray: directionData.times[getDayType(new Date()).key] || [], notesLegend: directionData.notes || {}, isShortView: true, now: new Date(), dayTypeForGrid: getDayType(new Date()), limit: 5 });
           }
@@ -174,66 +192,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function generateFilterHtml(directionId) {
     let optionsHtml = '';
-    for (let i = 0; i <= 23; i++) {
-      const hour = i.toString().padStart(2, '0');
-      optionsHtml += `<option value="${i}">${hour}:00</option>`;
-    }
-    return `
-        <div class="filter-section">
-            <button type="button" class="filter-toggle-btn">
-                <span>Filtruj</span>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
-            </button>
-            <div class="filter-container">
-                <form class="time-filter-form" data-direction-id="${directionId}">
-                    <fieldset class="time-filter-fieldset">
-                        <legend class="filter-legend">Zakres godzin</legend>
-                        <div class="filter-content">
-                            <div class="filter-inputs">
-                                <div class="filter-group">
-                                    <label for="from-hour-${directionId}">Od</label>
-                                    <select name="from-hour" id="from-hour-${directionId}">${optionsHtml}</select>
-                                </div>
-                                <div class="filter-group">
-                                    <label for="to-hour-${directionId}">Do</label>
-                                    <select name="to-hour" id="to-hour-${directionId}">${optionsHtml.replace('value="0"', 'value="24" selected')}</select>
-                                </div>
-                            </div>
-                            <div class="filter-actions">
-                                <button type="submit" class="filter-button">Filtruj</button>
-                                <button type="reset" class="reset-button">Wyczyść</button>
-                            </div>
-                        </div>
-                    </fieldset>
-                </form>
-            </div>
-        </div>`;
+    for (let i = 0; i <= 23; i++) { optionsHtml += `<option value="${i}">${i.toString().padStart(2, '0')}:00</option>`; }
+    return `<div class="filter-section"><button type="button" class="filter-toggle-btn"><span>Filtruj</span><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg></button><div class="filter-container"><form class="time-filter-form" data-direction-id="${directionId}"><fieldset class="time-filter-fieldset"><legend class="filter-legend">Zakres godzin</legend><div class="filter-content"><div class="filter-inputs"><div class="filter-group"><label for="from-hour-${directionId}">Od</label><select name="from-hour" id="from-hour-${directionId}">${optionsHtml}</select></div><div class="filter-group"><label for="to-hour-${directionId}">Do</label><select name="to-hour" id="to-hour-${directionId}">${optionsHtml.replace('value="0"', 'value="24" selected')}</select></div></div><div class="filter-actions"><button type="submit" class="filter-button">Filtruj</button><button type="reset" class="reset-button">Wyczyść</button></div></div></fieldset></form></div></div>`;
   }
 
-  // Pozostała część pliku bez zmian
-  function scrollToElement(elementId) {
-    const targetElement = document.getElementById(elementId);
-    if (targetElement) {
-      const y = targetElement.getBoundingClientRect().top + window.pageYOffset - 70;
-      window.scrollTo({ top: y, behavior: 'smooth' });
-    }
-  }
+  function scrollToElement(elementId) { const targetElement = document.getElementById(elementId); if (targetElement) { const y = targetElement.getBoundingClientRect().top + window.pageYOffset - 70; window.scrollTo({ top: y, behavior: 'smooth' }); } }
   function formatMinutesUntilShort(totalMinutes) { if (totalMinutes < 0) return ''; if (totalMinutes < 1) return 'teraz'; if (totalMinutes === 1) return 'za 1 min'; if (totalMinutes < 60) return `za ${totalMinutes} min`; const hours = Math.floor(totalMinutes / 60); const minutes = totalMinutes % 60; if (minutes === 0) return `za ${hours}h`; return `za ${hours}h ${minutes}m`; }
   function formatMinutesUntilFriendly(totalMinutes) { if (totalMinutes < 0) return ''; if (totalMinutes < 1) return 'Odjeżdża teraz'; if (totalMinutes === 1) return 'Odjazd za 1 minutę'; if (totalMinutes < 60) { const lastDigit = totalMinutes % 10; const lastTwoDigits = totalMinutes % 100; if (lastDigit >= 2 && lastDigit <= 4 && !(lastTwoDigits >= 12 && lastTwoDigits <= 14)) { return `Odjazd za ${totalMinutes} minuty`; } return `Odjazd za ${totalMinutes} minut`; } const hours = Math.floor(totalMinutes / 60); const minutes = totalMinutes % 60; let hourWord = 'godzin'; if (hours === 1) hourWord = 'godzinę'; if (hours >= 2 && hours <= 4) hourWord = 'godziny'; if (minutes === 0) return `Odjazd za ${hours} ${hourWord}`; return `Odjazd za ${hours} ${hourWord} i ${minutes} min`; }
 
-  // NOWOŚĆ: Funkcja przyjmuje teraz `customTitle`
   function generateTimesGridHtml(options) {
-    const { timesArray, notesLegend, isShortView, now, dayTypeForGrid, limit = null, customTitle = null } = options;
-
+    const { timesArray, notesLegend, isShortView, now, dayTypeForGrid, limit = null, customTitle = null, showAllInRange = false } = options;
     let titleHtml = '';
     if (customTitle) {
-      titleHtml = `<div class="flex justify-between items-center mt-2 mb-2"><p class="text-gray-700">${customTitle}</p></div>`;
+      titleHtml = `<div class="schedule-grid-header"><span class="toolbar-title">${customTitle}</span></div>`;
     } else if (isShortView && limit) {
-      // Przywrócono domyślny tytuł dla widoku skróconego
       const today = getDayType(now);
-      titleHtml = `<div class="flex justify-between items-center mt-2 mb-2"><p class="text-gray-700">Najbliższe kursy dzisiaj (${today.displayName})</p></div>`;
+      titleHtml = `<div class="schedule-grid-header"><span class="toolbar-title">Najbliższe kursy (${today.displayName})</span></div>`;
     }
-
     if (!timesArray || timesArray.length === 0) {
       return `${titleHtml}<p class="text-blue-600 p-4 rounded-lg border border-blue-200 bg-blue-50/50 backdrop-blur-sm shadow-sm">Brak kursów w wybranym zakresie.</p>`;
     }
@@ -241,10 +216,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const isTodaySchedule = dayTypeForGrid.key === today.key;
     const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes();
     const departures = timesArray.map(timeObj => ({ ...timeObj, totalMinutes: (([h, m]) => h * 60 + m)(timeObj.time.split(':').map(Number)), isPast: isTodaySchedule && (([h, m]) => h * 60 + m)(timeObj.time.split(':').map(Number)) < currentTimeInMinutes })).sort((a, b) => a.totalMinutes - b.totalMinutes);
-    let departuresToDisplay = isShortView ? departures.filter(dep => !dep.isPast) : departures;
-    if (isShortView && limit) {
-      departuresToDisplay = departuresToDisplay.slice(0, limit);
+
+    let departuresToDisplay = departures;
+    if (isShortView && !showAllInRange) {
+      departuresToDisplay = departures.filter(dep => !dep.isPast);
+      if (limit) {
+        departuresToDisplay = departuresToDisplay.slice(0, limit);
+      }
     }
+
     if (departuresToDisplay.length === 0) {
       return `${titleHtml}<p class="text-blue-600 p-4 rounded-lg border border-blue-200 bg-blue-50/50 backdrop-blur-sm shadow-sm">Brak przyszłych kursów w wybranym zakresie.</p>`;
     }
@@ -258,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const noteText = (time.noteKey && notesLegend[time.noteKey]) || '';
       const noteHtml = noteText ? `<span class="time-note">${time.noteKey}</span>` : '';
       let countdownHtml = '', timeBoxContentPrefix = '', tooltipText = noteText;
-      if (isTodaySchedule && isNextFive) {
+      if (isTodaySchedule && isNextFive && !time.isPast) {
         timeBoxContentPrefix = '<span class="time-icon">⏰</span>';
         const minutesUntil = time.totalMinutes - currentTimeInMinutes;
         if (minutesUntil >= 0) {
@@ -274,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return `${titleHtml}<div class="time-grid">${timesHtml}</div>`;
   }
 
-  // --- Pozostałe funkcje pomocnicze bez zmian ---
+  // --- Pozostałe funkcje pomocnicze (bez zmian) ---
   function getPublicHolidays(year) { const a = year % 19, b = Math.floor(year / 100), c = year % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451); const month = Math.floor((h + l - 7 * m + 114) / 31), day = ((h + l - 7 * m + 114) % 31) + 1; const easterMonday = new Date(year, month - 1, day + 1); const corpusChristi = new Date(year, month - 1, day + 60); const formatDate = (date) => date.toISOString().slice(0, 10); return [`${year}-01-01`, `${year}-01-06`, formatDate(easterMonday), `${year}-05-01`, `${year}-05-03`, formatDate(corpusChristi), `${year}-08-15`, `${year}-11-01`, `${year}-11-11`, `${year}-12-25`, `${year}-12-26`]; }
   function getDayType(date) { const day = date.getDay(); const holidays = getPublicHolidays(date.getFullYear()); const dateString = date.toISOString().slice(0, 10); if (day === 0 || holidays.includes(dateString)) return { key: 'sundays', displayName: 'Niedziele i Święta' }; if (day === 6) return { key: 'saturdays', displayName: 'Soboty' }; return { key: 'workdays', displayName: 'Dni Robocze' }; }
   const tooltipElement = document.getElementById('custom-tooltip');

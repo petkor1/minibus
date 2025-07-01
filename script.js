@@ -209,13 +209,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const selectClasses = "block w-32 appearance-none rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50";
     const selectStyle = `background-image: url(&quot;data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e&quot;); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em;`;
 
-    return `<div class="mt-4 mb-6">
-              <form class="flex items-center flex-wrap gap-x-4 gap-y-3" data-direction-id="${directionId}">
-                <div class="flex items-center gap-x-2">
+    return `<div class="filter-section mt-4 mb-6">
+              <form class="time-filter-form flex items-center flex-wrap gap-x-4 gap-y-3" data-direction-id="${directionId}">
+                <div class="filter-group flex items-center gap-x-2">
                   <label for="from-hour-${directionId}" class="text-sm font-medium text-gray-600 whitespace-nowrap">od</label>
                   <select name="from-hour" id="from-hour-${directionId}" class="${selectClasses}" style="${selectStyle}">${fromOptionsHtml}</select>
                 </div>
-                <div class="flex items-center gap-x-2">
+                <div class="filter-group flex items-center gap-x-2">
                   <label for="to-hour-${directionId}" class="text-sm font-medium text-gray-600">do</label>
                   <select name="to-hour" id="to-hour-${directionId}" class="${selectClasses}" style="${selectStyle}">${toOptionsHtml}</select>
                 </div>

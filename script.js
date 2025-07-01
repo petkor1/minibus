@@ -1,6 +1,6 @@
 // ===================================================================================
 // KOMPLETNY KOD APLIKACJI - script.js
-// Wersja z ulepszonym stylem wyświetlania najbliższych kursów.
+// Wersja z ulepszonymi, kontekstowymi komunikatami.
 // ===================================================================================
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }) : selectedDayTimes;
 
       directionGridsHtml = `<div id="grid-${directionId}">
-                          ${generateTimesGridHtml({ timesArray: initialTimes, notesLegend: direction.notes || {}, isShortView: false, now, dayTypeForGrid: getDayTypeByKey(activeDayTypeKey), limit: null })}
+                          ${generateTimesGridHtml({ timesArray: initialTimes, notesLegend: direction.notes || {}, isShortView: false, now, dayTypeForGrid: getDayTypeByKey(activeDayTypeKey), limit: null, isInitialLoad: true })}
                       </div>`;
     } else {
       const allDayTypes = [{ key: 'workdays', displayName: 'Dni Robocze' }, { key: 'saturdays', displayName: 'Soboty' }, { key: 'sundays', displayName: 'Niedziele i Święta' }];
@@ -209,16 +209,13 @@ document.addEventListener('DOMContentLoaded', () => {
       return hour >= fromHour;
     });
 
-    const customTitle = `Odjazdy (${getDayTypeByKey(activeDayTypeKey).displayName}) od ${fromHour.toString().padStart(2, '0')}:00`;
-
     gridContainer.innerHTML = generateTimesGridHtml({
       timesArray: filteredTimes,
       notesLegend: directionData.notes || {},
       isShortView: false,
       limit: null,
       now,
-      dayTypeForGrid: getDayTypeByKey(activeDayTypeKey),
-      customTitle
+      dayTypeForGrid: getDayTypeByKey(activeDayTypeKey)
     });
   }
 
@@ -356,12 +353,23 @@ document.addEventListener('DOMContentLoaded', () => {
   function formatMinutesUntilShort(totalMinutes) { if (totalMinutes < 0) return ''; if (totalMinutes < 1) return 'teraz'; if (totalMinutes === 1) return 'za 1 min'; if (totalMinutes < 60) return `za ${totalMinutes} min`; const hours = Math.floor(totalMinutes / 60); const minutes = totalMinutes % 60; if (minutes === 0) return `za ${hours}h`; return `za ${hours}h ${minutes}m`; }
   function formatMinutesUntilFriendly(totalMinutes) { if (totalMinutes < 0) return ''; if (totalMinutes < 1) return 'Odjeżdża teraz'; if (totalMinutes === 1) return 'Odjazd za 1 minutę'; if (totalMinutes < 60) { const lastDigit = totalMinutes % 10; const lastTwoDigits = totalMinutes % 100; if (lastDigit >= 2 && lastDigit <= 4 && !(lastTwoDigits >= 12 && lastTwoDigits <= 14)) { return `Odjazd za ${totalMinutes} minuty`; } return `Odjazd za ${totalMinutes} minut`; } const hours = Math.floor(totalMinutes / 60); const minutes = totalMinutes % 60; let hourWord = 'godzin'; if (hours === 1) hourWord = 'godzinę'; if (hours >= 2 && hours <= 4) hourWord = 'godziny'; if (minutes === 0) return `Odjazd za ${hours} ${hourWord}`; return `Odjazd za ${hours} ${hourWord} i ${minutes} min`; }
 
-  // ### ZMIANA: Nowa logika wyświetlania ikon i liczników ###
+  // ### ZMIANA: Nowa, kontekstowa logika komunikatów ###
   function generateTimesGridHtml(options) {
-    const { timesArray, notesLegend, now, dayTypeForGrid, limit = null } = options;
+    const { timesArray, notesLegend, now, dayTypeForGrid, limit = null, isInitialLoad = false } = options;
+
+    const messageBoxHtml = (message) => `
+        <div class="text-blue-600 p-4 rounded-lg border border-blue-200 bg-blue-50/50 flex items-start gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>${message}</span>
+        </div>`;
 
     if (!timesArray || timesArray.length === 0) {
-      return `<p class="text-blue-600 p-4 rounded-lg border border-blue-200 bg-blue-50/50 backdrop-blur-sm shadow-sm">Brak kursów w wybranym zakresie.</p>`;
+      if (isInitialLoad) {
+        return messageBoxHtml('Na dziś nie ma już więcej kursów. Sprawdź rozkład na inny dzień, korzystając z przycisków powyżej lub kliknij "Pełny rozkład".');
+      }
+      return messageBoxHtml('Brak kursów w wybranym zakresie.');
     }
 
     const isTodaySchedule = dayTypeForGrid.key === getDayType(new Date()).key;
@@ -371,7 +379,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let departuresToDisplay = limit ? departures.slice(0, limit) : departures;
 
     if (departuresToDisplay.length === 0) {
-      return `<p class="text-blue-600 p-4 rounded-lg border border-blue-200 bg-blue-50/50 backdrop-blur-sm shadow-sm">Brak przyszłych kursów w wybranym zakresie.</p>`;
+      if (isInitialLoad) {
+        return messageBoxHtml('Na dziś nie ma już więcej kursów. Sprawdź rozkład na inny dzień, korzystając z przycisków powyżej.');
+      }
+      return messageBoxHtml('Brak przyszłych kursów w wybranym zakresie.');
     }
 
     const firstFutureIndex = departures.findIndex(dep => !dep.isPast);
@@ -388,12 +399,10 @@ document.addEventListener('DOMContentLoaded', () => {
       let timeBoxContentPrefix = '';
       let tooltipText = noteText;
 
-      // Zegar tylko dla pierwszego przyszłego kursu
       if (isFirstFuture) {
         timeBoxContentPrefix = '<span class="time-icon">⏰</span>';
       }
 
-      // Licznik dla wszystkich przyszłych kursów
       if (isFuture) {
         const minutesUntil = time.totalMinutes - currentTimeInMinutes;
         if (minutesUntil >= 0) {

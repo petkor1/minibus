@@ -114,7 +114,7 @@ const schedulesData = {
     },
     "gdow-dobczyce": {
         routeName: "Gdów <-> Dobczyce",
-        acceptsCard: true,
+        acceptsCard: false,
         variants: [
             {
                 type: "standardowy",

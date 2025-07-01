@@ -1,6 +1,6 @@
 // ===================================================================================
 // KOMPLETNY KOD APLIKACJI - script.js
-// Wersja z automatycznym systemem publikacji komunikatów.
+// Wersja z ulepszonymi, kontekstowymi komunikatami.
 // ===================================================================================
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -84,6 +84,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const directionHtml = generateDirectionHtml(activeDirection, route, activeSchedule, { index: activeDirectionIndex, now, activeDayTypeKey, isFullView, routeId });
     let finalHtml = '';
     if (activeSchedule.type.toLowerCase() !== 'standardowy') {
+      if (route.acceptsCard) {
+        finalHtml += `<div class="flex items-center justify-start gap-2 text-sm text-gray-500 -mt-3 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
+                            <path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm3 1a1 1 0 100-2h3a1 1 0 100 2H7z" clip-rule="evenodd" />
+                        </svg>
+                        <span>Można płacić kartą</span>
+                    </div>`;
+      }
       finalHtml += `<div class="text-blue-600 p-4 mb-6 rounded-lg border border-blue-200 bg-blue-50/50 flex items-start gap-3" role="alert">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -91,7 +100,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         <p>Obowiązuje rozkład: <strong class="capitalize font-semibold">${activeSchedule.type}</strong></p>
                     </div>`;
     }
-    finalHtml += switcherHtml + directionHtml;
+    finalHtml += switcherHtml;
+    finalHtml += directionHtml;
     detailsContainer.innerHTML = finalHtml;
     setupEventListeners(routeId, activeSchedule, { activeDirectionIndex, activeDayTypeKey });
     if (isFullView && scrollToDirection) scrollToElement(scrollToDirection);
@@ -123,17 +133,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!isFullView) {
       controlsHtml = generateControlsHtml(directionId, now, activeDayTypeKey);
       const selectedDayTimes = direction.times[activeDayTypeKey] || [];
-      const isToday = activeDayTypeKey === getDayType(now).key;
-      const initialTimes = isToday ? selectedDayTimes.filter(timeObj => {
-        const [hour, minute] = timeObj.time.split(':').map(Number);
-        return (hour * 60 + minute) >= (now.getHours() * 60 + now.getMinutes());
-      }) : selectedDayTimes;
-      directionGridsHtml = `<div id="grid-${directionId}">${generateTimesGridHtml({ timesArray: initialTimes, notesLegend: direction.notes || {}, isShortView: false, now, dayTypeForGrid: getDayTypeByKey(activeDayTypeKey), limit: null, isInitialLoad: true })}</div>`;
+      directionGridsHtml = `<div id="grid-${directionId}">${generateTimesGridHtml({ timesArray: selectedDayTimes, notesLegend: direction.notes || {}, now, dayTypeForGrid: getDayTypeByKey(activeDayTypeKey), isInitialLoad: true })}</div>`;
     } else {
       const allDayTypes = [{ key: 'workdays', displayName: 'Dni Robocze' }, { key: 'saturdays', displayName: 'Soboty' }, { key: 'sundays', displayName: 'Niedziele i Święta' }];
       directionGridsHtml = `<div id="grid-${directionId}">`;
       allDayTypes.forEach(dayType => {
-        directionGridsHtml += `<p class="mt-6 mb-2 text-gray-700">${dayType.displayName}</p>${generateTimesGridHtml({ timesArray: direction.times[dayType.key] || [], notesLegend: direction.notes || {}, isShortView: false, now, dayTypeForGrid: dayType })}`;
+        directionGridsHtml += `<p class="mt-6 mb-2 text-gray-700">${dayType.displayName}</p>${generateTimesGridHtml({ timesArray: direction.times[dayType.key] || [], notesLegend: direction.notes || {}, now, dayTypeForGrid: dayType, isFullDayView: true })}`;
       });
       directionGridsHtml += `</div>`;
     }
@@ -160,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const [hour] = timeObj.time.split(':').map(Number);
       return hour >= fromHour;
     });
-    gridContainer.innerHTML = generateTimesGridHtml({ timesArray: filteredTimes, notesLegend: directionData.notes || {}, isShortView: false, limit: null, now, dayTypeForGrid: getDayTypeByKey(activeDayTypeKey) });
+    gridContainer.innerHTML = generateTimesGridHtml({ timesArray: filteredTimes, notesLegend: directionData.notes || {}, now, dayTypeForGrid: getDayTypeByKey(activeDayTypeKey) });
   }
 
   function setupEventListeners(routeId, activeSchedule, options) {
@@ -252,21 +257,33 @@ document.addEventListener('DOMContentLoaded', () => {
   function formatMinutesUntilShort(totalMinutes) { if (totalMinutes < 0) return ''; if (totalMinutes < 1) return 'teraz'; if (totalMinutes === 1) return 'za 1 min'; if (totalMinutes < 60) return `za ${totalMinutes} min`; const hours = Math.floor(totalMinutes / 60); const minutes = totalMinutes % 60; if (minutes === 0) return `za ${hours}h`; return `za ${hours}h ${minutes}m`; }
   function formatMinutesUntilFriendly(totalMinutes) { if (totalMinutes < 0) return ''; if (totalMinutes < 1) return 'Odjeżdża teraz'; if (totalMinutes === 1) return 'Odjazd za 1 minutę'; if (totalMinutes < 60) { const lastDigit = totalMinutes % 10; const lastTwoDigits = totalMinutes % 100; if (lastDigit >= 2 && lastDigit <= 4 && !(lastTwoDigits >= 12 && lastTwoDigits <= 14)) { return `Odjazd za ${totalMinutes} minuty`; } return `Odjazd za ${totalMinutes} minut`; } const hours = Math.floor(totalMinutes / 60); const minutes = totalMinutes % 60; let hourWord = 'godzin'; if (hours === 1) hourWord = 'godzinę'; if (hours >= 2 && hours <= 4) hourWord = 'godziny'; if (minutes === 0) return `Odjazd za ${hours} ${hourWord}`; return `Odjazd za ${hours} ${hourWord} i ${minutes} min`; }
 
+  // ### ZMIANA: Ulepszone, kontekstowe komunikaty ###
   function generateTimesGridHtml(options) {
-    const { timesArray, notesLegend, now, dayTypeForGrid, limit = null, isInitialLoad = false } = options;
+    const { timesArray, notesLegend, now, dayTypeForGrid, limit = null, isInitialLoad = false, isFullDayView = false } = options;
     const messageBoxHtml = (message) => `<div class="text-blue-600 p-4 rounded-lg border border-blue-200 bg-blue-50/50 flex items-start gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span>${message}</span></div>`;
+
+    const isTodaySchedule = dayTypeForGrid.key === getDayType(new Date()).key;
+
     if (!timesArray || timesArray.length === 0) {
-      if (isInitialLoad) return messageBoxHtml('Na dziś nie ma już więcej kursów. Sprawdź rozkład na inny dzień, korzystając z przycisków powyżej.');
+      if (isFullDayView) return messageBoxHtml('W tym dniu nie ma żadnych kursów.');
       return messageBoxHtml('Brak kursów w wybranym zakresie.');
     }
-    const isTodaySchedule = dayTypeForGrid.key === getDayType(new Date()).key;
+
     const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes();
     const departures = timesArray.map(timeObj => ({ ...timeObj, totalMinutes: (([h, m]) => h * 60 + m)(timeObj.time.split(':').map(Number)), isPast: isTodaySchedule && (([h, m]) => h * 60 + m)(timeObj.time.split(':').map(Number)) < currentTimeInMinutes })).sort((a, b) => a.totalMinutes - b.totalMinutes);
-    let departuresToDisplay = limit ? departures.slice(0, limit) : departures;
-    if (departuresToDisplay.length === 0) {
-      if (isInitialLoad) return messageBoxHtml('Na dziś nie ma już więcej kursów. Sprawdź rozkład na inny dzień, korzystając z przycisków powyżej.');
-      return messageBoxHtml('Brak przyszłych kursów w wybranym zakresie.');
+
+    let departuresToDisplay = departures;
+    if (isInitialLoad && isTodaySchedule) {
+      departuresToDisplay = departures.filter(dep => !dep.isPast);
     }
+
+    if (departuresToDisplay.length === 0) {
+      if (isTodaySchedule) {
+        return messageBoxHtml('Na dziś nie ma już więcej kursów. Sprawdź pełny rozkład.');
+      }
+      return messageBoxHtml('Brak kursów w wybranym zakresie.');
+    }
+
     const firstFutureIndex = departures.findIndex(dep => !dep.isPast);
     const timesHtml = departuresToDisplay.map((time, idx) => {
       const isFirstFuture = departures.indexOf(time) === firstFutureIndex;
@@ -299,7 +316,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const hideTooltip = () => { if (tooltipElement) tooltipElement.classList.remove('visible'); };
   const handleMobileTooltip = (target) => { if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) { showTooltip(target); clearTimeout(mobileTooltipTimer); mobileTooltipTimer = setTimeout(hideTooltip, 4000); } };
 
-  // ### ZMIANA: Nowa, dynamiczna obsługa komunikatów ###
   const announcementsContainer = document.getElementById('announcements-container');
   function formatTextWithMarkdown(text) { if (!text) return ''; return text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); }
   if (announcementsContainer) {
@@ -308,7 +324,6 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(data => {
         const now = new Date();
         now.setHours(0, 0, 0, 0);
-
         const activeAnnouncements = data.filter(item => {
           const pubDate = new Date(item.publicationDate);
           const termDate = new Date(item.terminationDate);
@@ -316,20 +331,16 @@ document.addEventListener('DOMContentLoaded', () => {
           termDate.setHours(0, 0, 0, 0);
           return now >= pubDate && now <= termDate;
         });
-
         activeAnnouncements.sort((a, b) => new Date(b.publicationDate) - new Date(a.publicationDate));
-
         announcementsContainer.innerHTML = '';
         if (!activeAnnouncements || activeAnnouncements.length === 0) {
           announcementsContainer.innerHTML = '<p class="col-span-full text-center">Brak aktualnych komunikatów.</p>';
           return;
         }
-
         activeAnnouncements.forEach((item, i) => {
           const card = document.createElement('div');
           card.className = 'bg-white p-6 rounded-lg shadow-md flex flex-col';
           if (i === 0) card.style.borderLeft = '3px solid #c2410c';
-
           const fTxt = formatTextWithMarkdown(item.text), pTxt = item.text.replace(/\*\*([^*]+)\*\*/g, '$1').replace(/\n/g, ' ');
           let dTxt = fTxt, more = false;
           if (pTxt.length > 250) {

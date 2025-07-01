@@ -1,6 +1,6 @@
 // ===================================================================================
 // KOMPLETNY KOD APLIKACJI - script.js
-// Wersja z przełącznikiem dnia tygodnia i filtrem suwakowym.
+// Wersja z dodaną etykietą nad przełącznikiem kierunku.
 // ===================================================================================
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -110,9 +110,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isFullView && scrollToDirection) scrollToElement(scrollToDirection);
   }
 
+  // ### ZMIANA: Dodano etykietę nad przełącznikiem ###
   function generateDirectionSwitcherHtml(directions, routeId, activeIndex) {
     if (directions.length <= 1) return '';
 
+    const labelHtml = `<label class="block text-xs font-medium text-gray-500 mb-1">Wybierz kierunek:</label>`;
+
+    // Dla 3 lub więcej kierunków, użyj listy rozwijanej
     if (directions.length > 2) {
       const optionsHtml = directions.map((direction, index) => {
         const isSelected = index === activeIndex ? 'selected' : '';
@@ -121,21 +125,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const selectClasses = "block w-full appearance-none rounded-md border-gray-300 bg-white py-2 pl-3 pr-10 text-base text-gray-800 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500";
       const selectStyle = `background-image: url(&quot;data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e&quot;); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em;`;
-      const iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                          </svg>`;
 
-      return `<div class="direction-switcher-dropdown mb-6 rounded-lg border border-gray-200 bg-gray-50 p-3">
-                    <div class="flex items-center gap-3">
-                        ${iconHtml}
-                        <label for="direction-select" class="text-sm font-medium text-gray-700 whitespace-nowrap">Kierunek:</label>
-                        <select id="direction-select" data-route-id="${routeId}" class="${selectClasses}" style="${selectStyle}">
-                            ${optionsHtml}
-                        </select>
-                    </div>
+      return `<div class="direction-switcher-container mb-6">
+                    ${labelHtml}
+                    <select id="direction-select" data-route-id="${routeId}" class="${selectClasses}" style="${selectStyle}">
+                        ${optionsHtml}
+                    </select>
                 </div>`;
     }
 
+    // Dla 2 kierunków, użyj Segmented Button
     const buttonsHtml = directions.map((direction, index) => {
       const isActive = index === activeIndex;
       const activeClasses = 'bg-orange-100 text-orange-700 border-orange-500 z-10';
@@ -151,9 +150,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 </button>`;
     }).join('');
 
-    return `<div class="direction-switcher isolate inline-flex rounded-lg shadow-sm mb-6 w-full">
-                <span class="sr-only">Wybierz kierunek</span>
-                ${buttonsHtml}
+    return `<div class="direction-switcher-container mb-6">
+                ${labelHtml}
+                <div class="isolate inline-flex rounded-lg shadow-sm w-full">
+                    ${buttonsHtml}
+                </div>
             </div>`;
   }
 
@@ -193,7 +194,6 @@ document.addEventListener('DOMContentLoaded', () => {
     return `<div class="schedule-direction" id="${directionId}" data-direction-index="${index}">${controlsHtml}${directionGridsHtml}${legendHtml}<div class="flex justify-start mt-4"><button class="toggle-full-schedule-btn" data-route-id="${route.routeName}" data-full-view="${isFullView}" data-direction-id="${directionId}">${isFullView ? 'Zwiń rozkład' : 'Pełny rozkład ->'}</button></div></div>`;
   }
 
-  // ### POPRAWKA 1: Funkcja przyjmuje teraz `activeDayTypeKey` jako argument ###
   function applyTimeFilter(slider, routeId, activeSchedule, activeDayTypeKey) {
     const directionId = slider.dataset.directionId;
     const fromHour = parseInt(slider.value, 10);
@@ -212,7 +212,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return hour >= fromHour;
     });
 
-    // ### POPRAWKA 2: Tytuł jest teraz generowany i przekazywany dalej ###
     const customTitle = `Odjazdy (${getDayTypeByKey(activeDayTypeKey).displayName}) od ${fromHour.toString().padStart(2, '0')}:00`;
 
     gridContainer.innerHTML = generateTimesGridHtml({
@@ -222,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
       limit: null,
       now,
       dayTypeForGrid: getDayTypeByKey(activeDayTypeKey),
-      customTitle // Przekazanie tytułu
+      customTitle
     });
   }
 
@@ -274,7 +273,6 @@ document.addEventListener('DOMContentLoaded', () => {
           if (hint) hint.style.display = 'none';
           if (timeValue) timeValue.textContent = `${slider.value.padStart(2, '0')}:00`;
         }
-        // ### POPRAWKA 3: Przekazanie `activeDayTypeKey` do funkcji filtrującej ###
         applyTimeFilter(slider, routeId, activeSchedule, activeDayTypeKey);
       });
     });

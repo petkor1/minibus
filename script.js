@@ -1,6 +1,6 @@
 // ===================================================================================
 // KOMPLETNY KOD APLIKACJI - script.js
-// Wersja z filtrem w postaci suwaka godzinowego.
+// Wersja z przełącznikiem kierunków i filtrem suwakowym.
 // ===================================================================================
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const routeId = button.dataset.routeId;
       document.querySelectorAll('.schedule-selector-btn').forEach(btn => btn.classList.remove('active'));
       button.classList.add('active');
-      renderSchedule(routeId, false);
+      renderSchedule(routeId); // Domyślnie renderuje z indeksem 0
       placeholderText.classList.add('hidden');
       detailsContainer.classList.remove('hidden');
       const targetPosition = detailsContainer.getBoundingClientRect().top + window.pageYOffset - 70;
@@ -72,32 +72,72 @@ document.addEventListener('DOMContentLoaded', () => {
     if (placeholderText) placeholderText.textContent = "Błąd ładowania modułu rozkładów jazdy.";
   }
 
-  function renderSchedule(routeId, isFullView, scrollToDirection = null) {
+  // ### ZMIANA 1: Główna funkcja renderująca, teraz z obsługą aktywnego kierunku ###
+  function renderSchedule(routeId, options = {}) {
+    const { isFullView = false, scrollToDirection = null, activeDirectionIndex = 0 } = options;
+
     const route = schedulesData[routeId];
     const activeSchedule = getActiveSchedule(route);
     if (!activeSchedule) {
       detailsContainer.innerHTML = '<p class="text-center text-red-600 p-4">Dla tej trasy nie znaleziono aktywnego rozkładu jazdy na dzień dzisiejszy.</p>';
       return;
     }
+
     const now = new Date();
     const today = getDayType(now);
-    const allDayTypes = [{ key: 'workdays', displayName: 'Dni Robocze' }, { key: 'saturdays', displayName: 'Soboty' }, { key: 'sundays', displayName: 'Niedziele i Święta' }];
-    let html = '';
+
+    // Generowanie przełącznika kierunków
+    const switcherHtml = generateDirectionSwitcherHtml(activeSchedule.directions, routeId, activeDirectionIndex);
+
+    // Pobranie tylko aktywnego kierunku
+    const activeDirection = activeSchedule.directions[activeDirectionIndex];
+    if (!activeDirection) return; // Zabezpieczenie
+
+    // Generowanie HTML tylko dla aktywnego kierunku
+    const directionHtml = generateDirectionHtml(activeDirection, route, activeSchedule, {
+      index: activeDirectionIndex,
+      now,
+      today,
+      isFullView,
+      routeId
+    });
+
+    let finalHtml = '';
     const nonStandardTypes = ['wakacyjny', 'feriowy', 'świąteczny'];
     if (activeSchedule.type && nonStandardTypes.includes(activeSchedule.type.toLowerCase())) {
-      html += `<div class="schedule-variant-info-subtle"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg><span>Obowiązuje rozkład: <strong>${activeSchedule.type}</strong></span></div>`;
+      finalHtml += `<div class="schedule-variant-info-subtle"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg><span>Obowiązuje rozkład: <strong>${activeSchedule.type}</strong></span></div>`;
     }
-    activeSchedule.directions.forEach((direction, index) => {
-      html += generateDirectionHtml(direction, route, activeSchedule, { index, now, today, allDayTypes, isFullView, routeId });
-    });
-    detailsContainer.innerHTML = html;
+
+    // Łączenie HTML: przełącznik + widok kierunku
+    finalHtml += switcherHtml + directionHtml;
+
+    detailsContainer.innerHTML = finalHtml;
     setupEventListeners(routeId, activeSchedule);
     if (isFullView && scrollToDirection) scrollToElement(scrollToDirection);
   }
 
-  // ### POPRAWKA: Usunięto limit 5 kursów dla widoku początkowego ###
+  // ### ZMIANA 2: Nowa funkcja do generowania przełącznika kierunków ###
+  function generateDirectionSwitcherHtml(directions, routeId, activeIndex) {
+    if (directions.length <= 1) return ''; // Nie pokazuj przełącznika, jeśli jest tylko jeden kierunek
+
+    const buttonsHtml = directions.map((direction, index) => {
+      const isActive = index === activeIndex;
+      const activeClasses = 'bg-orange-600 text-white shadow';
+      const inactiveClasses = 'bg-gray-200 text-gray-600 hover:bg-gray-300';
+      return `<button 
+                    type="button" 
+                    class="direction-tab-btn flex-1 px-4 py-3 text-sm font-semibold transition-colors ${isActive ? activeClasses : inactiveClasses}"
+                    data-route-id="${routeId}"
+                    data-direction-index="${index}">
+                    ${direction.directionName}
+                </button>`;
+    }).join('');
+
+    return `<div class="direction-switcher flex rounded-lg overflow-hidden mb-6">${buttonsHtml}</div>`;
+  }
+
   function generateDirectionHtml(direction, route, activeSchedule, context) {
-    const { index, now, today, allDayTypes, isFullView, routeId } = context;
+    const { index, now, today, isFullView, routeId } = context;
     const directionId = `${routeId}-${direction.directionName.replace(/[^a-zA-Z0-9]/g, '-')}-${index}`;
     let directionGridsHtml, filterHtml = '';
 
@@ -113,6 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
                           ${generateTimesGridHtml({ timesArray: initialTimes, notesLegend: direction.notes || {}, isShortView: false, now, dayTypeForGrid: today, limit: null, customTitle: initialTitle })}
                       </div>`;
     } else {
+      const allDayTypes = [{ key: 'workdays', displayName: 'Dni Robocze' }, { key: 'saturdays', displayName: 'Soboty' }, { key: 'sundays', displayName: 'Niedziele i Święta' }];
       directionGridsHtml = `<div id="grid-${directionId}">`;
       allDayTypes.forEach(dayType => {
         directionGridsHtml += `<p class="mt-6 mb-2 text-gray-700">${dayType.displayName}</p>${generateTimesGridHtml({ timesArray: direction.times[dayType.key] || [], notesLegend: direction.notes || {}, isShortView: false, now, dayTypeForGrid: dayType })}`;
@@ -125,14 +166,16 @@ document.addEventListener('DOMContentLoaded', () => {
       for (const key in direction.notes) legendHtml += `<p class="text-sm text-gray-600"><span class="font-bold">${key}</span> - ${direction.notes[key]}</p>`;
       legendHtml += '</div>';
     }
-    return `${index > 0 ? '<hr class="my-6 border-gray-300">' : ''}<div class="schedule-direction" id="${directionId}" data-direction-index="${index}"><h4 class="font-bold text-xl flex items-center gap-2"><span class="inline-block align-middle text-orange-600" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="5" width="18" height="12" rx="3" fill="#c2410c" stroke="#c2410c" /><rect x="6" y="8" width="4" height="4" rx="1" fill="#fff" /><rect x="14" y="8" width="4" height="4" rx="1" fill="#fff" /><circle cx="7.5" cy="17" r="1.5" fill="#1e293b"/><circle cx="16.5" cy="17" r="1.5" fill="#1e293b"/></svg></span>${direction.directionName}</h4>${filterHtml}${directionGridsHtml}${legendHtml}<div class="flex justify-start mt-4"><button class="toggle-full-schedule-btn" data-route-id="${route.routeName}" data-full-view="${isFullView}" data-direction-id="${directionId}">${isFullView ? 'Zwiń rozkład' : 'Pełny rozkład ->'}</button></div></div>`;
+    // Usunięto <hr>, ponieważ renderujemy tylko jeden kierunek naraz
+    return `<div class="schedule-direction" id="${directionId}" data-direction-index="${index}">${filterHtml}${directionGridsHtml}${legendHtml}<div class="flex justify-start mt-4"><button class="toggle-full-schedule-btn" data-route-id="${route.routeName}" data-full-view="${isFullView}" data-direction-id="${directionId}">${isFullView ? 'Zwiń rozkład' : 'Pełny rozkład ->'}</button></div></div>`;
   }
 
   function applyTimeFilter(slider, routeId, activeSchedule) {
     const directionId = slider.dataset.directionId;
     const fromHour = parseInt(slider.value, 10);
+    const directionIndex = parseInt(document.getElementById(directionId).dataset.directionIndex, 10);
 
-    const directionData = activeSchedule.directions.find(d => `${routeId}-${d.directionName.replace(/[^a-zA-Z0-9]/g, '-')}-${activeSchedule.directions.indexOf(d)}` === directionId);
+    const directionData = activeSchedule.directions[directionIndex];
     if (!directionData) return;
 
     const now = new Date();
@@ -159,11 +202,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // ### ZMIANA 3: Dodano listener dla przełącznika kierunków ###
   function setupEventListeners(routeId, activeSchedule) {
+    // Listener dla przycisku "Pełny rozkład"
     detailsContainer.querySelectorAll('.toggle-full-schedule-btn').forEach(button => {
       button.addEventListener('click', (e) => {
+        const directionId = e.target.dataset.directionId;
+        const directionElement = document.getElementById(directionId);
+        const activeDirectionIndex = parseInt(directionElement.dataset.directionIndex, 10);
         const currentIsFull = e.target.dataset.fullView === 'true';
-        renderSchedule(routeId, !currentIsFull, e.target.dataset.directionId);
+        renderSchedule(routeId, { isFullView: !currentIsFull, activeDirectionIndex, scrollToDirection: directionId });
         if (currentIsFull) {
           const schedulesSection = document.getElementById('schedules-section');
           if (schedulesSection) setTimeout(() => schedulesSection.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
@@ -171,6 +219,15 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
+    // NOWY listener dla przełącznika kierunków
+    detailsContainer.querySelectorAll('.direction-tab-btn').forEach(button => {
+      button.addEventListener('click', (e) => {
+        const newActiveIndex = parseInt(e.currentTarget.dataset.directionIndex, 10);
+        renderSchedule(routeId, { activeDirectionIndex: newActiveIndex });
+      });
+    });
+
+    // Listener dla suwaka
     detailsContainer.querySelectorAll('.time-slider').forEach(slider => {
       const labelContainer = document.getElementById(`slider-label-${slider.dataset.directionId}`);
 

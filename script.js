@@ -1,6 +1,6 @@
 // ===================================================================================
 // KOMPLETNY KOD APLIKACJI - script.js
-// Wersja z poprawioną obsługą wariantów rozkładów.
+// Wersja z automatycznym systemem publikacji komunikatów.
 // ===================================================================================
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -28,13 +28,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const detailsContainer = document.getElementById('schedule-details-container');
   const placeholderText = document.getElementById('schedule-placeholder-text');
 
-  // Funkcja do wyboru aktywnego wariantu rozkładu
   function getActiveSchedule(route) {
     if (!route || !route.variants) return null;
-
     const now = new Date();
     now.setHours(0, 0, 0, 0);
-
     const activeVariants = route.variants.filter(variant => {
       const from = new Date(variant.validFrom);
       const to = new Date(variant.validTo);
@@ -42,10 +39,8 @@ document.addEventListener('DOMContentLoaded', () => {
       to.setHours(0, 0, 0, 0);
       return now >= from && now <= to;
     });
-
     const specialVariant = activeVariants.find(v => v.type.toLowerCase() !== 'standardowy');
     if (specialVariant) return specialVariant;
-
     return activeVariants.find(v => v.type.toLowerCase() === 'standardowy') || null;
   }
 
@@ -76,32 +71,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderSchedule(routeId, options = {}) {
     const { isFullView = false, scrollToDirection = null, activeDirectionIndex = 0, activeDayTypeKey = getDayType(new Date()).key } = options;
-
     const route = schedulesData[routeId];
     const activeSchedule = getActiveSchedule(route);
-
     if (!activeSchedule) {
       detailsContainer.innerHTML = '<p class="text-center text-red-600 p-4">Dla tej trasy nie znaleziono aktywnego rozkładu jazdy na dzień dzisiejszy.</p>';
       return;
     }
-
     const now = new Date();
-
     const switcherHtml = generateDirectionSwitcherHtml(activeSchedule.directions, routeId, activeDirectionIndex);
-
     const activeDirection = activeSchedule.directions[activeDirectionIndex];
     if (!activeDirection) return;
-
-    const directionHtml = generateDirectionHtml(activeDirection, route, activeSchedule, {
-      index: activeDirectionIndex,
-      now,
-      activeDayTypeKey,
-      isFullView,
-      routeId
-    });
-
+    const directionHtml = generateDirectionHtml(activeDirection, route, activeSchedule, { index: activeDirectionIndex, now, activeDayTypeKey, isFullView, routeId });
     let finalHtml = '';
-    // ### ZMIANA: Ujednolicono styl komunikatu ###
     if (activeSchedule.type.toLowerCase() !== 'standardowy') {
       finalHtml += `<div class="text-blue-600 p-4 mb-6 rounded-lg border border-blue-200 bg-blue-50/50 flex items-start gap-3" role="alert">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -110,9 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <p>Obowiązuje rozkład: <strong class="capitalize font-semibold">${activeSchedule.type}</strong></p>
                     </div>`;
     }
-
     finalHtml += switcherHtml + directionHtml;
-
     detailsContainer.innerHTML = finalHtml;
     setupEventListeners(routeId, activeSchedule, { activeDirectionIndex, activeDayTypeKey });
     if (isFullView && scrollToDirection) scrollToElement(scrollToDirection);
@@ -120,68 +99,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function generateDirectionSwitcherHtml(directions, routeId, activeIndex) {
     if (directions.length <= 1) return '';
-
     const labelHtml = `<label class="block text-xs font-medium text-gray-500 mb-1">Wybierz kierunek:</label>`;
-
     if (directions.length > 2) {
-      const optionsHtml = directions.map((direction, index) => {
-        const isSelected = index === activeIndex ? 'selected' : '';
-        return `<option value="${index}" ${isSelected}>${direction.directionName}</option>`;
-      }).join('');
-
+      const optionsHtml = directions.map((direction, index) => `<option value="${index}" ${index === activeIndex ? 'selected' : ''}>${direction.directionName}</option>`).join('');
       const selectClasses = "block w-full appearance-none rounded-md border-gray-300 bg-white py-2 pl-3 pr-10 text-base text-gray-800 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500";
       const selectStyle = `background-image: url(&quot;data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e&quot;); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em;`;
-
-      return `<div class="direction-switcher-container mb-6">
-                    ${labelHtml}
-                    <select id="direction-select" data-route-id="${routeId}" class="${selectClasses}" style="${selectStyle}">
-                        ${optionsHtml}
-                    </select>
-                </div>`;
+      return `<div class="direction-switcher-container mb-6">${labelHtml}<select id="direction-select" data-route-id="${routeId}" class="${selectClasses}" style="${selectStyle}">${optionsHtml}</select></div>`;
     }
-
     const buttonsHtml = directions.map((direction, index) => {
       const isActive = index === activeIndex;
       const activeClasses = 'bg-orange-100 text-orange-700 border-orange-500 z-10';
       const inactiveClasses = 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300';
       const roundingClasses = index === 0 ? 'rounded-l-lg' : 'rounded-r-lg';
-
-      return `<button 
-                    type="button" 
-                    class="direction-tab-btn relative -ml-px flex-1 inline-flex items-center justify-center border px-4 py-3 text-sm font-semibold transition-colors focus:z-20 ${isActive ? activeClasses : inactiveClasses} ${roundingClasses}"
-                    data-route-id="${routeId}"
-                    data-direction-index="${index}">
-                    ${direction.directionName}
-                </button>`;
+      return `<button type="button" class="direction-tab-btn relative -ml-px flex-1 inline-flex items-center justify-center border px-4 py-3 text-sm font-semibold transition-colors focus:z-20 ${isActive ? activeClasses : inactiveClasses} ${roundingClasses}" data-route-id="${routeId}" data-direction-index="${index}">${direction.directionName}</button>`;
     }).join('');
-
-    return `<div class="direction-switcher-container mb-6">
-                ${labelHtml}
-                <div class="isolate inline-flex rounded-lg shadow-sm w-full">
-                    ${buttonsHtml}
-                </div>
-            </div>`;
+    return `<div class="direction-switcher-container mb-6">${labelHtml}<div class="isolate inline-flex rounded-lg shadow-sm w-full">${buttonsHtml}</div></div>`;
   }
 
   function generateDirectionHtml(direction, route, activeSchedule, context) {
     const { index, now, activeDayTypeKey, isFullView, routeId } = context;
     const directionId = `${routeId}-${direction.directionName.replace(/[^a-zA-Z0-9]/g, '-')}-${index}`;
     let directionGridsHtml, controlsHtml = '';
-
     if (!isFullView) {
       controlsHtml = generateControlsHtml(directionId, now, activeDayTypeKey);
-
       const selectedDayTimes = direction.times[activeDayTypeKey] || [];
       const isToday = activeDayTypeKey === getDayType(now).key;
-
       const initialTimes = isToday ? selectedDayTimes.filter(timeObj => {
         const [hour, minute] = timeObj.time.split(':').map(Number);
         return (hour * 60 + minute) >= (now.getHours() * 60 + now.getMinutes());
       }) : selectedDayTimes;
-
-      directionGridsHtml = `<div id="grid-${directionId}">
-                          ${generateTimesGridHtml({ timesArray: initialTimes, notesLegend: direction.notes || {}, isShortView: false, now, dayTypeForGrid: getDayTypeByKey(activeDayTypeKey), limit: null, isInitialLoad: true })}
-                      </div>`;
+      directionGridsHtml = `<div id="grid-${directionId}">${generateTimesGridHtml({ timesArray: initialTimes, notesLegend: direction.notes || {}, isShortView: false, now, dayTypeForGrid: getDayTypeByKey(activeDayTypeKey), limit: null, isInitialLoad: true })}</div>`;
     } else {
       const allDayTypes = [{ key: 'workdays', displayName: 'Dni Robocze' }, { key: 'saturdays', displayName: 'Soboty' }, { key: 'sundays', displayName: 'Niedziele i Święta' }];
       directionGridsHtml = `<div id="grid-${directionId}">`;
@@ -203,37 +150,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const directionId = slider.dataset.directionId;
     const fromHour = parseInt(slider.value, 10);
     const directionIndex = parseInt(document.getElementById(directionId).dataset.directionIndex, 10);
-
     const directionData = activeSchedule.directions[directionIndex];
     if (!directionData) return;
-
     const now = new Date();
     const allTimesForDay = directionData.times[activeDayTypeKey] || [];
     const gridContainer = document.getElementById(`grid-${directionId}`);
     if (!gridContainer) return;
-
     const filteredTimes = allTimesForDay.filter(timeObj => {
       const [hour] = timeObj.time.split(':').map(Number);
       return hour >= fromHour;
     });
-
-    gridContainer.innerHTML = generateTimesGridHtml({
-      timesArray: filteredTimes,
-      notesLegend: directionData.notes || {},
-      isShortView: false,
-      limit: null,
-      now,
-      dayTypeForGrid: getDayTypeByKey(activeDayTypeKey)
-    });
+    gridContainer.innerHTML = generateTimesGridHtml({ timesArray: filteredTimes, notesLegend: directionData.notes || {}, isShortView: false, limit: null, now, dayTypeForGrid: getDayTypeByKey(activeDayTypeKey) });
   }
 
   function setupEventListeners(routeId, activeSchedule, options) {
     const { activeDirectionIndex, activeDayTypeKey } = options;
-
     detailsContainer.querySelectorAll('.toggle-full-schedule-btn').forEach(button => {
       button.addEventListener('click', (e) => {
         const directionId = e.target.dataset.directionId;
-        const directionElement = document.getElementById(directionId);
         const currentIsFull = e.target.dataset.fullView === 'true';
         renderSchedule(routeId, { isFullView: !currentIsFull, activeDirectionIndex, activeDayTypeKey, scrollToDirection: directionId });
         if (currentIsFull) {
@@ -242,14 +176,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     });
-
     detailsContainer.querySelectorAll('.direction-tab-btn').forEach(button => {
       button.addEventListener('click', (e) => {
         const newActiveIndex = parseInt(e.currentTarget.dataset.directionIndex, 10);
         renderSchedule(routeId, { activeDirectionIndex: newActiveIndex, activeDayTypeKey });
       });
     });
-
     const directionSelect = detailsContainer.querySelector('#direction-select');
     if (directionSelect) {
       directionSelect.addEventListener('change', (e) => {
@@ -257,18 +189,15 @@ document.addEventListener('DOMContentLoaded', () => {
         renderSchedule(routeId, { activeDirectionIndex: newActiveIndex, activeDayTypeKey });
       });
     }
-
     detailsContainer.querySelectorAll('.day-type-btn').forEach(button => {
       button.addEventListener('click', (e) => {
         const newDayTypeKey = e.currentTarget.dataset.dayKey;
         renderSchedule(routeId, { activeDirectionIndex, activeDayTypeKey: newDayTypeKey });
       });
     });
-
     detailsContainer.querySelectorAll('.time-slider').forEach(slider => {
       const labelContainer = document.getElementById(`slider-label-${slider.dataset.directionId}`);
       const timeValue = document.getElementById(`slider-time-${slider.dataset.directionId}`);
-
       slider.addEventListener('input', () => {
         if (labelContainer) {
           const hint = labelContainer.querySelector('.slider-hint');
@@ -278,7 +207,6 @@ document.addEventListener('DOMContentLoaded', () => {
         applyTimeFilter(slider, routeId, activeSchedule, activeDayTypeKey);
       });
     });
-
     const tooltipElement = document.getElementById('custom-tooltip');
     if (tooltipElement) {
       detailsContainer.querySelectorAll('[data-tooltip]').forEach(el => {
@@ -296,64 +224,27 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function generateDayTypeSwitcherHtml(activeDayTypeKey) {
-    const allDayTypes = [
-      { key: 'workdays', displayName: 'Robocze' },
-      { key: 'saturdays', displayName: 'Soboty' },
-      { key: 'sundays', displayName: 'Niedziele' }
-    ];
-
+    const allDayTypes = [{ key: 'workdays', displayName: 'Robocze' }, { key: 'saturdays', displayName: 'Soboty' }, { key: 'sundays', displayName: 'Niedziele' }];
     const buttonsHtml = allDayTypes.map(dayType => {
       const isActive = dayType.key === activeDayTypeKey;
       const activeClasses = 'bg-orange-100 text-orange-700 border-orange-500 z-10';
       const inactiveClasses = 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300';
-      return `<button 
-                    type="button" 
-                    class="day-type-btn relative -ml-px flex-1 inline-flex items-center justify-center border px-3 py-2 text-sm font-semibold transition-colors focus:z-20 first:rounded-l-lg last:rounded-r-lg ${isActive ? activeClasses : inactiveClasses}"
-                    data-day-key="${dayType.key}">
-                    ${dayType.displayName}
-                </button>`;
+      return `<button type="button" class="day-type-btn relative -ml-px flex-1 inline-flex items-center justify-center border px-3 py-2 text-sm font-semibold transition-colors focus:z-20 first:rounded-l-lg last:rounded-r-lg ${isActive ? activeClasses : inactiveClasses}" data-day-key="${dayType.key}">${dayType.displayName}</button>`;
     }).join('');
-
-    return `<div class="day-type-switcher">
-                <label class="block text-xs font-medium text-gray-500 mb-1">Pokaż rozkład na:</label>
-                <div class="isolate inline-flex rounded-lg shadow-sm w-full">
-                    ${buttonsHtml}
-                </div>
-            </div>`;
+    return `<div class="day-type-switcher"><label class="block text-xs font-medium text-gray-500 mb-1">Pokaż rozkład na:</label><div class="isolate inline-flex rounded-lg shadow-sm w-full">${buttonsHtml}</div></div>`;
   }
 
   function generateFilterHtml(directionId, now, activeDayTypeKey) {
     const currentHour = now.getHours();
     const isToday = activeDayTypeKey === getDayType(now).key;
     const currentTimeFormatted = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-
-    const initialLabel = `
-        <span class="block text-sm font-medium text-gray-700">
-            Odjazdy od: <span id="slider-time-${directionId}" class="font-bold text-orange-600">${isToday ? currentTimeFormatted : "04:00"}</span>
-        </span>
-        <span class="slider-hint block text-xs text-gray-500">
-            (przesuń, aby zmienić)
-        </span>
-    `;
-
+    const initialLabel = `<span class="block text-sm font-medium text-gray-700">Odjazdy od: <span id="slider-time-${directionId}" class="font-bold text-orange-600">${isToday ? currentTimeFormatted : "04:00"}</span></span><span class="slider-hint block text-xs text-gray-500">(przesuń, aby zmienić)</span>`;
     const sliderClasses = "w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:bg-orange-600 [&::-webkit-slider-thumb]:rounded-full [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:bg-orange-600 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-none";
-
-    return `<div class="filter-section">
-              <div class="time-slider-container">
-                <div class="mb-2" id="slider-label-${directionId}">
-                  ${initialLabel}
-                </div>
-                <input type="range" id="time-slider-${directionId}" data-direction-id="${directionId}" class="time-slider ${sliderClasses}" min="4" max="23" value="${isToday ? currentHour : 4}">
-              </div>
-            </div>`;
+    return `<div class="filter-section"><div class="time-slider-container"><div class="mb-2" id="slider-label-${directionId}">${initialLabel}</div><input type="range" id="time-slider-${directionId}" data-direction-id="${directionId}" class="time-slider ${sliderClasses}" min="4" max="23" value="${isToday ? currentHour : 4}"></div></div>`;
   }
 
   function getDayTypeByKey(key) {
-    const dayTypes = {
-      workdays: { key: 'workdays', displayName: 'Dni Robocze' },
-      saturdays: { key: 'saturdays', displayName: 'Soboty' },
-      sundays: { key: 'sundays', displayName: 'Niedziele i Święta' }
-    };
+    const dayTypes = { workdays: { key: 'workdays', displayName: 'Dni Robocze' }, saturdays: { key: 'saturdays', displayName: 'Soboty' }, sundays: { key: 'sundays', displayName: 'Niedziele i Święta' } };
     return dayTypes[key];
   }
 
@@ -363,53 +254,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function generateTimesGridHtml(options) {
     const { timesArray, notesLegend, now, dayTypeForGrid, limit = null, isInitialLoad = false } = options;
-
-    const messageBoxHtml = (message) => `
-        <div class="text-blue-600 p-4 rounded-lg border border-blue-200 bg-blue-50/50 flex items-start gap-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>${message}</span>
-        </div>`;
-
+    const messageBoxHtml = (message) => `<div class="text-blue-600 p-4 rounded-lg border border-blue-200 bg-blue-50/50 flex items-start gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span>${message}</span></div>`;
     if (!timesArray || timesArray.length === 0) {
-      if (isInitialLoad) {
-        return messageBoxHtml('Na dziś nie ma już więcej kursów. Sprawdź pełny rozkład.');
-      }
+      if (isInitialLoad) return messageBoxHtml('Na dziś nie ma już więcej kursów. Sprawdź rozkład na inny dzień, korzystając z przycisków powyżej.');
       return messageBoxHtml('Brak kursów w wybranym zakresie.');
     }
-
     const isTodaySchedule = dayTypeForGrid.key === getDayType(new Date()).key;
     const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes();
     const departures = timesArray.map(timeObj => ({ ...timeObj, totalMinutes: (([h, m]) => h * 60 + m)(timeObj.time.split(':').map(Number)), isPast: isTodaySchedule && (([h, m]) => h * 60 + m)(timeObj.time.split(':').map(Number)) < currentTimeInMinutes })).sort((a, b) => a.totalMinutes - b.totalMinutes);
-
     let departuresToDisplay = limit ? departures.slice(0, limit) : departures;
-
     if (departuresToDisplay.length === 0) {
-      if (isInitialLoad) {
-        return messageBoxHtml('Na dziś nie ma już więcej kursów. Sprawdź rozkład na inny dzień, korzystając z przycisków powyżej.');
-      }
+      if (isInitialLoad) return messageBoxHtml('Na dziś nie ma już więcej kursów. Sprawdź rozkład na inny dzień, korzystając z przycisków powyżej.');
       return messageBoxHtml('Brak przyszłych kursów w wybranym zakresie.');
     }
-
     const firstFutureIndex = departures.findIndex(dep => !dep.isPast);
-
     const timesHtml = departuresToDisplay.map((time, idx) => {
       const isFirstFuture = departures.indexOf(time) === firstFutureIndex;
       const isFuture = !time.isPast && isTodaySchedule;
-
       const bgClass = time.isPast ? 'bg-no-background' : 'bg-light-gray';
       const noteText = (time.noteKey && notesLegend[time.noteKey]) || '';
       const noteHtml = noteText ? `<span class="time-note">${time.noteKey}</span>` : '';
-
-      let countdownHtml = '';
-      let timeBoxContentPrefix = '';
-      let tooltipText = noteText;
-
-      if (isFirstFuture) {
-        timeBoxContentPrefix = '<span class="time-icon">⏰</span>';
-      }
-
+      let countdownHtml = '', timeBoxContentPrefix = '', tooltipText = noteText;
+      if (isFirstFuture) timeBoxContentPrefix = '<span class="time-icon">⏰</span>';
       if (isFuture) {
         const minutesUntil = time.totalMinutes - currentTimeInMinutes;
         if (minutesUntil >= 0) {
@@ -419,7 +285,6 @@ document.addEventListener('DOMContentLoaded', () => {
           tooltipText = noteText ? `${friendlyCountdownText} (${noteText})` : friendlyCountdownText;
         }
       }
-
       const tooltip = tooltipText ? `data-tooltip="${tooltipText}"` : '';
       return `<div class="time-box ${bgClass}" ${tooltip}><div class="time-box-content">${timeBoxContentPrefix}<span class="time-value">${time.time}</span>${noteHtml}</div><div class="countdown-container">${countdownHtml}</div></div>`;
     }).join('');
@@ -433,7 +298,61 @@ document.addEventListener('DOMContentLoaded', () => {
   const showTooltip = (target) => { const message = target.dataset.tooltip; if (!message || !tooltipElement) return; tooltipElement.textContent = message; tooltipElement.classList.add('visible'); const targetRect = target.getBoundingClientRect(); const tooltipRect = tooltipElement.getBoundingClientRect(); const centeredLeft = targetRect.left + (targetRect.width / 2) - (tooltipRect.width / 2); const left = Math.max(10, Math.min(centeredLeft, window.innerWidth - tooltipRect.width - 10)); tooltipElement.style.left = `${left}px`; if (targetRect.top < tooltipRect.height + 15) { tooltipElement.style.top = `${targetRect.bottom + 8}px`; } else { tooltipElement.style.top = `${targetRect.top - tooltipRect.height - 8}px`; } };
   const hideTooltip = () => { if (tooltipElement) tooltipElement.classList.remove('visible'); };
   const handleMobileTooltip = (target) => { if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) { showTooltip(target); clearTimeout(mobileTooltipTimer); mobileTooltipTimer = setTimeout(hideTooltip, 4000); } };
+
+  // ### ZMIANA: Nowa, dynamiczna obsługa komunikatów ###
   const announcementsContainer = document.getElementById('announcements-container');
   function formatTextWithMarkdown(text) { if (!text) return ''; return text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); }
-  if (announcementsContainer) { fetch('announcements.json').then(r => { if (!r.ok) throw new Error; return r.json(); }).then(data => { announcementsContainer.innerHTML = ''; if (!data || data.length === 0) { announcementsContainer.innerHTML = '<p class="col-span-full text-center">Brak komunikatów.</p>'; return; } data.forEach((item, i) => { const card = document.createElement('div'); card.className = 'bg-white p-6 rounded-lg shadow-md flex flex-col'; if (i === 0) card.style.borderLeft = '3px solid #c2410c'; const fTxt = formatTextWithMarkdown(item.text), pTxt = item.text.replace(/\*\*([^*]+)\*\*/g, '$1').replace(/\n/g, ' '); let dTxt = fTxt, more = false; if (pTxt.length > 250) { let cut = pTxt.lastIndexOf(' ', 250); if (cut === -1) cut = 250; dTxt = formatTextWithMarkdown(item.text.substring(0, cut)) + '...'; more = true; } card.innerHTML = `<h3 class="font-bold text-xl mb-1">${item.title}</h3><p class="text-sm text-gray-500 mb-6">${item.date}</p><div class="announcement-content text-gray-700">${dTxt}</div>${more ? `<a class="read-more text-orange-700 hover:underline pt-2 cursor-pointer font-semibold mt-4">Czytaj więcej</a>` : ''}`; announcementsContainer.appendChild(card); if (more) { const btn = card.querySelector('.read-more'), div = card.querySelector('.announcement-content'); btn.addEventListener('click', function () { const coll = this.textContent === 'Czytaj więcej'; div.innerHTML = coll ? fTxt : dTxt; this.textContent = coll ? 'Zwiń' : 'Czytaj więcej'; }); } }); }).catch(err => { console.error(err); announcementsContainer.innerHTML = '<p class="text-center text-red-600">Nie udało się załadować.</p>'; }); }
+  if (announcementsContainer) {
+    fetch('announcements.json')
+      .then(r => { if (!r.ok) throw new Error; return r.json(); })
+      .then(data => {
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+
+        const activeAnnouncements = data.filter(item => {
+          const pubDate = new Date(item.publicationDate);
+          const termDate = new Date(item.terminationDate);
+          pubDate.setHours(0, 0, 0, 0);
+          termDate.setHours(0, 0, 0, 0);
+          return now >= pubDate && now <= termDate;
+        });
+
+        activeAnnouncements.sort((a, b) => new Date(b.publicationDate) - new Date(a.publicationDate));
+
+        announcementsContainer.innerHTML = '';
+        if (!activeAnnouncements || activeAnnouncements.length === 0) {
+          announcementsContainer.innerHTML = '<p class="col-span-full text-center">Brak aktualnych komunikatów.</p>';
+          return;
+        }
+
+        activeAnnouncements.forEach((item, i) => {
+          const card = document.createElement('div');
+          card.className = 'bg-white p-6 rounded-lg shadow-md flex flex-col';
+          if (i === 0) card.style.borderLeft = '3px solid #c2410c';
+
+          const fTxt = formatTextWithMarkdown(item.text), pTxt = item.text.replace(/\*\*([^*]+)\*\*/g, '$1').replace(/\n/g, ' ');
+          let dTxt = fTxt, more = false;
+          if (pTxt.length > 250) {
+            let cut = pTxt.lastIndexOf(' ', 250);
+            if (cut === -1) cut = 250;
+            dTxt = formatTextWithMarkdown(item.text.substring(0, cut)) + '...';
+            more = true;
+          }
+          card.innerHTML = `<h3 class="font-bold text-xl mb-1">${item.title}</h3><p class="text-sm text-gray-500 mb-6">${item.displayDate}</p><div class="announcement-content text-gray-700">${dTxt}</div>${more ? `<a class="read-more text-orange-700 hover:underline pt-2 cursor-pointer font-semibold mt-4">Czytaj więcej</a>` : ''}`;
+          announcementsContainer.appendChild(card);
+          if (more) {
+            const btn = card.querySelector('.read-more'), div = card.querySelector('.announcement-content');
+            btn.addEventListener('click', function () {
+              const coll = this.textContent === 'Czytaj więcej';
+              div.innerHTML = coll ? fTxt : dTxt;
+              this.textContent = coll ? 'Zwiń' : 'Czytaj więcej';
+            });
+          }
+        });
+      })
+      .catch(err => {
+        console.error(err);
+        announcementsContainer.innerHTML = '<p class="text-center text-red-600">Nie udało się załadować komunikatów.</p>';
+      });
+  }
 });

@@ -1,6 +1,6 @@
 // ===================================================================================
 // KOMPLETNY KOD APLIKACJI - script.js
-// Wersja z ulepszonymi, kontekstowymi komunikatami.
+// Wersja z poprawioną obsługą wariantów rozkładów.
 // ===================================================================================
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -28,23 +28,25 @@ document.addEventListener('DOMContentLoaded', () => {
   const detailsContainer = document.getElementById('schedule-details-container');
   const placeholderText = document.getElementById('schedule-placeholder-text');
 
+  // Funkcja do wyboru aktywnego wariantu rozkładu
   function getActiveSchedule(route) {
+    if (!route || !route.variants) return null;
+
     const now = new Date();
     now.setHours(0, 0, 0, 0);
-    if (route.variants) {
-      const activeVariant = route.variants.find(variant => {
-        const from = new Date(variant.validFrom);
-        const to = new Date(variant.validTo);
-        from.setHours(0, 0, 0, 0);
-        to.setHours(0, 0, 0, 0);
-        return now >= from && now <= to;
-      });
-      if (activeVariant) return activeVariant;
-    }
-    if (route.directions) {
-      return { type: 'standardowy', directions: route.directions };
-    }
-    return null;
+
+    const activeVariants = route.variants.filter(variant => {
+      const from = new Date(variant.validFrom);
+      const to = new Date(variant.validTo);
+      from.setHours(0, 0, 0, 0);
+      to.setHours(0, 0, 0, 0);
+      return now >= from && now <= to;
+    });
+
+    const specialVariant = activeVariants.find(v => v.type.toLowerCase() !== 'standardowy');
+    if (specialVariant) return specialVariant;
+
+    return activeVariants.find(v => v.type.toLowerCase() === 'standardowy') || null;
   }
 
   if (typeof schedulesData !== 'undefined' && selectorContainer && detailsContainer) {
@@ -77,6 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const route = schedulesData[routeId];
     const activeSchedule = getActiveSchedule(route);
+
     if (!activeSchedule) {
       detailsContainer.innerHTML = '<p class="text-center text-red-600 p-4">Dla tej trasy nie znaleziono aktywnego rozkładu jazdy na dzień dzisiejszy.</p>';
       return;
@@ -98,9 +101,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     let finalHtml = '';
-    const nonStandardTypes = ['wakacyjny', 'feriowy', 'świąteczny'];
-    if (activeSchedule.type && nonStandardTypes.includes(activeSchedule.type.toLowerCase())) {
-      finalHtml += `<div class="schedule-variant-info-subtle"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg><span>Obowiązuje rozkład: <strong>${activeSchedule.type}</strong></span></div>`;
+    if (activeSchedule.type.toLowerCase() !== 'standardowy') {
+      finalHtml += `<div class="schedule-variant-info bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4 mb-6 rounded-r-lg" role="alert">
+                        <div class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <p class="font-bold">Obowiązuje rozkład: <span class="capitalize">${activeSchedule.type}</span></p>
+                        </div>
+                    </div>`;
     }
 
     finalHtml += switcherHtml + directionHtml;
@@ -155,6 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
   }
 
+  // ### POPRAWKA: Przycisk "Pełny rozkład" ma teraz poprawny `data-route-id` ###
   function generateDirectionHtml(direction, route, activeSchedule, context) {
     const { index, now, activeDayTypeKey, isFullView, routeId } = context;
     const directionId = `${routeId}-${direction.directionName.replace(/[^a-zA-Z0-9]/g, '-')}-${index}`;
@@ -188,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
       for (const key in direction.notes) legendHtml += `<p class="text-sm text-gray-600"><span class="font-bold">${key}</span> - ${direction.notes[key]}</p>`;
       legendHtml += '</div>';
     }
-    return `<div class="schedule-direction" id="${directionId}" data-direction-index="${index}">${controlsHtml}${directionGridsHtml}${legendHtml}<div class="flex justify-start mt-4"><button class="toggle-full-schedule-btn" data-route-id="${route.routeName}" data-full-view="${isFullView}" data-direction-id="${directionId}">${isFullView ? 'Zwiń rozkład' : 'Pełny rozkład ->'}</button></div></div>`;
+    return `<div class="schedule-direction" id="${directionId}" data-direction-index="${index}">${controlsHtml}${directionGridsHtml}${legendHtml}<div class="flex justify-start mt-4"><button class="toggle-full-schedule-btn" data-route-id="${routeId}" data-full-view="${isFullView}" data-direction-id="${directionId}">${isFullView ? 'Zwiń rozkład' : 'Pełny rozkład ->'}</button></div></div>`;
   }
 
   function applyTimeFilter(slider, routeId, activeSchedule, activeDayTypeKey) {
@@ -353,7 +363,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function formatMinutesUntilShort(totalMinutes) { if (totalMinutes < 0) return ''; if (totalMinutes < 1) return 'teraz'; if (totalMinutes === 1) return 'za 1 min'; if (totalMinutes < 60) return `za ${totalMinutes} min`; const hours = Math.floor(totalMinutes / 60); const minutes = totalMinutes % 60; if (minutes === 0) return `za ${hours}h`; return `za ${hours}h ${minutes}m`; }
   function formatMinutesUntilFriendly(totalMinutes) { if (totalMinutes < 0) return ''; if (totalMinutes < 1) return 'Odjeżdża teraz'; if (totalMinutes === 1) return 'Odjazd za 1 minutę'; if (totalMinutes < 60) { const lastDigit = totalMinutes % 10; const lastTwoDigits = totalMinutes % 100; if (lastDigit >= 2 && lastDigit <= 4 && !(lastTwoDigits >= 12 && lastTwoDigits <= 14)) { return `Odjazd za ${totalMinutes} minuty`; } return `Odjazd za ${totalMinutes} minut`; } const hours = Math.floor(totalMinutes / 60); const minutes = totalMinutes % 60; let hourWord = 'godzin'; if (hours === 1) hourWord = 'godzinę'; if (hours >= 2 && hours <= 4) hourWord = 'godziny'; if (minutes === 0) return `Odjazd za ${hours} ${hourWord}`; return `Odjazd za ${hours} ${hourWord} i ${minutes} min`; }
 
-  // ### ZMIANA: Nowa, kontekstowa logika komunikatów ###
   function generateTimesGridHtml(options) {
     const { timesArray, notesLegend, now, dayTypeForGrid, limit = null, isInitialLoad = false } = options;
 
@@ -367,7 +376,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!timesArray || timesArray.length === 0) {
       if (isInitialLoad) {
-        return messageBoxHtml('Na dziś nie ma już więcej kursów. Sprawdź rozkład na inny dzień, korzystając z przycisków powyżej lub kliknij "Pełny rozkład".');
+        return messageBoxHtml('Na dziś nie ma już więcej kursów. Sprawdź rozkład na inny dzień, korzystając z przycisków powyżej.');
       }
       return messageBoxHtml('Brak kursów w wybranym zakresie.');
     }

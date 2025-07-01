@@ -101,14 +101,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     let finalHtml = '';
+    // ### ZMIANA: Ujednolicono styl komunikatu ###
     if (activeSchedule.type.toLowerCase() !== 'standardowy') {
-      finalHtml += `<div class="schedule-variant-info bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4 mb-6 rounded-r-lg" role="alert">
-                        <div class="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <p class="font-bold">Obowiązuje rozkład: <span class="capitalize">${activeSchedule.type}</span></p>
-                        </div>
+      finalHtml += `<div class="text-blue-600 p-4 mb-6 rounded-lg border border-blue-200 bg-blue-50/50 flex items-start gap-3" role="alert">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p>Obowiązuje rozkład: <strong class="capitalize font-semibold">${activeSchedule.type}</strong></p>
                     </div>`;
     }
 
@@ -164,7 +163,6 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
   }
 
-  // ### POPRAWKA: Przycisk "Pełny rozkład" ma teraz poprawny `data-route-id` ###
   function generateDirectionHtml(direction, route, activeSchedule, context) {
     const { index, now, activeDayTypeKey, isFullView, routeId } = context;
     const directionId = `${routeId}-${direction.directionName.replace(/[^a-zA-Z0-9]/g, '-')}-${index}`;

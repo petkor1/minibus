@@ -1,6 +1,6 @@
 // ===================================================================================
 // KOMPLETNY KOD APLIKACJI - script.js
-// Wersja z przełącznikiem kierunków i filtrem suwakowym.
+// Wersja z inteligentnym przełącznikiem kierunków (zakładki lub lista rozwijana).
 // ===================================================================================
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const routeId = button.dataset.routeId;
       document.querySelectorAll('.schedule-selector-btn').forEach(btn => btn.classList.remove('active'));
       button.classList.add('active');
-      renderSchedule(routeId); // Domyślnie renderuje z indeksem 0
+      renderSchedule(routeId);
       placeholderText.classList.add('hidden');
       detailsContainer.classList.remove('hidden');
       const targetPosition = detailsContainer.getBoundingClientRect().top + window.pageYOffset - 70;
@@ -72,7 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (placeholderText) placeholderText.textContent = "Błąd ładowania modułu rozkładów jazdy.";
   }
 
-  // ### ZMIANA 1: Główna funkcja renderująca, teraz z obsługą aktywnego kierunku ###
   function renderSchedule(routeId, options = {}) {
     const { isFullView = false, scrollToDirection = null, activeDirectionIndex = 0 } = options;
 
@@ -86,14 +85,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const now = new Date();
     const today = getDayType(now);
 
-    // Generowanie przełącznika kierunków
     const switcherHtml = generateDirectionSwitcherHtml(activeSchedule.directions, routeId, activeDirectionIndex);
 
-    // Pobranie tylko aktywnego kierunku
     const activeDirection = activeSchedule.directions[activeDirectionIndex];
-    if (!activeDirection) return; // Zabezpieczenie
+    if (!activeDirection) return;
 
-    // Generowanie HTML tylko dla aktywnego kierunku
     const directionHtml = generateDirectionHtml(activeDirection, route, activeSchedule, {
       index: activeDirectionIndex,
       now,
@@ -108,7 +104,6 @@ document.addEventListener('DOMContentLoaded', () => {
       finalHtml += `<div class="schedule-variant-info-subtle"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg><span>Obowiązuje rozkład: <strong>${activeSchedule.type}</strong></span></div>`;
     }
 
-    // Łączenie HTML: przełącznik + widok kierunku
     finalHtml += switcherHtml + directionHtml;
 
     detailsContainer.innerHTML = finalHtml;
@@ -116,10 +111,29 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isFullView && scrollToDirection) scrollToElement(scrollToDirection);
   }
 
-  // ### ZMIANA 2: Nowa funkcja do generowania przełącznika kierunków ###
+  // ### ZMIANA 1: Inteligentny przełącznik - zakładki lub lista rozwijana ###
   function generateDirectionSwitcherHtml(directions, routeId, activeIndex) {
-    if (directions.length <= 1) return ''; // Nie pokazuj przełącznika, jeśli jest tylko jeden kierunek
+    if (directions.length <= 1) return '';
 
+    // Dla 3 lub więcej kierunków, użyj listy rozwijanej
+    if (directions.length > 2) {
+      const optionsHtml = directions.map((direction, index) => {
+        const isSelected = index === activeIndex ? 'selected' : '';
+        return `<option value="${index}" ${isSelected}>${direction.directionName}</option>`;
+      }).join('');
+
+      const selectClasses = "block w-full appearance-none rounded-md border-gray-300 bg-white py-3 pl-3 pr-10 text-base font-medium text-gray-800 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500";
+      const selectStyle = `background-image: url(&quot;data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e&quot;); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em;`;
+
+      return `<div class="direction-switcher-dropdown mb-6">
+                    <label for="direction-select" class="sr-only">Wybierz kierunek</label>
+                    <select id="direction-select" data-route-id="${routeId}" class="${selectClasses}" style="${selectStyle}">
+                        ${optionsHtml}
+                    </select>
+                </div>`;
+    }
+
+    // Dla 2 kierunków, użyj zakładek
     const buttonsHtml = directions.map((direction, index) => {
       const isActive = index === activeIndex;
       const activeClasses = 'bg-orange-600 text-white shadow';
@@ -166,7 +180,6 @@ document.addEventListener('DOMContentLoaded', () => {
       for (const key in direction.notes) legendHtml += `<p class="text-sm text-gray-600"><span class="font-bold">${key}</span> - ${direction.notes[key]}</p>`;
       legendHtml += '</div>';
     }
-    // Usunięto <hr>, ponieważ renderujemy tylko jeden kierunek naraz
     return `<div class="schedule-direction" id="${directionId}" data-direction-index="${index}">${filterHtml}${directionGridsHtml}${legendHtml}<div class="flex justify-start mt-4"><button class="toggle-full-schedule-btn" data-route-id="${route.routeName}" data-full-view="${isFullView}" data-direction-id="${directionId}">${isFullView ? 'Zwiń rozkład' : 'Pełny rozkład ->'}</button></div></div>`;
   }
 
@@ -202,9 +215,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ### ZMIANA 3: Dodano listener dla przełącznika kierunków ###
+  // ### ZMIANA 2: Dodano listener dla listy rozwijanej ###
   function setupEventListeners(routeId, activeSchedule) {
-    // Listener dla przycisku "Pełny rozkład"
     detailsContainer.querySelectorAll('.toggle-full-schedule-btn').forEach(button => {
       button.addEventListener('click', (e) => {
         const directionId = e.target.dataset.directionId;
@@ -219,7 +231,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    // NOWY listener dla przełącznika kierunków
     detailsContainer.querySelectorAll('.direction-tab-btn').forEach(button => {
       button.addEventListener('click', (e) => {
         const newActiveIndex = parseInt(e.currentTarget.dataset.directionIndex, 10);
@@ -227,7 +238,14 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    // Listener dla suwaka
+    const directionSelect = detailsContainer.querySelector('#direction-select');
+    if (directionSelect) {
+      directionSelect.addEventListener('change', (e) => {
+        const newActiveIndex = parseInt(e.currentTarget.value, 10);
+        renderSchedule(routeId, { activeDirectionIndex: newActiveIndex });
+      });
+    }
+
     detailsContainer.querySelectorAll('.time-slider').forEach(slider => {
       const labelContainer = document.getElementById(`slider-label-${slider.dataset.directionId}`);
 

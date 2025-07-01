@@ -1,6 +1,6 @@
 // ===================================================================================
 // KOMPLETNY KOD APLIKACJI - script.js
-// Wersja z inteligentnym przełącznikiem kierunków (Segmented Button lub Dropdown).
+// Wersja z przełącznikiem dnia tygodnia i filtrem suwakowym.
 // ===================================================================================
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderSchedule(routeId, options = {}) {
-    const { isFullView = false, scrollToDirection = null, activeDirectionIndex = 0 } = options;
+    const { isFullView = false, scrollToDirection = null, activeDirectionIndex = 0, activeDayTypeKey = getDayType(new Date()).key } = options;
 
     const route = schedulesData[routeId];
     const activeSchedule = getActiveSchedule(route);
@@ -83,7 +83,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const now = new Date();
-    const today = getDayType(now);
 
     const switcherHtml = generateDirectionSwitcherHtml(activeSchedule.directions, routeId, activeDirectionIndex);
 
@@ -93,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const directionHtml = generateDirectionHtml(activeDirection, route, activeSchedule, {
       index: activeDirectionIndex,
       now,
-      today,
+      activeDayTypeKey,
       isFullView,
       routeId
     });
@@ -107,15 +106,13 @@ document.addEventListener('DOMContentLoaded', () => {
     finalHtml += switcherHtml + directionHtml;
 
     detailsContainer.innerHTML = finalHtml;
-    setupEventListeners(routeId, activeSchedule);
+    setupEventListeners(routeId, activeSchedule, { activeDirectionIndex, activeDayTypeKey });
     if (isFullView && scrollToDirection) scrollToElement(scrollToDirection);
   }
 
-  // ### ZMIANA: Inteligentny przełącznik - Segmented Button lub Dropdown ###
   function generateDirectionSwitcherHtml(directions, routeId, activeIndex) {
     if (directions.length <= 1) return '';
 
-    // Dla 3 lub więcej kierunków, użyj listy rozwijanej
     if (directions.length > 2) {
       const optionsHtml = directions.map((direction, index) => {
         const isSelected = index === activeIndex ? 'selected' : '';
@@ -139,7 +136,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>`;
     }
 
-    // Dla 2 kierunków, użyj Segmented Button (bez ikony)
     const buttonsHtml = directions.map((direction, index) => {
       const isActive = index === activeIndex;
       const activeClasses = 'bg-orange-100 text-orange-700 border-orange-500 z-10';
@@ -162,20 +158,23 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function generateDirectionHtml(direction, route, activeSchedule, context) {
-    const { index, now, today, isFullView, routeId } = context;
+    const { index, now, activeDayTypeKey, isFullView, routeId } = context;
     const directionId = `${routeId}-${direction.directionName.replace(/[^a-zA-Z0-9]/g, '-')}-${index}`;
-    let directionGridsHtml, filterHtml = '';
+    let directionGridsHtml, controlsHtml = '';
 
     if (!isFullView) {
-      filterHtml = generateFilterHtml(directionId, now);
-      const initialTimes = (direction.times[today.key] || []).filter(timeObj => {
+      controlsHtml = generateControlsHtml(directionId, now, activeDayTypeKey);
+
+      const selectedDayTimes = direction.times[activeDayTypeKey] || [];
+      const isToday = activeDayTypeKey === getDayType(now).key;
+
+      const initialTimes = isToday ? selectedDayTimes.filter(timeObj => {
         const [hour, minute] = timeObj.time.split(':').map(Number);
         return (hour * 60 + minute) >= (now.getHours() * 60 + now.getMinutes());
-      });
-      const currentTimeFormatted = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-      const initialTitle = `Odjazdy (${today.displayName}) od ${currentTimeFormatted}`;
+      }) : selectedDayTimes;
+
       directionGridsHtml = `<div id="grid-${directionId}">
-                          ${generateTimesGridHtml({ timesArray: initialTimes, notesLegend: direction.notes || {}, isShortView: false, now, dayTypeForGrid: today, limit: null, customTitle: initialTitle })}
+                          ${generateTimesGridHtml({ timesArray: initialTimes, notesLegend: direction.notes || {}, isShortView: false, now, dayTypeForGrid: getDayTypeByKey(activeDayTypeKey), limit: null })}
                       </div>`;
     } else {
       const allDayTypes = [{ key: 'workdays', displayName: 'Dni Robocze' }, { key: 'saturdays', displayName: 'Soboty' }, { key: 'sundays', displayName: 'Niedziele i Święta' }];
@@ -191,10 +190,11 @@ document.addEventListener('DOMContentLoaded', () => {
       for (const key in direction.notes) legendHtml += `<p class="text-sm text-gray-600"><span class="font-bold">${key}</span> - ${direction.notes[key]}</p>`;
       legendHtml += '</div>';
     }
-    return `<div class="schedule-direction" id="${directionId}" data-direction-index="${index}">${filterHtml}${directionGridsHtml}${legendHtml}<div class="flex justify-start mt-4"><button class="toggle-full-schedule-btn" data-route-id="${route.routeName}" data-full-view="${isFullView}" data-direction-id="${directionId}">${isFullView ? 'Zwiń rozkład' : 'Pełny rozkład ->'}</button></div></div>`;
+    return `<div class="schedule-direction" id="${directionId}" data-direction-index="${index}">${controlsHtml}${directionGridsHtml}${legendHtml}<div class="flex justify-start mt-4"><button class="toggle-full-schedule-btn" data-route-id="${route.routeName}" data-full-view="${isFullView}" data-direction-id="${directionId}">${isFullView ? 'Zwiń rozkład' : 'Pełny rozkład ->'}</button></div></div>`;
   }
 
-  function applyTimeFilter(slider, routeId, activeSchedule) {
+  // ### POPRAWKA 1: Funkcja przyjmuje teraz `activeDayTypeKey` jako argument ###
+  function applyTimeFilter(slider, routeId, activeSchedule, activeDayTypeKey) {
     const directionId = slider.dataset.directionId;
     const fromHour = parseInt(slider.value, 10);
     const directionIndex = parseInt(document.getElementById(directionId).dataset.directionIndex, 10);
@@ -203,17 +203,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!directionData) return;
 
     const now = new Date();
-    const today = getDayType(now);
-    const allTimesForToday = directionData.times[today.key] || [];
+    const allTimesForDay = directionData.times[activeDayTypeKey] || [];
     const gridContainer = document.getElementById(`grid-${directionId}`);
     if (!gridContainer) return;
 
-    const filteredTimes = allTimesForToday.filter(timeObj => {
+    const filteredTimes = allTimesForDay.filter(timeObj => {
       const [hour] = timeObj.time.split(':').map(Number);
       return hour >= fromHour;
     });
 
-    const customTitle = `Odjazdy (${today.displayName}) od ${fromHour.toString().padStart(2, '0')}:00`;
+    // ### POPRAWKA 2: Tytuł jest teraz generowany i przekazywany dalej ###
+    const customTitle = `Odjazdy (${getDayTypeByKey(activeDayTypeKey).displayName}) od ${fromHour.toString().padStart(2, '0')}:00`;
 
     gridContainer.innerHTML = generateTimesGridHtml({
       timesArray: filteredTimes,
@@ -221,20 +221,20 @@ document.addEventListener('DOMContentLoaded', () => {
       isShortView: false,
       limit: null,
       now,
-      dayTypeForGrid: today,
-      customTitle
+      dayTypeForGrid: getDayTypeByKey(activeDayTypeKey),
+      customTitle // Przekazanie tytułu
     });
   }
 
-  // ### ZMIANA: Przywrócono listener dla listy rozwijanej ###
-  function setupEventListeners(routeId, activeSchedule) {
+  function setupEventListeners(routeId, activeSchedule, options) {
+    const { activeDirectionIndex, activeDayTypeKey } = options;
+
     detailsContainer.querySelectorAll('.toggle-full-schedule-btn').forEach(button => {
       button.addEventListener('click', (e) => {
         const directionId = e.target.dataset.directionId;
         const directionElement = document.getElementById(directionId);
-        const activeDirectionIndex = parseInt(directionElement.dataset.directionIndex, 10);
         const currentIsFull = e.target.dataset.fullView === 'true';
-        renderSchedule(routeId, { isFullView: !currentIsFull, activeDirectionIndex, scrollToDirection: directionId });
+        renderSchedule(routeId, { isFullView: !currentIsFull, activeDirectionIndex, activeDayTypeKey, scrollToDirection: directionId });
         if (currentIsFull) {
           const schedulesSection = document.getElementById('schedules-section');
           if (schedulesSection) setTimeout(() => schedulesSection.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
     detailsContainer.querySelectorAll('.direction-tab-btn').forEach(button => {
       button.addEventListener('click', (e) => {
         const newActiveIndex = parseInt(e.currentTarget.dataset.directionIndex, 10);
-        renderSchedule(routeId, { activeDirectionIndex: newActiveIndex });
+        renderSchedule(routeId, { activeDirectionIndex: newActiveIndex, activeDayTypeKey });
       });
     });
 
@@ -253,22 +253,29 @@ document.addEventListener('DOMContentLoaded', () => {
     if (directionSelect) {
       directionSelect.addEventListener('change', (e) => {
         const newActiveIndex = parseInt(e.currentTarget.value, 10);
-        renderSchedule(routeId, { activeDirectionIndex: newActiveIndex });
+        renderSchedule(routeId, { activeDirectionIndex: newActiveIndex, activeDayTypeKey });
       });
     }
 
+    detailsContainer.querySelectorAll('.day-type-btn').forEach(button => {
+      button.addEventListener('click', (e) => {
+        const newDayTypeKey = e.currentTarget.dataset.dayKey;
+        renderSchedule(routeId, { activeDirectionIndex, activeDayTypeKey: newDayTypeKey });
+      });
+    });
+
     detailsContainer.querySelectorAll('.time-slider').forEach(slider => {
       const labelContainer = document.getElementById(`slider-label-${slider.dataset.directionId}`);
+      const timeValue = document.getElementById(`slider-time-${slider.dataset.directionId}`);
 
       slider.addEventListener('input', () => {
         if (labelContainer) {
-          labelContainer.innerHTML = `
-                <span class="block text-sm font-medium text-gray-700">
-                    Odjazdy od: <span class="font-bold text-orange-600">${slider.value.padStart(2, '0')}:00</span>
-                </span>
-            `;
+          const hint = labelContainer.querySelector('.slider-hint');
+          if (hint) hint.style.display = 'none';
+          if (timeValue) timeValue.textContent = `${slider.value.padStart(2, '0')}:00`;
         }
-        applyTimeFilter(slider, routeId, activeSchedule);
+        // ### POPRAWKA 3: Przekazanie `activeDayTypeKey` do funkcji filtrującej ###
+        applyTimeFilter(slider, routeId, activeSchedule, activeDayTypeKey);
       });
     });
 
@@ -282,30 +289,72 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function generateFilterHtml(directionId, now) {
+  function generateControlsHtml(directionId, now, activeDayTypeKey) {
+    const daySwitcherHtml = generateDayTypeSwitcherHtml(activeDayTypeKey);
+    const filterHtml = generateFilterHtml(directionId, now, activeDayTypeKey);
+    return `<div class="controls-container mb-6 space-y-4">${daySwitcherHtml}${filterHtml}</div>`;
+  }
+
+  function generateDayTypeSwitcherHtml(activeDayTypeKey) {
+    const allDayTypes = [
+      { key: 'workdays', displayName: 'Robocze' },
+      { key: 'saturdays', displayName: 'Soboty' },
+      { key: 'sundays', displayName: 'Niedziele' }
+    ];
+
+    const buttonsHtml = allDayTypes.map(dayType => {
+      const isActive = dayType.key === activeDayTypeKey;
+      const activeClasses = 'bg-orange-100 text-orange-700 border-orange-500 z-10';
+      const inactiveClasses = 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300';
+      return `<button 
+                    type="button" 
+                    class="day-type-btn relative -ml-px flex-1 inline-flex items-center justify-center border px-3 py-2 text-sm font-semibold transition-colors focus:z-20 first:rounded-l-lg last:rounded-r-lg ${isActive ? activeClasses : inactiveClasses}"
+                    data-day-key="${dayType.key}">
+                    ${dayType.displayName}
+                </button>`;
+    }).join('');
+
+    return `<div class="day-type-switcher">
+                <label class="block text-xs font-medium text-gray-500 mb-1">Pokaż rozkład na:</label>
+                <div class="isolate inline-flex rounded-lg shadow-sm w-full">
+                    ${buttonsHtml}
+                </div>
+            </div>`;
+  }
+
+  function generateFilterHtml(directionId, now, activeDayTypeKey) {
     const currentHour = now.getHours();
-    const currentMinutes = now.getMinutes().toString().padStart(2, '0');
-    const currentTimeFormatted = `${currentHour.toString().padStart(2, '0')}:${currentMinutes}`;
+    const isToday = activeDayTypeKey === getDayType(now).key;
+    const currentTimeFormatted = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
 
     const initialLabel = `
         <span class="block text-sm font-medium text-gray-700">
-            Odjazdy od: <span class="font-bold text-orange-600">${currentTimeFormatted}</span>
+            Odjazdy od: <span id="slider-time-${directionId}" class="font-bold text-orange-600">${isToday ? currentTimeFormatted : "04:00"}</span>
         </span>
-        <span class="block text-xs text-gray-500">
-            (przesuń, aby zmienić godzinę)
+        <span class="slider-hint block text-xs text-gray-500">
+            (przesuń, aby zmienić)
         </span>
     `;
 
     const sliderClasses = "w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:bg-orange-600 [&::-webkit-slider-thumb]:rounded-full [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:bg-orange-600 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-none";
 
-    return `<div class="filter-section mt-6 mb-6">
+    return `<div class="filter-section">
               <div class="time-slider-container">
                 <div class="mb-2" id="slider-label-${directionId}">
                   ${initialLabel}
                 </div>
-                <input type="range" id="time-slider-${directionId}" data-direction-id="${directionId}" class="time-slider ${sliderClasses}" min="4" max="23" value="${currentHour}">
+                <input type="range" id="time-slider-${directionId}" data-direction-id="${directionId}" class="time-slider ${sliderClasses}" min="4" max="23" value="${isToday ? currentHour : 4}">
               </div>
             </div>`;
+  }
+
+  function getDayTypeByKey(key) {
+    const dayTypes = {
+      workdays: { key: 'workdays', displayName: 'Dni Robocze' },
+      saturdays: { key: 'saturdays', displayName: 'Soboty' },
+      sundays: { key: 'sundays', displayName: 'Niedziele i Święta' }
+    };
+    return dayTypes[key];
   }
 
   function scrollToElement(elementId) { const targetElement = document.getElementById(elementId); if (targetElement) { const y = targetElement.getBoundingClientRect().top + window.pageYOffset - 70; window.scrollTo({ top: y, behavior: 'smooth' }); } }
@@ -313,24 +362,24 @@ document.addEventListener('DOMContentLoaded', () => {
   function formatMinutesUntilFriendly(totalMinutes) { if (totalMinutes < 0) return ''; if (totalMinutes < 1) return 'Odjeżdża teraz'; if (totalMinutes === 1) return 'Odjazd za 1 minutę'; if (totalMinutes < 60) { const lastDigit = totalMinutes % 10; const lastTwoDigits = totalMinutes % 100; if (lastDigit >= 2 && lastDigit <= 4 && !(lastTwoDigits >= 12 && lastTwoDigits <= 14)) { return `Odjazd za ${totalMinutes} minuty`; } return `Odjazd za ${totalMinutes} minut`; } const hours = Math.floor(totalMinutes / 60); const minutes = totalMinutes % 60; let hourWord = 'godzin'; if (hours === 1) hourWord = 'godzinę'; if (hours >= 2 && hours <= 4) hourWord = 'godziny'; if (minutes === 0) return `Odjazd za ${hours} ${hourWord}`; return `Odjazd za ${hours} ${hourWord} i ${minutes} min`; }
 
   function generateTimesGridHtml(options) {
-    const { timesArray, notesLegend, isShortView, now, dayTypeForGrid, limit = null, customTitle = null } = options;
+    const { timesArray, notesLegend, now, dayTypeForGrid, limit = null, customTitle = null } = options;
     let titleHtml = '';
     if (customTitle) {
-      titleHtml = `<div class="schedule-grid-header mb-3"><span class="text-base font-medium text-gray-800">${customTitle}</span></div>`;
+      // Usunięto ten tytuł, ponieważ teraz jest on częścią kontrolek
     }
 
     if (!timesArray || timesArray.length === 0) {
-      return `${titleHtml}<p class="text-blue-600 p-4 rounded-lg border border-blue-200 bg-blue-50/50 backdrop-blur-sm shadow-sm">Brak kursów w wybranym zakresie.</p>`;
+      return `<p class="text-blue-600 p-4 rounded-lg border border-blue-200 bg-blue-50/50 backdrop-blur-sm shadow-sm">Brak kursów w wybranym zakresie.</p>`;
     }
-    const today = getDayType(now);
-    const isTodaySchedule = dayTypeForGrid.key === today.key;
+
+    const isTodaySchedule = dayTypeForGrid.key === getDayType(new Date()).key;
     const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes();
     const departures = timesArray.map(timeObj => ({ ...timeObj, totalMinutes: (([h, m]) => h * 60 + m)(timeObj.time.split(':').map(Number)), isPast: isTodaySchedule && (([h, m]) => h * 60 + m)(timeObj.time.split(':').map(Number)) < currentTimeInMinutes })).sort((a, b) => a.totalMinutes - b.totalMinutes);
 
     let departuresToDisplay = limit ? departures.slice(0, limit) : departures;
 
     if (departuresToDisplay.length === 0) {
-      return `${titleHtml}<p class="text-blue-600 p-4 rounded-lg border border-blue-200 bg-blue-50/50 backdrop-blur-sm shadow-sm">Brak przyszłych kursów w wybranym zakresie.</p>`;
+      return `<p class="text-blue-600 p-4 rounded-lg border border-blue-200 bg-blue-50/50 backdrop-blur-sm shadow-sm">Brak przyszłych kursów w wybranym zakresie.</p>`;
     }
 
     const futureDepartures = isTodaySchedule ? departures.filter(dep => !dep.isPast) : [];
@@ -358,7 +407,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const tooltip = tooltipText ? `data-tooltip="${tooltipText}"` : '';
       return `<div class="time-box ${bgClass}" ${tooltip}><div class="time-box-content">${timeBoxContentPrefix}<span class="time-value">${time.time}</span>${noteHtml}</div><div class="countdown-container">${countdownHtml}</div></div>`;
     }).join('');
-    return `${titleHtml}<div class="time-grid">${timesHtml}</div>`;
+    return `<div class="time-grid">${timesHtml}</div>`;
   }
 
   function getPublicHolidays(year) { const a = year % 19, b = Math.floor(year / 100), c = year % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451); const month = Math.floor((h + l - 7 * m + 114) / 31), day = ((h + l - 7 * m + 114) % 31) + 1; const easterMonday = new Date(year, month - 1, day + 1); const corpusChristi = new Date(year, month - 1, day + 60); const formatDate = (date) => date.toISOString().slice(0, 10); return [`${year}-01-01`, `${year}-01-06`, formatDate(easterMonday), `${year}-05-01`, `${year}-05-03`, formatDate(corpusChristi), `${year}-08-15`, `${year}-11-01`, `${year}-11-11`, `${year}-12-25`, `${year}-12-26`]; }

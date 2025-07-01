@@ -1,6 +1,6 @@
 // ===================================================================================
 // KOMPLETNY KOD APLIKACJI - script.js
-// Wersja z dodaną etykietą nad przełącznikiem kierunku.
+// Wersja z ulepszonym stylem wyświetlania najbliższych kursów.
 // ===================================================================================
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -110,13 +110,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isFullView && scrollToDirection) scrollToElement(scrollToDirection);
   }
 
-  // ### ZMIANA: Dodano etykietę nad przełącznikiem ###
   function generateDirectionSwitcherHtml(directions, routeId, activeIndex) {
     if (directions.length <= 1) return '';
 
     const labelHtml = `<label class="block text-xs font-medium text-gray-500 mb-1">Wybierz kierunek:</label>`;
 
-    // Dla 3 lub więcej kierunków, użyj listy rozwijanej
     if (directions.length > 2) {
       const optionsHtml = directions.map((direction, index) => {
         const isSelected = index === activeIndex ? 'selected' : '';
@@ -134,7 +132,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>`;
     }
 
-    // Dla 2 kierunków, użyj Segmented Button
     const buttonsHtml = directions.map((direction, index) => {
       const isActive = index === activeIndex;
       const activeClasses = 'bg-orange-100 text-orange-700 border-orange-500 z-10';
@@ -359,12 +356,9 @@ document.addEventListener('DOMContentLoaded', () => {
   function formatMinutesUntilShort(totalMinutes) { if (totalMinutes < 0) return ''; if (totalMinutes < 1) return 'teraz'; if (totalMinutes === 1) return 'za 1 min'; if (totalMinutes < 60) return `za ${totalMinutes} min`; const hours = Math.floor(totalMinutes / 60); const minutes = totalMinutes % 60; if (minutes === 0) return `za ${hours}h`; return `za ${hours}h ${minutes}m`; }
   function formatMinutesUntilFriendly(totalMinutes) { if (totalMinutes < 0) return ''; if (totalMinutes < 1) return 'Odjeżdża teraz'; if (totalMinutes === 1) return 'Odjazd za 1 minutę'; if (totalMinutes < 60) { const lastDigit = totalMinutes % 10; const lastTwoDigits = totalMinutes % 100; if (lastDigit >= 2 && lastDigit <= 4 && !(lastTwoDigits >= 12 && lastTwoDigits <= 14)) { return `Odjazd za ${totalMinutes} minuty`; } return `Odjazd za ${totalMinutes} minut`; } const hours = Math.floor(totalMinutes / 60); const minutes = totalMinutes % 60; let hourWord = 'godzin'; if (hours === 1) hourWord = 'godzinę'; if (hours >= 2 && hours <= 4) hourWord = 'godziny'; if (minutes === 0) return `Odjazd za ${hours} ${hourWord}`; return `Odjazd za ${hours} ${hourWord} i ${minutes} min`; }
 
+  // ### ZMIANA: Nowa logika wyświetlania ikon i liczników ###
   function generateTimesGridHtml(options) {
-    const { timesArray, notesLegend, now, dayTypeForGrid, limit = null, customTitle = null } = options;
-    let titleHtml = '';
-    if (customTitle) {
-      // Usunięto ten tytuł, ponieważ teraz jest on częścią kontrolek
-    }
+    const { timesArray, notesLegend, now, dayTypeForGrid, limit = null } = options;
 
     if (!timesArray || timesArray.length === 0) {
       return `<p class="text-blue-600 p-4 rounded-lg border border-blue-200 bg-blue-50/50 backdrop-blur-sm shadow-sm">Brak kursów w wybranym zakresie.</p>`;
@@ -380,20 +374,27 @@ document.addEventListener('DOMContentLoaded', () => {
       return `<p class="text-blue-600 p-4 rounded-lg border border-blue-200 bg-blue-50/50 backdrop-blur-sm shadow-sm">Brak przyszłych kursów w wybranym zakresie.</p>`;
     }
 
-    const futureDepartures = isTodaySchedule ? departures.filter(dep => !dep.isPast) : [];
-    const nextFiveDepartures = futureDepartures.slice(0, 5);
-    const nextFiveTimes = new Set(nextFiveDepartures.map(d => d.time));
     const firstFutureIndex = departures.findIndex(dep => !dep.isPast);
 
     const timesHtml = departuresToDisplay.map((time, idx) => {
-      const isNextFive = nextFiveTimes.has(time.time);
-      const isFirstFutureInDisplay = departures.indexOf(time) === firstFutureIndex;
-      const bgClass = (isFirstFutureInDisplay && isTodaySchedule) ? 'bg-light-red' : (time.isPast ? 'bg-no-background' : 'bg-light-gray');
+      const isFirstFuture = departures.indexOf(time) === firstFutureIndex;
+      const isFuture = !time.isPast && isTodaySchedule;
+
+      const bgClass = time.isPast ? 'bg-no-background' : 'bg-light-gray';
       const noteText = (time.noteKey && notesLegend[time.noteKey]) || '';
       const noteHtml = noteText ? `<span class="time-note">${time.noteKey}</span>` : '';
-      let countdownHtml = '', timeBoxContentPrefix = '', tooltipText = noteText;
-      if (isTodaySchedule && isNextFive && !time.isPast) {
+
+      let countdownHtml = '';
+      let timeBoxContentPrefix = '';
+      let tooltipText = noteText;
+
+      // Zegar tylko dla pierwszego przyszłego kursu
+      if (isFirstFuture) {
         timeBoxContentPrefix = '<span class="time-icon">⏰</span>';
+      }
+
+      // Licznik dla wszystkich przyszłych kursów
+      if (isFuture) {
         const minutesUntil = time.totalMinutes - currentTimeInMinutes;
         if (minutesUntil >= 0) {
           const shortCountdownText = formatMinutesUntilShort(minutesUntil);
@@ -402,6 +403,7 @@ document.addEventListener('DOMContentLoaded', () => {
           tooltipText = noteText ? `${friendlyCountdownText} (${noteText})` : friendlyCountdownText;
         }
       }
+
       const tooltip = tooltipText ? `data-tooltip="${tooltipText}"` : '';
       return `<div class="time-box ${bgClass}" ${tooltip}><div class="time-box-content">${timeBoxContentPrefix}<span class="time-value">${time.time}</span>${noteHtml}</div><div class="countdown-container">${countdownHtml}</div></div>`;
     }).join('');

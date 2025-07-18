@@ -1,6 +1,6 @@
 // ===================================================================================
 // KOMPLETNY KOD APLIKACJI - script.js
-// Wersja z ulepszonymi, kontekstowymi komunikatami.
+// Wersja z kalkulatorem cen biletów.
 // ===================================================================================
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -84,15 +84,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const directionHtml = generateDirectionHtml(activeDirection, route, activeSchedule, { index: activeDirectionIndex, now, activeDayTypeKey, isFullView, routeId });
     let finalHtml = '';
     if (activeSchedule.type.toLowerCase() !== 'standardowy') {
-      if (route.acceptsCard) {
-        finalHtml += `<div class="flex items-center justify-start gap-2 text-sm text-gray-500 -mt-3 mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
-                            <path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm3 1a1 1 0 100-2h3a1 1 0 100 2H7z" clip-rule="evenodd" />
-                        </svg>
-                        <span>Można płacić kartą</span>
-                    </div>`;
-      }
       finalHtml += `<div class="text-blue-600 p-4 mb-6 rounded-lg border border-blue-200 bg-blue-50/50 flex items-start gap-3" role="alert">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -101,6 +92,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>`;
     }
     finalHtml += switcherHtml;
+    if (route.acceptsCard) {
+      finalHtml += `<div class="flex items-center justify-start gap-2 text-sm text-gray-500 -mt-3 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
+                            <path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm3 1a1 1 0 100-2h3a1 1 0 100 2H7z" clip-rule="evenodd" />
+                        </svg>
+                        <span>Można płacić kartą</span>
+                    </div>`;
+    }
     finalHtml += directionHtml;
     detailsContainer.innerHTML = finalHtml;
     setupEventListeners(routeId, activeSchedule, { activeDirectionIndex, activeDayTypeKey });
@@ -129,9 +129,26 @@ document.addEventListener('DOMContentLoaded', () => {
   function generateDirectionHtml(direction, route, activeSchedule, context) {
     const { index, now, activeDayTypeKey, isFullView, routeId } = context;
     const directionId = `${routeId}-${direction.directionName.replace(/[^a-zA-Z0-9]/g, '-')}-${index}`;
-    let directionGridsHtml, controlsHtml = '';
+    let directionGridsHtml, controlsHtml = '', priceCalculatorHtml = '';
+
     if (!isFullView) {
       controlsHtml = generateControlsHtml(directionId, now, activeDayTypeKey);
+
+      if (typeof priceListData !== 'undefined' && priceListData[routeId]) {
+        priceCalculatorHtml = `
+            <div class="price-calculator-toggle-container mt-6 mb-4">
+                <button class="toggle-price-calculator-btn flex items-center gap-2 text-sm font-semibold text-orange-600 hover:text-orange-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M8.433 7.418c.158-.103.346-.196.567-.267v1.698a2.5 2.5 0 00-1.162-.328zM11 12.849v-1.698c.22.071.408.164.567.267a2.5 2.5 0 001.162.328z" />
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.5 4.5 0 00-1.831.876a1 1 0 00.707 1.852A2.5 2.5 0 0110 9.5v1.034a2.5 2.5 0 01-1.162.328 1 1 0 00-.707 1.852A4.5 4.5 0 009 14.908V15a1 1 0 102 0v-.092a4.5 4.5 0 001.831-.876a1 1 0 00-.707-1.852A2.5 2.5 0 0110 11.5v-1.034a2.5 2.5 0 011.162-.328 1 1 0 00.707-1.852A4.5 4.5 0 0011 6.092V6z" clip-rule="evenodd" />
+                    </svg>
+                    <span>Sprawdź cenę biletu</span>
+                </button>
+            </div>
+            <div class="price-calculator-container hidden bg-gray-50 p-4 rounded-lg border mb-6"></div>
+        `;
+      }
+
       const selectedDayTimes = direction.times[activeDayTypeKey] || [];
       directionGridsHtml = `<div id="grid-${directionId}">${generateTimesGridHtml({ timesArray: selectedDayTimes, notesLegend: direction.notes || {}, now, dayTypeForGrid: getDayTypeByKey(activeDayTypeKey), isInitialLoad: true })}</div>`;
     } else {
@@ -148,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
       for (const key in direction.notes) legendHtml += `<p class="text-sm text-gray-600"><span class="font-bold">${key}</span> - ${direction.notes[key]}</p>`;
       legendHtml += '</div>';
     }
-    return `<div class="schedule-direction" id="${directionId}" data-direction-index="${index}">${controlsHtml}${directionGridsHtml}${legendHtml}<div class="flex justify-start mt-4"><button class="toggle-full-schedule-btn" data-route-id="${routeId}" data-full-view="${isFullView}" data-direction-id="${directionId}">${isFullView ? 'Zwiń rozkład' : 'Pełny rozkład ->'}</button></div></div>`;
+    return `<div class="schedule-direction" id="${directionId}" data-direction-index="${index}">${controlsHtml}${priceCalculatorHtml}${directionGridsHtml}${legendHtml}<div class="flex justify-start mt-4"><button class="toggle-full-schedule-btn" data-route-id="${routeId}" data-full-view="${isFullView}" data-direction-id="${directionId}">${isFullView ? 'Zwiń rozkład' : 'Pełny rozkład ->'}</button></div></div>`;
   }
 
   function applyTimeFilter(slider, routeId, activeSchedule, activeDayTypeKey) {
@@ -212,6 +229,18 @@ document.addEventListener('DOMContentLoaded', () => {
         applyTimeFilter(slider, routeId, activeSchedule, activeDayTypeKey);
       });
     });
+
+    detailsContainer.querySelectorAll('.toggle-price-calculator-btn').forEach(button => {
+      button.addEventListener('click', (e) => {
+        const container = e.currentTarget.parentElement.nextElementSibling;
+        container.classList.toggle('hidden');
+        if (!container.innerHTML) {
+          container.id = `price-calc-${routeId}-${activeDirectionIndex}`;
+          renderPriceCalculator(container, routeId);
+        }
+      });
+    });
+
     const tooltipElement = document.getElementById('custom-tooltip');
     if (tooltipElement) {
       detailsContainer.querySelectorAll('[data-tooltip]').forEach(el => {
@@ -257,33 +286,22 @@ document.addEventListener('DOMContentLoaded', () => {
   function formatMinutesUntilShort(totalMinutes) { if (totalMinutes < 0) return ''; if (totalMinutes < 1) return 'teraz'; if (totalMinutes === 1) return 'za 1 min'; if (totalMinutes < 60) return `za ${totalMinutes} min`; const hours = Math.floor(totalMinutes / 60); const minutes = totalMinutes % 60; if (minutes === 0) return `za ${hours}h`; return `za ${hours}h ${minutes}m`; }
   function formatMinutesUntilFriendly(totalMinutes) { if (totalMinutes < 0) return ''; if (totalMinutes < 1) return 'Odjeżdża teraz'; if (totalMinutes === 1) return 'Odjazd za 1 minutę'; if (totalMinutes < 60) { const lastDigit = totalMinutes % 10; const lastTwoDigits = totalMinutes % 100; if (lastDigit >= 2 && lastDigit <= 4 && !(lastTwoDigits >= 12 && lastTwoDigits <= 14)) { return `Odjazd za ${totalMinutes} minuty`; } return `Odjazd za ${totalMinutes} minut`; } const hours = Math.floor(totalMinutes / 60); const minutes = totalMinutes % 60; let hourWord = 'godzin'; if (hours === 1) hourWord = 'godzinę'; if (hours >= 2 && hours <= 4) hourWord = 'godziny'; if (minutes === 0) return `Odjazd za ${hours} ${hourWord}`; return `Odjazd za ${hours} ${hourWord} i ${minutes} min`; }
 
-  // ### ZMIANA: Ulepszone, kontekstowe komunikaty ###
   function generateTimesGridHtml(options) {
     const { timesArray, notesLegend, now, dayTypeForGrid, limit = null, isInitialLoad = false, isFullDayView = false } = options;
     const messageBoxHtml = (message) => `<div class="text-blue-600 p-4 rounded-lg border border-blue-200 bg-blue-50/50 flex items-start gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span>${message}</span></div>`;
-
-    const isTodaySchedule = dayTypeForGrid.key === getDayType(new Date()).key;
-
     if (!timesArray || timesArray.length === 0) {
       if (isFullDayView) return messageBoxHtml('W tym dniu nie ma żadnych kursów.');
+      if (isInitialLoad) return messageBoxHtml('Na dziś nie ma już więcej kursów. Sprawdź pełny rozkład.');
       return messageBoxHtml('Brak kursów w wybranym zakresie.');
     }
-
+    const isTodaySchedule = dayTypeForGrid.key === getDayType(new Date()).key;
     const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes();
     const departures = timesArray.map(timeObj => ({ ...timeObj, totalMinutes: (([h, m]) => h * 60 + m)(timeObj.time.split(':').map(Number)), isPast: isTodaySchedule && (([h, m]) => h * 60 + m)(timeObj.time.split(':').map(Number)) < currentTimeInMinutes })).sort((a, b) => a.totalMinutes - b.totalMinutes);
-
-    let departuresToDisplay = departures;
-    if (isInitialLoad && isTodaySchedule) {
-      departuresToDisplay = departures.filter(dep => !dep.isPast);
-    }
-
+    let departuresToDisplay = limit ? departures.slice(0, limit) : departures;
     if (departuresToDisplay.length === 0) {
-      if (isTodaySchedule) {
-        return messageBoxHtml('Na dziś nie ma już więcej kursów. Sprawdź pełny rozkład.');
-      }
-      return messageBoxHtml('Brak kursów w wybranym zakresie.');
+      if (isInitialLoad) return messageBoxHtml('Na dziś nie ma już więcej kursów. Sprawdź pełny rozkład.');
+      return messageBoxHtml('Brak przyszłych kursów w wybranym zakresie.');
     }
-
     const firstFutureIndex = departures.findIndex(dep => !dep.isPast);
     const timesHtml = departuresToDisplay.map((time, idx) => {
       const isFirstFuture = departures.indexOf(time) === firstFutureIndex;
@@ -315,6 +333,96 @@ document.addEventListener('DOMContentLoaded', () => {
   const showTooltip = (target) => { const message = target.dataset.tooltip; if (!message || !tooltipElement) return; tooltipElement.textContent = message; tooltipElement.classList.add('visible'); const targetRect = target.getBoundingClientRect(); const tooltipRect = tooltipElement.getBoundingClientRect(); const centeredLeft = targetRect.left + (targetRect.width / 2) - (tooltipRect.width / 2); const left = Math.max(10, Math.min(centeredLeft, window.innerWidth - tooltipRect.width - 10)); tooltipElement.style.left = `${left}px`; if (targetRect.top < tooltipRect.height + 15) { tooltipElement.style.top = `${targetRect.bottom + 8}px`; } else { tooltipElement.style.top = `${targetRect.top - tooltipRect.height - 8}px`; } };
   const hideTooltip = () => { if (tooltipElement) tooltipElement.classList.remove('visible'); };
   const handleMobileTooltip = (target) => { if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) { showTooltip(target); clearTimeout(mobileTooltipTimer); mobileTooltipTimer = setTimeout(hideTooltip, 4000); } };
+
+  // --- SEKCJA: LOGIKA KALKULATORA CEN ---
+
+  function renderPriceCalculator(container, initialRouteId = null) {
+    const routeOptions = Object.keys(priceListData).map(id =>
+      `<option value="${id}" ${id === initialRouteId ? 'selected' : ''}>${schedulesData[id].routeName}</option>`
+    ).join('');
+
+    container.innerHTML = `
+          <div class="space-y-4">
+              ${!initialRouteId ? `
+              <div>
+                  <label for="route-select-${container.id}" class="block text-sm font-medium text-gray-700">Wybierz trasę:</label>
+                  <select id="route-select-${container.id}" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm rounded-md">
+                      <option value="">-- wybierz --</option>
+                      ${routeOptions}
+                  </select>
+              </div>` : ''}
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                      <label for="from-stop-${container.id}" class="block text-sm font-medium text-gray-700">Skąd:</label>
+                      <select id="from-stop-${container.id}" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm rounded-md" disabled></select>
+                  </div>
+                  <div>
+                      <label for="to-stop-${container.id}" class="block text-sm font-medium text-gray-700">Dokąd:</label>
+                      <select id="to-stop-${container.id}" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm rounded-md" disabled></select>
+                  </div>
+              </div>
+              <div id="price-result-${container.id}" class="text-center text-lg font-bold text-orange-600 h-8"></div>
+          </div>
+      `;
+
+    const routeSelect = document.getElementById(`route-select-${container.id}`);
+    const fromSelect = document.getElementById(`from-stop-${container.id}`);
+    const toSelect = document.getElementById(`to-stop-${container.id}`);
+    const resultDiv = document.getElementById(`price-result-${container.id}`);
+
+    const updateStops = (routeId) => {
+      fromSelect.innerHTML = '<option value="">-- wybierz --</option>';
+      toSelect.innerHTML = '<option value="">-- wybierz --</option>';
+      toSelect.disabled = true;
+      resultDiv.textContent = '';
+
+      if (priceListData && priceListData[routeId]) {
+        priceListData[routeId].stops.forEach((stop, index) => {
+          fromSelect.innerHTML += `<option value="${index}">${stop}</option>`;
+          toSelect.innerHTML += `<option value="${index}">${stop}</option>`;
+        });
+        fromSelect.disabled = false;
+      } else {
+        fromSelect.disabled = true;
+      }
+    };
+
+    const calculatePrice = () => {
+      const routeId = routeSelect ? routeSelect.value : initialRouteId;
+      const fromIndex = parseInt(fromSelect.value, 10);
+      const toIndex = parseInt(toSelect.value, 10);
+
+      if (routeId && !isNaN(fromIndex) && !isNaN(toIndex)) {
+        if (fromIndex === toIndex) {
+          resultDiv.textContent = '';
+          return;
+        }
+        const price = priceListData[routeId].prices[fromIndex][toIndex];
+        resultDiv.textContent = `Cena biletu: ${price.toFixed(2)} zł`;
+      } else {
+        resultDiv.textContent = '';
+      }
+    };
+
+    if (routeSelect) {
+      routeSelect.addEventListener('change', () => updateStops(routeSelect.value));
+    }
+    fromSelect.addEventListener('change', () => {
+      toSelect.disabled = fromSelect.value === '';
+      calculatePrice();
+    });
+    toSelect.addEventListener('change', calculatePrice);
+
+    if (initialRouteId) {
+      updateStops(initialRouteId);
+    }
+  }
+
+  const mainCalculatorContainer = document.getElementById('main-price-calculator');
+  if (mainCalculatorContainer) {
+    mainCalculatorContainer.id = 'main-calc';
+    renderPriceCalculator(mainCalculatorContainer);
+  }
 
   const announcementsContainer = document.getElementById('announcements-container');
   function formatTextWithMarkdown(text) { if (!text) return ''; return text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); }

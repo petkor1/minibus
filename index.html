@@ -8,10 +8,8 @@
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Roboto+Mono&display=swap"
       rel="stylesheet"
     />
-
-    <link rel="stylesheet" href="dist/output.css?v=3.2.2" />
+    <link rel="stylesheet" href="dist/output.css?v=3.3.0" />
   </head>
-
   <body class="bg-background">
     <header class="main-header bg-white shadow-md sticky top-0 z-50">
       <div
@@ -142,7 +140,23 @@
           ></div>
         </div>
       </section>
-      <section id="tickets-section" class="section tickets-section py-16">
+
+      <!-- ### ZMIANA: Dodano nową sekcję kalkulatora ### -->
+      <section id="pricelist-section" class="section py-16">
+        <div class="container mx-auto px-4 max-w-4xl">
+          <h2 class="text-3xl font-bold text-center mb-10">
+            Kalkulator Cen Biletów
+          </h2>
+          <div
+            id="main-price-calculator"
+            class="bg-white p-6 rounded-lg shadow space-y-4"
+          >
+            <!-- Zawartość kalkulatora zostanie wygenerowana przez JS -->
+          </div>
+        </div>
+      </section>
+
+      <section id="tickets-section" class="section tickets-section pt-0 pb-16">
         <div class="container mx-auto px-4 max-w-4xl">
           <h2 class="text-3xl font-bold text-center mb-10">
             Bilety miesięczne (FAQ)
@@ -258,7 +272,9 @@
       </div>
     </footer>
     <div id="custom-tooltip"></div>
-    <script src="schedules.js?v=3.2.2"></script>
-    <script src="script.js?v=3.2.2"></script>
+    <script src="schedules.js?v=3.3.0"></script>
+    <script src="pricelist.js?v=3.3.0"></script>
+    <!-- ### ZMIANA: Dodano link do nowego pliku ### -->
+    <script src="script.js?v=3.3.0"></script>
   </body>
 </html>

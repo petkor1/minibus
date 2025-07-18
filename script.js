@@ -1,6 +1,6 @@
 // ===================================================================================
 // KOMPLETNY KOD APLIKACJI - script.js
-// Wersja z kalkulatorem cen biletów.
+// Wersja z kalkulatorem cen biletów opartym o priceListId.
 // ===================================================================================
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -134,7 +134,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!isFullView) {
       controlsHtml = generateControlsHtml(directionId, now, activeDayTypeKey);
 
-      if (typeof priceListData !== 'undefined' && priceListData[routeId]) {
+      const priceListId = route.priceListId;
+      if (typeof priceListData !== 'undefined' && priceListId && priceListData[priceListId]) {
         priceCalculatorHtml = `
             <div class="price-calculator-toggle-container mt-6 mb-4">
                 <button class="toggle-price-calculator-btn flex items-center gap-2 text-sm font-semibold text-orange-600 hover:text-orange-800">
@@ -235,8 +236,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = e.currentTarget.parentElement.nextElementSibling;
         container.classList.toggle('hidden');
         if (!container.innerHTML) {
+          const priceListId = schedulesData[routeId].priceListId;
           container.id = `price-calc-${routeId}-${activeDirectionIndex}`;
-          renderPriceCalculator(container, routeId);
+          renderPriceCalculator(container, priceListId);
         }
       });
     });
@@ -334,16 +336,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const hideTooltip = () => { if (tooltipElement) tooltipElement.classList.remove('visible'); };
   const handleMobileTooltip = (target) => { if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) { showTooltip(target); clearTimeout(mobileTooltipTimer); mobileTooltipTimer = setTimeout(hideTooltip, 4000); } };
 
-  // --- SEKCJA: LOGIKA KALKULATORA CEN ---
+  // --- SEKCJA: LOGIKA KALKULATORA CEN (NOWA WERSJA) ---
 
-  function renderPriceCalculator(container, initialRouteId = null) {
-    const routeOptions = Object.keys(priceListData).map(id =>
-      `<option value="${id}" ${id === initialRouteId ? 'selected' : ''}>${schedulesData[id].routeName}</option>`
-    ).join('');
+  function renderPriceCalculator(container, priceListId) {
+    // ### POPRAWKA: Logika renderowania opcji dla głównego kalkulatora ###
+    const routeOptions = Object.keys(priceListData).map(id => {
+      // Użyj displayName, jeśli istnieje, w przeciwnym razie wróć do szukania w schedulesData
+      const displayName = priceListData[id].displayName || (schedulesData[id] ? schedulesData[id].routeName : id);
+      return `<option value="${id}" ${id === priceListId ? 'selected' : ''}>${displayName}</option>`
+    }).join('');
 
     container.innerHTML = `
           <div class="space-y-4">
-              ${!initialRouteId ? `
+              ${container.id === 'main-calc' ? `
               <div>
                   <label for="route-select-${container.id}" class="block text-sm font-medium text-gray-700">Wybierz trasę:</label>
                   <select id="route-select-${container.id}" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm rounded-md">
@@ -370,14 +375,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const toSelect = document.getElementById(`to-stop-${container.id}`);
     const resultDiv = document.getElementById(`price-result-${container.id}`);
 
-    const updateStops = (routeId) => {
+    const updateStops = (currentPriceListId) => {
       fromSelect.innerHTML = '<option value="">-- wybierz --</option>';
       toSelect.innerHTML = '<option value="">-- wybierz --</option>';
       toSelect.disabled = true;
       resultDiv.textContent = '';
 
-      if (priceListData && priceListData[routeId]) {
-        priceListData[routeId].stops.forEach((stop, index) => {
+      const currentPriceData = priceListData[currentPriceListId];
+      if (currentPriceData) {
+        currentPriceData.stops.forEach((stop, index) => {
           fromSelect.innerHTML += `<option value="${index}">${stop}</option>`;
           toSelect.innerHTML += `<option value="${index}">${stop}</option>`;
         });
@@ -388,16 +394,16 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const calculatePrice = () => {
-      const routeId = routeSelect ? routeSelect.value : initialRouteId;
+      const currentPriceListId = routeSelect ? routeSelect.value : priceListId;
       const fromIndex = parseInt(fromSelect.value, 10);
       const toIndex = parseInt(toSelect.value, 10);
 
-      if (routeId && !isNaN(fromIndex) && !isNaN(toIndex)) {
+      if (currentPriceListId && !isNaN(fromIndex) && !isNaN(toIndex)) {
         if (fromIndex === toIndex) {
           resultDiv.textContent = '';
           return;
         }
-        const price = priceListData[routeId].prices[fromIndex][toIndex];
+        const price = priceListData[currentPriceListId].prices[fromIndex][toIndex];
         resultDiv.textContent = `Cena biletu: ${price.toFixed(2)} zł`;
       } else {
         resultDiv.textContent = '';
@@ -413,8 +419,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     toSelect.addEventListener('change', calculatePrice);
 
-    if (initialRouteId) {
-      updateStops(initialRouteId);
+    if (priceListId) {
+      updateStops(priceListId);
     }
   }
 

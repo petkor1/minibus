@@ -1,16 +1,18 @@
 // ===================================================================================
-// DANE CENNIKÓW (Struktura macierzy)
-// Wersja w pełni zgodna z dostarczonym plikiem .csv
+// DANE CENNIKÓW (Struktura ostateczna)
+// Jedno źródło danych dla połączonych tras.
 // ===================================================================================
 const priceListData = {
-    "myslenice-biertowice": {
-        // Uporządkowana lista 12 przystanków. Kolejność jest kluczowa.
+    "poreba-myslenice-biertowice": {
+        // Nazwa wyświetlana w głównym kalkulatorze
+        displayName: "Poręba <-> Biertowice (przez Myślenice)",
+        // Uporządkowana, kompletna lista 12 przystanków
         stops: [
             "Poręba", "Trzemeśnia", "Trzemeśnia Skrzyż.", "Łęki", "Droginia",
             "Osieczany", "Myślenice D.A.", "Myślenice Górne Przedm.", "Bysina",
             "Jasienica", "Sułkowice", "Biertowice"
         ],
-        // Macierz cen, gdzie prices[i][j] to cena z przystanku stops[i] do stops[j].
+        // Kompletna macierz cen
         prices: [
             [0.00, 6.00, 6.00, 6.00, 6.00, 6.50, 7.00, 7.50, 7.50, 8.00, 8.50, 9.00], // Poręba
             [6.00, 0.00, 6.00, 6.00, 6.00, 6.00, 6.50, 7.00, 7.00, 7.50, 8.00, 8.50], // Trzemeśnia
@@ -25,27 +27,6 @@ const priceListData = {
             [8.50, 8.00, 7.50, 7.50, 7.50, 7.50, 7.00, 7.00, 6.50, 6.00, 0.00, 6.00], // Sułkowice
             [9.00, 8.50, 8.00, 8.00, 8.00, 8.00, 7.50, 7.50, 7.00, 6.50, 6.00, 0.00]  // Biertowice
         ]
-    },
-    "myslenice-poreba": {
-        // Używamy tych samych danych, co dla trasy Myślenice <-> Biertowice
-        stops: [
-            "Poręba", "Trzemeśnia", "Trzemeśnia Skrzyż.", "Łęki", "Droginia",
-            "Osieczany", "Myślenice D.A.", "Myślenice Górne Przedm.", "Bysina",
-            "Jasienica", "Sułkowice", "Biertowice"
-        ],
-        prices: [
-            [0.00, 6.00, 6.00, 6.00, 6.00, 6.50, 7.00, 7.50, 7.50, 8.00, 8.50, 9.00],
-            [6.00, 0.00, 6.00, 6.00, 6.00, 6.00, 6.50, 7.00, 7.00, 7.50, 8.00, 8.50],
-            [6.00, 6.00, 0.00, 6.00, 6.00, 6.00, 6.00, 6.50, 6.50, 7.00, 7.50, 8.00],
-            [6.00, 6.00, 6.00, 0.00, 6.00, 6.00, 6.00, 6.50, 6.50, 7.00, 7.50, 8.00],
-            [6.00, 6.00, 6.00, 6.00, 0.00, 6.00, 6.00, 6.50, 6.50, 7.00, 7.50, 8.00],
-            [6.50, 6.00, 6.00, 6.00, 6.00, 0.00, 6.00, 6.50, 6.50, 7.00, 7.50, 8.00],
-            [7.00, 6.50, 6.00, 6.00, 6.00, 6.00, 0.00, 6.00, 6.00, 6.50, 7.00, 7.50],
-            [7.50, 7.00, 6.50, 6.50, 6.50, 6.50, 6.00, 0.00, 6.00, 6.50, 7.00, 7.50],
-            [7.50, 7.00, 6.50, 6.50, 6.50, 6.50, 6.00, 6.00, 0.00, 6.00, 6.50, 7.00],
-            [8.00, 7.50, 7.00, 7.00, 7.00, 7.00, 6.50, 6.50, 6.00, 0.00, 6.00, 6.50],
-            [8.50, 8.00, 7.50, 7.50, 7.50, 7.50, 7.00, 7.00, 6.50, 6.00, 0.00, 6.00],
-            [9.00, 8.50, 8.00, 8.00, 8.00, 8.00, 7.50, 7.50, 7.00, 6.50, 6.00, 0.00]
-        ]
     }
+    // W przyszłości możesz tu dodać cenniki dla innych tras, np. "myslenice-dobczyce": { ... }
 };

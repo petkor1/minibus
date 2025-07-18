@@ -74,6 +74,7 @@ const schedulesData = {
     "myslenice-biertowice": {
         routeName: "Myślenice <-> Biertowice",
         acceptsCard: true,
+        priceListId: "poreba-myslenice-biertowice",
         variants: [
             {
                 type: "standardowy",
@@ -276,6 +277,7 @@ const schedulesData = {
     "myslenice-poreba": {
         routeName: "Myślenice <-> Poręba",
         acceptsCard: true,
+        priceListId: "poreba-myslenice-biertowice",
         variants: [
             {
                 type: "standardowy",

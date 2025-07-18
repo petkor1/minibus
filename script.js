@@ -92,15 +92,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>`;
     }
     finalHtml += switcherHtml;
-    if (route.acceptsCard) {
-      finalHtml += `<div class="flex items-center justify-start gap-2 text-sm text-gray-500 -mt-3 mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
-                            <path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm3 1a1 1 0 100-2h3a1 1 0 100 2H7z" clip-rule="evenodd" />
-                        </svg>
-                        <span>Można płacić kartą</span>
-                    </div>`;
-    }
     finalHtml += directionHtml;
     detailsContainer.innerHTML = finalHtml;
     setupEventListeners(routeId, activeSchedule, { activeDirectionIndex, activeDayTypeKey });
@@ -137,21 +128,27 @@ document.addEventListener('DOMContentLoaded', () => {
       const priceListId = route.priceListId;
       if (typeof priceListData !== 'undefined' && priceListId && priceListData[priceListId]) {
         priceCalculatorHtml = `
-            <div class="price-calculator-toggle-container mt-6 mb-4">
-                <button class="toggle-price-calculator-btn flex items-center gap-2 text-sm font-semibold text-orange-600 hover:text-orange-800">
+            <div class="price-calculator-wrapper -mt-4 mb-4">
+                <button class="toggle-price-calculator-btn flex items-center gap-2 text-sm font-semibold text-orange-600 hover:text-orange-800" data-accepts-card="${route.acceptsCard}">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                       <path d="M8.433 7.418c.158-.103.346-.196.567-.267v1.698a2.5 2.5 0 00-1.162-.328zM11 12.849v-1.698c.22.071.408.164.567.267a2.5 2.5 0 001.162.328z" />
                       <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.5 4.5 0 00-1.831.876a1 1 0 00.707 1.852A2.5 2.5 0 0110 9.5v1.034a2.5 2.5 0 01-1.162.328 1 1 0 00-.707 1.852A4.5 4.5 0 009 14.908V15a1 1 0 102 0v-.092a4.5 4.5 0 001.831-.876a1 1 0 00-.707-1.852A2.5 2.5 0 0110 11.5v-1.034a2.5 2.5 0 011.162-.328 1 1 0 00.707-1.852A4.5 4.5 0 0011 6.092V6z" clip-rule="evenodd" />
                     </svg>
                     <span>Sprawdź cenę biletu</span>
                 </button>
+                <div class="price-calculator-container hidden bg-gray-50 p-4 rounded-lg border mt-2"></div>
             </div>
-            <div class="price-calculator-container hidden bg-gray-50 p-4 rounded-lg border mb-6"></div>
         `;
       }
 
       const selectedDayTimes = direction.times[activeDayTypeKey] || [];
-      directionGridsHtml = `<div id="grid-${directionId}">${generateTimesGridHtml({ timesArray: selectedDayTimes, notesLegend: direction.notes || {}, now, dayTypeForGrid: getDayTypeByKey(activeDayTypeKey), isInitialLoad: true })}</div>`;
+      const isToday = activeDayTypeKey === getDayType(now).key;
+      const initialTimes = isToday ? selectedDayTimes.filter(timeObj => {
+        const [hour, minute] = timeObj.time.split(':').map(Number);
+        return (hour * 60 + minute) >= (now.getHours() * 60 + now.getMinutes());
+      }) : selectedDayTimes;
+
+      directionGridsHtml = `<div id="grid-${directionId}">${generateTimesGridHtml({ timesArray: initialTimes, notesLegend: direction.notes || {}, now, dayTypeForGrid: getDayTypeByKey(activeDayTypeKey), isInitialLoad: true })}</div>`;
     } else {
       const allDayTypes = [{ key: 'workdays', displayName: 'Dni Robocze' }, { key: 'saturdays', displayName: 'Soboty' }, { key: 'sundays', displayName: 'Niedziele i Święta' }];
       directionGridsHtml = `<div id="grid-${directionId}">`;
@@ -166,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
       for (const key in direction.notes) legendHtml += `<p class="text-sm text-gray-600"><span class="font-bold">${key}</span> - ${direction.notes[key]}</p>`;
       legendHtml += '</div>';
     }
-    return `<div class="schedule-direction" id="${directionId}" data-direction-index="${index}">${controlsHtml}${priceCalculatorHtml}${directionGridsHtml}${legendHtml}<div class="flex justify-start mt-4"><button class="toggle-full-schedule-btn" data-route-id="${routeId}" data-full-view="${isFullView}" data-direction-id="${directionId}">${isFullView ? 'Zwiń rozkład' : 'Pełny rozkład ->'}</button></div></div>`;
+    return `<div class="schedule-direction" id="${directionId}" data-direction-index="${index}">${priceCalculatorHtml}${controlsHtml}${directionGridsHtml}${legendHtml}<div class="flex justify-start mt-4"><button class="toggle-full-schedule-btn" data-route-id="${routeId}" data-full-view="${isFullView}" data-direction-id="${directionId}">${isFullView ? 'Zwiń rozkład' : 'Pełny rozkład ->'}</button></div></div>`;
   }
 
   function applyTimeFilter(slider, routeId, activeSchedule, activeDayTypeKey) {
@@ -233,12 +230,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     detailsContainer.querySelectorAll('.toggle-price-calculator-btn').forEach(button => {
       button.addEventListener('click', (e) => {
-        const container = e.currentTarget.parentElement.nextElementSibling;
+        const container = e.currentTarget.nextElementSibling;
         container.classList.toggle('hidden');
         if (!container.innerHTML) {
           const priceListId = schedulesData[routeId].priceListId;
+          const acceptsCard = e.currentTarget.dataset.acceptsCard === 'true';
           container.id = `price-calc-${routeId}-${activeDirectionIndex}`;
-          renderPriceCalculator(container, priceListId);
+          renderPriceCalculator(container, priceListId, { acceptsCard });
         }
       });
     });
@@ -338,13 +336,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- SEKCJA: LOGIKA KALKULATORA CEN (NOWA WERSJA) ---
 
-  function renderPriceCalculator(container, priceListId) {
-    // ### POPRAWKA: Logika renderowania opcji dla głównego kalkulatora ###
+  function renderPriceCalculator(container, priceListId, options = {}) {
+    const { acceptsCard = false } = options;
+    const priceData = priceListData[priceListId];
+    if (!priceData && container.id !== 'main-calc') return;
+
     const routeOptions = Object.keys(priceListData).map(id => {
-      // Użyj displayName, jeśli istnieje, w przeciwnym razie wróć do szukania w schedulesData
-      const displayName = priceListData[id].displayName || (schedulesData[id] ? schedulesData[id].routeName : id);
+      const displayName = priceListData[id].displayName;
       return `<option value="${id}" ${id === priceListId ? 'selected' : ''}>${displayName}</option>`
     }).join('');
+
+    const cardPaymentHtml = acceptsCard ? `
+        <div class="flex items-center gap-2 text-sm text-green-600">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
+                <path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm3 1a1 1 0 100-2h3a1 1 0 100 2H7z" clip-rule="evenodd" />
+            </svg>
+            <span>Można płacić kartą</span>
+        </div>` : '';
 
     container.innerHTML = `
           <div class="space-y-4">
@@ -366,7 +375,10 @@ document.addEventListener('DOMContentLoaded', () => {
                       <select id="to-stop-${container.id}" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm rounded-md" disabled></select>
                   </div>
               </div>
-              <div id="price-result-${container.id}" class="text-center text-lg font-bold text-orange-600 h-8"></div>
+              <div id="price-result-container-${container.id}" class="flex justify-between items-center h-8">
+                  <span id="price-result-${container.id}" class="text-lg font-bold text-orange-600"></span>
+                  ${cardPaymentHtml}
+              </div>
           </div>
       `;
 

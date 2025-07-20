@@ -1,4 +1,4 @@
-[
+const announcementsData = [
   {
     "title": "Zmiana rozkładu jazdy w okresie wakacyjnym",
     "displayDate": "data publikacji: 27-06-2025",
@@ -20,4 +20,4 @@
     "terminationDate": "2025-09-07",
     "text": "Informujemy, że od **1 września 2025 r. (poniedziałek)** przywrócony zostaje standardowy, szkolny rozkład jazdy na wszystkich liniach."
   }
-]
+];

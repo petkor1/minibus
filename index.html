@@ -3,169 +3,160 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MINIBUS-ZP | Rozkłady Jazdy | Komunikaty</title>
+    <meta
+      name="description"
+      content="MINIBUS-ZP - Rozkłady jazdy, komunikaty i cenniki biletów. Przewóz osób na trasach Myślenice-Dobczyce, Gdów-Dobczyce i innych."
+    />
+    <title>MINIBUS-ZP | Rozkłady Jazdy | Komunikaty | Cenniki</title>
     <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Roboto+Mono&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="dist/output.css?v=3.3.0" />
+    <link rel="stylesheet" href="src/input.css" />
   </head>
-  <body class="bg-background">
-    <header class="main-header bg-white shadow-md sticky top-0 z-50">
-      <div
-        class="container mx-auto flex justify-between items-center p-4 header-content"
-      >
-        <div class="logo text-2xl font-bold text-orange-600 min-w-[150px]">
-          <a href="#">MINIBUS-ZP</a>
+  <body>
+    <!-- Header -->
+    <header class="main-header">
+      <div class="container header-content">
+        <div class="logo">
+          <a href="#" aria-label="MINIBUS-ZP - Strona główna">MINIBUS-ZP</a>
         </div>
-        <nav
-          class="main-nav hidden md:flex absolute md:relative top-full left-0 w-full bg-white md:bg-transparent shadow-md md:shadow-none justify-center flex-1"
-        >
-          <ul
-            class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-8 p-4 md:p-0 text-right"
-          >
-            <li>
-              <a
-                href="#schedules-section"
-                class="text-gray-600 hover:text-orange-600 pb-1 border-b-2 border-transparent hover:border-orange-600 transition whitespace-nowrap"
-                >Rozkłady Jazdy</a
-              >
-            </li>
-            <li>
-              <a
-                href="#announcements-section"
-                class="text-gray-600 hover:text-orange-600 pb-1 border-b-2 border-transparent hover:border-orange-600 transition whitespace-nowrap"
-                >Komunikaty</a
-              >
-            </li>
-            <li>
-              <a
-                href="#tickets-section"
-                class="text-gray-600 hover:text-orange-600 pb-1 border-b-2 border-transparent hover:border-orange-600 transition whitespace-nowrap"
-                >Bilety & FAQ</a
-              >
-            </li>
-            <li>
-              <a
-                href="#contact-section"
-                class="text-gray-600 hover:text-orange-600 pb-1 border-b-2 border-transparent hover:border-orange-600 transition whitespace-nowrap"
-                >Kontakt</a
-              >
-            </li>
-            <li class="md:hidden">
-              <a
-                href="tel:+48604619863"
-                class="text-lg font-semibold text-orange-600 whitespace-nowrap"
-                >+48 604 619 863</a
-              >
-            </li>
+        <nav class="main-nav" role="navigation" aria-label="Menu główne">
+          <ul>
+            <li><a href="#schedules-section">Rozkłady Jazdy</a></li>
+            <li><a href="#announcements-section">Komunikaty</a></li>
+            <li><a href="#pricelist-section">Cenniki</a></li>
+            <li><a href="#tickets-section">Bilety & FAQ</a></li>
+            <li><a href="#contact-section">Kontakt</a></li>
           </ul>
         </nav>
-        <div class="contact-info hidden lg:block min-w-[150px] text-right">
-          <a
-            href="tel:+48604619863"
-            class="text-lg font-semibold text-orange-600 whitespace-nowrap"
+        <div class="contact-info">
+          <a href="tel:+48604619863" aria-label="Zadzwoń: +48 604 619 863"
             >+48 604 619 863</a
           >
         </div>
         <button
-          class="mobile-nav-toggle md:hidden text-3xl z-50"
-          aria-label="Toggle navigation"
+          class="mobile-nav-toggle"
+          aria-label="Przełącz menu"
+          aria-expanded="false"
         >
+          <span class="sr-only">Menu</span>
           ☰
         </button>
       </div>
     </header>
+
     <main>
-      <section
-        id="hero-section"
-        class="hero-section text-white text-center py-20 bg-cover bg-center hero-background"
-      >
-        <div class="container mx-auto px-4">
-          <h1 class="text-4xl md:text-5xl font-bold mb-4 shadow-text">
-            MINIBUS-ZP - Podróż każdego dnia
-          </h1>
+      <!-- Hero Section -->
+      <section class="hero-section" role="banner">
+        <div class="container">
+          <h1>MINIBUS-ZP - Podróż każdego dnia</h1>
           <div
-            class="flex flex-col sm:flex-row justify-center items-center gap-4 mt-8 px-4"
+            style="
+              display: flex;
+              flex-direction: column;
+              gap: 1rem;
+              align-items: center;
+              margin-top: 2rem;
+            "
           >
-            <a
-              href="#schedules-section"
-              class="button primary bg-white text-orange-600 font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-gray-100 transition w-full sm:w-auto sm:px-4"
+            <a href="#schedules-section" class="button primary"
               >Sprawdź rozkład</a
-            ><a
-              href="#announcements-section"
-              class="button secondary bg-orange-500 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-orange-400 transition w-full sm:w-auto sm:px-4"
+            >
+            <a href="#announcements-section" class="button secondary"
               >Zobacz komunikaty</a
             >
           </div>
         </div>
       </section>
+
+      <!-- Announcements Section -->
       <section
         id="announcements-section"
-        class="section announcements-section py-16"
+        class="announcements-section"
+        aria-labelledby="announcements-heading"
       >
-        <div class="container mx-auto px-4 max-w-4xl">
-          <h2 class="text-3xl font-bold text-center mb-10">
-            Najnowsze komunikaty
-          </h2>
-          <div
-            class="announcements-grid grid grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-8"
-            id="announcements-container"
-          >
-            <p class="text-center col-span-full text-xl py-20">
+        <div class="container">
+          <h2 id="announcements-heading">Najnowsze komunikaty</h2>
+          <div class="announcements-grid" id="announcements-container">
+            <p class="text-center" style="grid-column: 1/-1">
+              <span class="loading" aria-label="Ładowanie komunikatów"></span>
               Ładowanie komunikatów...
             </p>
           </div>
         </div>
       </section>
+
+      <!-- Schedules Section -->
       <section
         id="schedules-section"
-        class="section schedules-section py-16 bg-gray-100"
+        class="schedules-section"
+        aria-labelledby="schedules-heading"
       >
-        <div class="container mx-auto px-4">
-          <h2 class="text-3xl font-bold text-center mb-8">Rozkłady jazdy</h2>
+        <div class="container">
+          <h2 id="schedules-heading">Rozkłady jazdy</h2>
           <p
             id="schedule-placeholder-text"
-            class="text-center text-gray-600 p-4 mb-6 rounded-lg border border-gray-200 bg-white shadow-sm"
+            class="text-center"
+            style="
+              background-color: white;
+              padding: 1rem;
+              margin-bottom: 1.5rem;
+              border-radius: var(--border-radius-md);
+              border: 1px solid var(--color-border);
+              color: var(--color-text-muted);
+            "
           >
             Wybierz trasę, aby wyświetlić szczegółowy rozkład jazdy.
           </p>
           <div
             id="schedule-selector-container"
             class="schedule-selector-grid"
+            role="group"
+            aria-label="Wybór trasy"
           ></div>
           <div
             id="schedule-details-container"
             class="schedule-details-container hidden"
+            aria-live="polite"
           ></div>
         </div>
       </section>
 
-      <!-- ### ZMIANA: Dodano nową sekcję kalkulatora ### -->
-      <section id="pricelist-section" class="section py-16">
-        <div class="container mx-auto px-4 max-w-4xl">
-          <h2 class="text-3xl font-bold text-center mb-10">
-            Kalkulator Cen Biletów
-          </h2>
+      <!-- Price Calculator Section -->
+      <section
+        id="pricelist-section"
+        class="pricelist-section"
+        aria-labelledby="pricelist-heading"
+      >
+        <div class="container" style="max-width: 800px">
+          <h2 id="pricelist-heading">Kalkulator cen biletów</h2>
           <div
             id="main-price-calculator"
-            class="bg-white p-6 rounded-lg shadow space-y-4"
+            class="price-calculator-container"
+            style="
+              background-color: white;
+              padding: 1.5rem;
+              border-radius: var(--border-radius-md);
+              box-shadow: var(--shadow-md);
+            "
           >
-            <!-- Zawartość kalkulatora zostanie wygenerowana przez JS -->
+            <!-- Calculator content will be generated by JavaScript -->
           </div>
         </div>
       </section>
 
-      <section id="tickets-section" class="section tickets-section pt-0 pb-16">
-        <div class="container mx-auto px-4 max-w-4xl">
-          <h2 class="text-3xl font-bold text-center mb-10">
-            Bilety miesięczne (FAQ)
-          </h2>
-          <div class="space-y-6">
-            <div class="faq-item bg-white p-6 rounded-lg shadow">
-              <h3 class="font-bold text-xl mb-2">
-                Jak kupić bilet miesięczny?
-              </h3>
+      <!-- Tickets & FAQ Section -->
+      <section
+        id="tickets-section"
+        class="tickets-section"
+        aria-labelledby="tickets-heading"
+      >
+        <div class="container" style="max-width: 800px">
+          <h2 id="tickets-heading">Bilety miesięczne (FAQ)</h2>
+          <div style="display: flex; flex-direction: column; gap: 1rem">
+            <div class="faq-item">
+              <h3>Jak kupić bilet miesięczny?</h3>
               <p>
                 Bilety miesięczne dostępne są w punkcie sprzedaży na Dworcu
                 Dekada w Myślenicach, stanowisko nr 8, od 25. dnia poprzedniego
@@ -173,93 +164,76 @@
                 w komunikatach.
               </p>
             </div>
-            <div class="faq-item bg-white p-6 rounded-lg shadow">
-              <h3 class="font-bold text-xl mb-2">
-                Czy mogę kupić bilet u kierowcy?
-              </h3>
+            <div class="faq-item">
+              <h3>Czy mogę kupić bilet u kierowcy?</h3>
               <p>
                 Bilety jednorazowe można kupić bezpośrednio u kierowcy. Sprzedaż
                 biletów miesięcznych odbywa się wyłącznie w punkcie sprzedaży na
                 Dworcu Dekada w Myślenicach.
               </p>
             </div>
-            <div class="faq-item bg-white p-6 rounded-lg shadow">
-              <h3 class="font-bold text-xl mb-2">
-                Czy są zniżki dla uczniów/studentów?
-              </h3>
+            <div class="faq-item">
+              <h3>Czy są zniżki dla uczniów/studentów?</h3>
               <p>
                 Tak, oferujemy zniżki ustawowe dla uczniów i studentów po
                 okazaniu ważnej legitymacji szkolnej/studenckiej.
               </p>
             </div>
-            <div class="text-center pt-10">
-              <a
-                href="docs/UPOWAZNIENIE-DO-PRZEKAZYWANIA-DANYCH.pdf"
-                class="button secondary bg-orange-500 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-orange-400 transition w-full sm:w-auto sm:px-4"
-                target="_blank"
-                download
-                >Pobierz formularz RODO</a
-              >
+            <div class="faq-item">
+              <h3>Czy można płacić kartą?</h3>
+              <p>
+                Płatność kartą jest możliwa na wybranych trasach. Sprawdź
+                oznaczenie przy rozkładzie jazdy lub zapytaj kierowcę.
+              </p>
             </div>
+          </div>
+          <div class="text-center mt-8">
+            <a
+              href="docs/UPOWAZNIENIE-DO-PRZEKAZYWANIA-DANYCH.pdf"
+              class="button secondary"
+              target="_blank"
+              download
+            >
+              Pobierz formularz RODO
+            </a>
           </div>
         </div>
       </section>
+
+      <!-- Contact Section -->
       <section
         id="contact-section"
-        class="section contact-section py-16 bg-gray-800 text-white"
+        class="contact-section"
+        aria-labelledby="contact-heading"
       >
-        <div class="container mx-auto px-4">
-          <h2 class="text-3xl font-bold text-center mb-10">Kontakt</h2>
-          <div
-            class="contact-info-grid grid grid-cols-1 md:grid-cols-3 gap-8 text-center"
-          >
+        <div class="container">
+          <h2 id="contact-heading">Kontakt</h2>
+          <div class="contact-info-grid">
             <div class="contact-item">
-              <h3 class="text-xl font-bold mb-2">Telefon</h3>
-              <p>
-                <a
-                  href="tel:+48604619863"
-                  class="text-orange-300 hover:text-orange-200 text-lg"
-                  >+48 604 619 863</a
-                >
-              </p>
+              <h3>Telefon</h3>
+              <p><a href="tel:+48604619863">+48 604 619 863</a></p>
             </div>
             <div class="contact-item">
-              <h3 class="text-xl font-bold mb-2">Email</h3>
-              <p>
-                <a
-                  href="mailto:minibus@and.pl"
-                  class="text-orange-300 hover:text-orange-200 text-lg"
-                  >minibus@and.pl</a
-                >
-              </p>
+              <h3>Email</h3>
+              <p><a href="mailto:minibus@and.pl">minibus@and.pl</a></p>
             </div>
             <div class="contact-item">
-              <h3 class="text-xl font-bold mb-2">Adres</h3>
-              <p class="text-lg">Stojowice 96<br />32-410 Dobczyce</p>
+              <h3>Adres</h3>
+              <p>Stojowice 96<br />32-410 Dobczyce</p>
             </div>
           </div>
         </div>
       </section>
     </main>
-    <footer class="main-footer bg-gray-900 text-gray-400 py-8">
-      <div class="container mx-auto footer-content text-center">
-        <nav class="footer-nav mb-4">
-          <ul class="flex justify-center space-x-6">
-            <li>
-              <a href="#schedules-section" class="hover:text-white"
-                >Rozkłady Jazdy</a
-              >
-            </li>
-            <li>
-              <a href="#announcements-section" class="hover:text-white"
-                >Komunikaty</a
-              >
-            </li>
-            <li>
-              <a href="#tickets-section" class="hover:text-white"
-                >Bilety & FAQ</a
-              >
-            </li>
+
+    <!-- Footer -->
+    <footer class="main-footer" role="contentinfo">
+      <div class="container">
+        <nav class="footer-nav" aria-label="Menu stopki">
+          <ul>
+            <li><a href="#schedules-section">Rozkłady Jazdy</a></li>
+            <li><a href="#announcements-section">Komunikaty</a></li>
+            <li><a href="#tickets-section">Bilety & FAQ</a></li>
           </ul>
         </nav>
         <p class="copyright">
@@ -271,7 +245,11 @@
         </p>
       </div>
     </footer>
-    <div id="custom-tooltip"></div>
+
+    <!-- Tooltip -->
+    <div id="custom-tooltip" role="tooltip"></div>
+    <script src="announcements.js?v=3.3.0"></script>
+
     <script src="schedules.js?v=3.3.0"></script>
     <script src="pricelist.js?v=3.3.0"></script>
     <script src="script.js?v=3.3.0"></script>

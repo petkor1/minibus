@@ -1013,3 +1013,40 @@ html {
     padding: 1.25rem;
   }
 }
+
+/* Klasa do animacji płynnego pojawiania się */
+.fade-in-up {
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.announcement-content {
+  max-height: 100px; /* Wysokość zwiniętego tekstu - możesz ją dostosować */
+  overflow: hidden; /* Ukrywa resztę tekstu */
+  transition: max-height 0.4s ease-in-out; /* Definiuje animację */
+  position: relative;
+}
+
+/* Dodajemy gradient na dole zwiniętego tekstu, żeby wyglądał lepiej */
+.announcement-content:not(.expanded)::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: linear-gradient(to bottom, transparent, var(--color-surface));
+}
+
+.announcement-content.expanded {
+  max-height: 1000px; /* Wystarczająco duża wysokość, by zmieścić całą treść */
+}

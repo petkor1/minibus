@@ -45,12 +45,15 @@ document.addEventListener('DOMContentLoaded', function () {
   initializePriceCalculator();
 });
 
-// Announcements functionality
 function loadAnnouncements() {
   const container = document.getElementById('announcements-container');
+  if (!container) return;
+
   const now = new Date();
   now.setHours(0, 0, 0, 0);
 
+  // ---> KROK 1: FILTROWANIE (przywrócona, poprawna logika) <---
+  // Najpierw wybieramy tylko te komunikaty, które są aktywne dzisiaj.
   const activeAnnouncements = announcementsData.filter(item => {
     const pubDate = new Date(item.publicationDate);
     const termDate = new Date(item.terminationDate);
@@ -59,6 +62,8 @@ function loadAnnouncements() {
     return now >= pubDate && now <= termDate;
   });
 
+  // ---> KROK 2: SORTOWANIE <---
+  // Sortujemy tylko aktywne komunikaty, aby najnowszy był pierwszy.
   activeAnnouncements.sort((a, b) => new Date(b.publicationDate) - new Date(a.publicationDate));
 
   container.innerHTML = '';
@@ -68,39 +73,34 @@ function loadAnnouncements() {
     return;
   }
 
+  // ---> KROK 3: RENDEROWANIE (z logiką animacji) <---
+  // Przechodzimy pętlą tylko po aktywnych komunikatach.
   activeAnnouncements.forEach((announcement, index) => {
     const card = document.createElement('div');
     card.className = `announcement-card ${index === 0 ? 'featured' : ''}`;
 
     const formattedText = formatTextWithMarkdown(announcement.text);
     const plainText = announcement.text.replace(/\*\*([^*]+)\*\*/g, '$1').replace(/\n/g, ' ');
-
-    let displayText = formattedText;
-    let showReadMore = false;
-
-    if (plainText.length > 250) {
-      const cutIndex = plainText.lastIndexOf(' ', 250);
-      const truncatedText = announcement.text.substring(0, cutIndex > -1 ? cutIndex : 250) + '...';
-      displayText = formatTextWithMarkdown(truncatedText);
-      showReadMore = true;
-    }
+    const showReadMore = plainText.length > 250;
 
     card.innerHTML = `
-                    <h3>${announcement.title}</h3>
-                    <p class="date">${announcement.displayDate}</p>
-                    <div class="announcement-content">${displayText}</div>
-                    ${showReadMore ? '<a class="read-more">Czytaj więcej</a>' : ''}
-                `;
+      <h3>${announcement.title}</h3>
+      <p class="date">${announcement.displayDate}</p>
+      <div class="announcement-content">${formattedText}</div>
+      ${showReadMore ? '<a href="#" class="read-more">Czytaj więcej</a>' : ''}
+    `;
+
+    const contentDiv = card.querySelector('.announcement-content');
 
     if (showReadMore) {
       const readMoreBtn = card.querySelector('.read-more');
-      const contentDiv = card.querySelector('.announcement-content');
-
-      readMoreBtn.addEventListener('click', function () {
-        const isExpanded = this.textContent === 'Zwiń';
-        contentDiv.innerHTML = isExpanded ? displayText : formattedText;
-        this.textContent = isExpanded ? 'Czytaj więcej' : 'Zwiń';
+      readMoreBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        const isNowExpanded = contentDiv.classList.toggle('expanded');
+        this.textContent = isNowExpanded ? 'Zwiń' : 'Czytaj więcej';
       });
+    } else {
+      contentDiv.classList.add('expanded');
     }
 
     container.appendChild(card);
@@ -135,21 +135,21 @@ function initializeSchedules() {
 }
 
 function selectRoute(routeId) {
-  const buttons = document.querySelectorAll('.schedule-selector-btn');
-  buttons.forEach(btn => {
+  document.querySelectorAll('.schedule-selector-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.routeId === routeId);
   });
 
   renderSchedule(routeId);
 
-  // Hide placeholder and show details
-  document.getElementById('schedule-placeholder-text').classList.add('hidden');
+  document.getElementById('schedule-placeholder-text')?.classList.add('hidden');
   const detailsContainer = document.getElementById('schedule-details-container');
-  detailsContainer.classList.remove('hidden');
+  detailsContainer?.classList.remove('hidden');
 
-  // Smooth scroll to details
+  // ---> DODAJ TĘ LINIĘ <---
+  detailsContainer?.classList.add('fade-in-up');
+
   setTimeout(() => {
-    detailsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    detailsContainer?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, 100);
 }
 
@@ -450,6 +450,11 @@ function attachScheduleEventListeners(routeId, activeDirectionIndex, activeDayTy
   document.querySelector('.toggle-price-calculator-btn')?.addEventListener('click', function () {
     const container = document.getElementById(`route-price-calc-${routeId}`);
     container.classList.toggle('hidden');
+
+    // ---> DODAJ TĘ LINIĘ <---
+    if (!container.classList.contains('hidden')) {
+      container.classList.add('fade-in-up');
+    }
 
     if (!container.innerHTML) {
       const route = schedulesData[routeId];

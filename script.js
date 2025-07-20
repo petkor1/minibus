@@ -171,19 +171,17 @@ function renderSchedule(routeId, options = {}) {
 
   let html = '';
 
-  // Show schedule type info if not standard
   if (activeSchedule.type !== 'standardowy') {
     html += `
-                    <div class="alert alert-info">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <p>Obowiązuje rozkład: <strong>${activeSchedule.type}</strong></p>
-                    </div>
-                `;
+      <div class="alert alert-info">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <p>Obowiązuje rozkład: <strong>${activeSchedule.type}</strong></p>
+      </div>
+    `;
   }
 
-  // Direction switcher
   if (activeSchedule.directions.length > 1) {
     html += '<div class="direction-switcher-container">';
     html += '<label>Wybierz kierunek:</label>';
@@ -192,12 +190,12 @@ function renderSchedule(routeId, options = {}) {
       html += '<div style="display: flex; gap: -1px; margin-top: 0.25rem;">';
       activeSchedule.directions.forEach((dir, idx) => {
         html += `
-                            <button class="direction-tab-btn ${idx === activeDirectionIndex ? 'active' : ''}"
-                                    data-route-id="${routeId}"
-                                    data-direction-index="${idx}">
-                                ${dir.directionName}
-                            </button>
-                        `;
+          <button class="direction-tab-btn ${idx === activeDirectionIndex ? 'active' : ''}"
+                  data-route-id="${routeId}"
+                  data-direction-index="${idx}">
+            ${dir.directionName}
+          </button>
+        `;
       });
       html += '</div>';
     } else {
@@ -207,30 +205,27 @@ function renderSchedule(routeId, options = {}) {
       });
       html += '</select>';
     }
-
     html += '</div>';
   }
 
   const direction = activeSchedule.directions[activeDirectionIndex];
 
-  // Price calculator button (if applicable)
   if (route.priceListId && priceListData[route.priceListId]) {
     html += `
-                    <div class="price-calculator-wrapper">
-                        <button class="toggle-price-calculator-btn" data-route-id="${routeId}" data-accepts-card="${route.acceptsCard}">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="width: 1.25rem; height: 1.25rem;">
-                                <path d="M8.433 7.418c.158-.103.346-.196.567-.267v1.698a2.5 2.5 0 00-1.162-.328zM11 12.849v-1.698c.22.071.408.164.567.267a2.5 2.5 0 001.162.328z" />
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.5 4.5 0 00-1.831.876a1 1 0 00.707 1.852A2.5 2.5 0 0110 9.5v1.034a2.5 2.5 0 01-1.162.328 1 1 0 00-.707 1.852A4.5 4.5 0 009 14.908V15a1 1 0 102 0v-.092a4.5 4.5 0 001.831-.876a1 1 0 00-.707-1.852A2.5 2.5 0 0110 11.5v-1.034a2.5 2.5 0 011.162-.328 1 1 0 00.707-1.852A4.5 4.5 0 0011 6.092V6z" clip-rule="evenodd" />
-                            </svg>
-                            <span>Sprawdź cenę biletu</span>
-                        </button>
-                        <div class="price-calculator-container hidden" id="route-price-calc-${routeId}"></div>
-                    </div>
-                `;
+      <div class="price-calculator-wrapper">
+        <button class="toggle-price-calculator-btn" data-route-id="${routeId}" data-accepts-card="${route.acceptsCard}">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="width: 1.25rem; height: 1.25rem;">
+            <path d="M8.433 7.418c.158-.103.346-.196.567-.267v1.698a2.5 2.5 0 00-1.162-.328zM11 12.849v-1.698c.22.071.408.164.567.267a2.5 2.5 0 001.162.328z" />
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.5 4.5 0 00-1.831.876a1 1 0 00.707 1.852A2.5 2.5 0 0110 9.5v1.034a2.5 2.5 0 01-1.162.328 1 1 0 00-.707 1.852A4.5 4.5 0 009 14.908V15a1 1 0 102 0v-.092a4.5 4.5 0 001.831-.876a1 1 0 00-.707-1.852A2.5 2.5 0 0110 11.5v-1.034a2.5 2.5 0 011.162-.328 1 1 0 00.707-1.852A4.5 4.5 0 0011 6.092V6z" clip-rule="evenodd" />
+          </svg>
+          <span>Sprawdź cenę biletu</span>
+        </button>
+        <div class="price-calculator-container hidden" id="route-price-calc-${routeId}"></div>
+      </div>
+    `;
   }
 
   if (!isFullView) {
-    // Day type switcher
     html += '<div class="day-type-switcher">';
     html += '<label>Pokaż rozkład na:</label>';
     html += '<div style="display: flex; gap: -1px; margin-top: 0.25rem;">';
@@ -243,43 +238,41 @@ function renderSchedule(routeId, options = {}) {
 
     dayTypes.forEach(dt => {
       html += `
-                        <button class="day-type-btn ${dt.key === activeDayTypeKey ? 'active' : ''}"
-                                data-route-id="${routeId}"
-                                data-day-key="${dt.key}">
-                            ${dt.name}
-                        </button>
-                    `;
+        <button class="day-type-btn ${dt.key === activeDayTypeKey ? 'active' : ''}"
+                data-route-id="${routeId}"
+                data-day-key="${dt.key}">
+          ${dt.name}
+        </button>
+      `;
     });
-
     html += '</div></div>';
 
-    // Time filter
     const now = new Date();
     const isToday = activeDayTypeKey === getDayType(now).key;
     const currentHour = now.getHours();
     const currentTime = `${currentHour.toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
 
     html += `
-                    <div class="time-slider-container">
-                        <label>
-                            Odjazdy od: <strong style="color: var(--color-primary);">
-                                <span id="slider-time">${isToday ? currentTime : '04:00'}</span>
-                            </strong>
-                            <span style="font-size: 0.75rem; color: var(--color-text-muted); margin-left: 0.5rem;">(przesuń, aby zmienić)</span>
-                        </label>
-                        <input type="range" class="time-slider" 
-                               id="time-slider-${routeId}"
-                               data-route-id="${routeId}"
-                               min="4" max="23" 
-                               value="${isToday ? currentHour : 4}">
-                    </div>
-                `;
+      <div class="time-slider-container">
+        <label>
+          Odjazdy od: <strong style="color: var(--color-primary);">
+            <span id="slider-time">${isToday ? currentTime : '04:00'}</span>
+          </strong>
+          <span style="font-size: 0.75rem; color: var(--color-text-muted); margin-left: 0.5rem;">(przesuń, aby zmienić)</span>
+        </label>
+        <input type="range" class="time-slider" 
+               id="time-slider-${routeId}"
+               data-route-id="${routeId}"
+               min="4" max="23" 
+               value="${isToday ? currentHour : 4}">
+      </div>
+    `;
 
-    // Times grid
     html += `<div id="times-grid-${routeId}">`;
     html += generateTimesGrid(direction, activeDayTypeKey, isToday ? currentHour : 4);
     html += '</div>';
   } else {
+    // -----> POCZĄTEK POPRAWKI <-----
     // Full schedule view
     html += '<div style="margin-top: 1rem;">';
     ['workdays', 'saturdays', 'sundays'].forEach(dayKey => {
@@ -297,20 +290,27 @@ function renderSchedule(routeId, options = {}) {
       } else {
         html += '<div class="time-grid">';
         times.forEach(t => {
-          html += `<div class="time-box bg-light-gray">
-                                <div class="time-box-content">
-                                    <span class="time-value">${t.time}</span>
-                                    ${t.noteKey ? `<span class="time-note">${t.noteKey}</span>` : ''}
-                                </div>
-                            </div>`;
+          // Dodano logikę do tworzenia tekstu dla tooltipa
+          let tooltipText = '';
+          if (t.noteKey && direction.notes && direction.notes[t.noteKey]) {
+            tooltipText = direction.notes[t.noteKey];
+          }
+
+          html += `<div class="time-box bg-light-gray" 
+                        ${tooltipText ? `data-tooltip="${tooltipText}"` : ''}>
+                      <div class="time-box-content">
+                        <span class="time-value">${t.time}</span>
+                        ${t.noteKey ? `<span class="time-note">${t.noteKey}</span>` : ''}
+                      </div>
+                    </div>`;
         });
         html += '</div>';
       }
     });
     html += '</div>';
+    // -----> KONIEC POPRAWKI <-----
   }
 
-  // Notes legend
   if (direction.notes && Object.keys(direction.notes).length > 0) {
     html += '<div class="notes-legend">';
     Object.entries(direction.notes).forEach(([key, value]) => {
@@ -319,14 +319,13 @@ function renderSchedule(routeId, options = {}) {
     html += '</div>';
   }
 
-  // Toggle full schedule button
   html += `
-                <button class="toggle-full-schedule-btn" 
-                        data-route-id="${routeId}" 
-                        data-full-view="${isFullView}">
-                    ${isFullView ? 'Zwiń rozkład' : 'Pełny rozkład →'}
-                </button>
-            `;
+    <button class="toggle-full-schedule-btn" 
+            data-route-id="${routeId}" 
+            data-full-view="${isFullView}">
+      ${isFullView ? 'Zwiń rozkład' : 'Pełny rozkład →'}
+    </button>
+  `;
 
   detailsContainer.innerHTML = html;
   attachScheduleEventListeners(routeId, activeDirectionIndex, activeDayTypeKey);
@@ -400,7 +399,6 @@ function attachScheduleEventListeners(routeId, activeDirectionIndex, activeDayTy
     btn.addEventListener('click', function () {
       const newIndex = parseInt(this.dataset.directionIndex);
       renderSchedule(routeId, { activeDirectionIndex: newIndex, activeDayTypeKey });
-      // Ta sekcja if() została stąd usunięta, bo była w złym miejscu.
     });
   });
 
@@ -426,9 +424,11 @@ function attachScheduleEventListeners(routeId, activeDirectionIndex, activeDayTy
       const hour = parseInt(this.value);
       document.getElementById('slider-time').textContent = `${hour.toString().padStart(2, '0')}:00`;
 
-      // Mała poprawka błędu, który mógłby się pojawić - bezpieczniejsze pobranie 'direction'
+      // -----> POCZĄTEK POPRAWKI <-----
+      // Używamy tej samej, prostej i poprawnej logiki, co w funkcji renderSchedule
       const activeSchedule = getActiveSchedule(schedulesData[routeId]);
       const direction = activeSchedule.directions[activeDirectionIndex];
+      // -----> KONIEC POPRAWKI <-----
 
       const gridContainer = document.getElementById(`times-grid-${routeId}`);
       gridContainer.innerHTML = generateTimesGrid(direction, activeDayTypeKey, hour);
@@ -441,8 +441,6 @@ function attachScheduleEventListeners(routeId, activeDirectionIndex, activeDayTy
     const isFullView = this.dataset.fullView === 'true';
     renderSchedule(routeId, { activeDirectionIndex, activeDayTypeKey, isFullView: !isFullView });
 
-    // -----> POPRAWKA JEST TERAZ W TYM MIEJSCU <-----
-    // Przewiń do góry sekcji TYLKO, gdy zwijasz rozkład.
     if (isFullView) {
       document.getElementById('schedules-section')?.scrollIntoView({ behavior: 'smooth' });
     }

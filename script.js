@@ -7,6 +7,11 @@ document.addEventListener('DOMContentLoaded', function () {
   if (navToggle && mainNav) {
     navToggle.addEventListener('click', function () {
       mainNav.classList.toggle('active');
+
+      // ---> POPRAWKA 1: DODAJ TĘ LINIĘ <---
+      // Ta linia dodaje/usuwa klasę na przycisku, aby uruchomić animację ikony w CSS
+      this.classList.toggle('is-active');
+
       const isActive = mainNav.classList.contains('active');
       this.setAttribute('aria-expanded', isActive);
     });
@@ -29,6 +34,11 @@ document.addEventListener('DOMContentLoaded', function () {
         // Close mobile menu if open
         if (mainNav && mainNav.classList.contains('active')) {
           mainNav.classList.remove('active');
+
+          // ---> POPRAWKA 2: DODAJ TEŻ TĘ LINIĘ <---
+          // Resetuje ikonę z "X" do hamburgera, gdy menu jest zamykane przez kliknięcie linku
+          navToggle.classList.remove('is-active');
+
           navToggle.setAttribute('aria-expanded', 'false');
         }
       }
@@ -44,6 +54,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // Initialize price calculator
   initializePriceCalculator();
 });
+
 
 function loadAnnouncements() {
   const container = document.getElementById('announcements-container');

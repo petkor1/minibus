@@ -118,17 +118,23 @@ body {
 
 /* Navigation */
 .main-nav {
-  display: none;
-}
-
-.main-nav.active {
-  display: block !important;
+  /* Pozycjonujemy menu pod nagłówkiem i chowamy je poza ekranem */
   position: absolute;
-  top: 100%;
+  top: 100%; /* Ustawia menu dokładnie pod nagłówkiem */
   left: 0;
   width: 100%;
   background-color: var(--color-surface);
   box-shadow: var(--shadow-md);
+
+  /* Logika animacji */
+  overflow: hidden; /* Ukrywa zawartość, gdy menu jest zwinięte */
+  max-height: 0; /* Domyślnie menu jest całkowicie zwinięte */
+  transition: max-height 0.4s ease-in-out; /* Definiuje płynne przejście */
+}
+
+.main-nav.active {
+  /* Po dodaniu klasy 'active' menu płynnie się rozwija */
+  max-height: 500px; /* Wystarczająco duża wartość, by zmieścić wszystkie linki */
 }
 
 .main-nav ul {
@@ -157,17 +163,82 @@ body {
 }
 
 .mobile-nav-toggle {
-  background: none;
+  position: relative;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background-color: transparent;
   border: none;
-  font-size: 1.5rem;
   cursor: pointer;
-  padding: 0.5rem;
-  color: var(--color-text-base);
-  transition: color 0.2s;
 }
 
-.mobile-nav-toggle:hover {
-  color: var(--color-primary);
+.hamburger-box {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30px;
+  height: 24px;
+  display: inline-block;
+}
+
+/* Środkowa kreska hamburgera */
+.hamburger-inner {
+  display: block;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: background-color 0.1s 0.2s ease-in-out;
+}
+
+/* Środkowa, górna i dolna kreska - wspólne style */
+.hamburger-inner,
+.hamburger-inner::before,
+.hamburger-inner::after {
+  position: absolute;
+  width: 30px;
+  height: 3px;
+  background-color: var(--color-text-base);
+  border-radius: 3px;
+  transition-property: transform;
+  transition-duration: 0.2s;
+  transition-timing-function: ease;
+}
+
+/* Górna kreska (tworzona pseudoelementem) */
+.hamburger-inner::before {
+  content: "";
+  top: -10px;
+  transition: top 0.1s 0.25s ease-in, opacity 0.1s ease-in;
+}
+
+/* Dolna kreska (tworzona pseudoelementem) */
+.hamburger-inner::after {
+  content: "";
+  bottom: -10px;
+  transition: bottom 0.1s 0.25s ease-in,
+    transform 0.2s cubic-bezier(0.55, 0.055, 0.675, 0.19);
+}
+
+/* ---- Style dla stanu aktywnego (ikona "X") ---- */
+
+/* Gdy przycisk ma klasę .is-active */
+.mobile-nav-toggle.is-active .hamburger-inner {
+  background-color: transparent; /* Środkowa kreska znika */
+  transition: background-color 0.1s ease-in-out;
+}
+
+.mobile-nav-toggle.is-active .hamburger-inner::before {
+  top: 0; /* Górna kreska przesuwa się na środek */
+  transform: rotate(45deg); /* i obraca się */
+  transition: top 0.1s ease-out,
+    transform 0.2s 0.12s cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+.mobile-nav-toggle.is-active .hamburger-inner::after {
+  bottom: 0; /* Dolna kreska przesuwa się na środek */
+  transform: rotate(-45deg); /* i obraca się w drugą stronę */
+  transition: bottom 0.1s ease-out,
+    transform 0.2s 0.12s cubic-bezier(0.215, 0.61, 0.355, 1);
 }
 
 .contact-info {
@@ -827,6 +898,8 @@ label {
     box-shadow: none;
     flex: 1;
     justify-content: center;
+    max-height: none; /* Resetuje ograniczenie wysokości z wersji mobilnej */
+    overflow: visible; /* Upewnia się, że treść jest widoczna */
   }
 
   .main-nav ul {

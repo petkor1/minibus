@@ -400,6 +400,7 @@ function attachScheduleEventListeners(routeId, activeDirectionIndex, activeDayTy
     btn.addEventListener('click', function () {
       const newIndex = parseInt(this.dataset.directionIndex);
       renderSchedule(routeId, { activeDirectionIndex: newIndex, activeDayTypeKey });
+      // Ta sekcja if() została stąd usunięta, bo była w złym miejscu.
     });
   });
 
@@ -425,7 +426,10 @@ function attachScheduleEventListeners(routeId, activeDirectionIndex, activeDayTy
       const hour = parseInt(this.value);
       document.getElementById('slider-time').textContent = `${hour.toString().padStart(2, '0')}:00`;
 
-      const direction = schedulesData[routeId].variants.find(v => getActiveSchedule(schedulesData[routeId]) === v).directions[activeDirectionIndex];
+      // Mała poprawka błędu, który mógłby się pojawić - bezpieczniejsze pobranie 'direction'
+      const activeSchedule = getActiveSchedule(schedulesData[routeId]);
+      const direction = activeSchedule.directions[activeDirectionIndex];
+
       const gridContainer = document.getElementById(`times-grid-${routeId}`);
       gridContainer.innerHTML = generateTimesGrid(direction, activeDayTypeKey, hour);
       attachTooltipListeners();
@@ -436,6 +440,12 @@ function attachScheduleEventListeners(routeId, activeDirectionIndex, activeDayTy
   document.querySelector('.toggle-full-schedule-btn')?.addEventListener('click', function () {
     const isFullView = this.dataset.fullView === 'true';
     renderSchedule(routeId, { activeDirectionIndex, activeDayTypeKey, isFullView: !isFullView });
+
+    // -----> POPRAWKA JEST TERAZ W TYM MIEJSCU <-----
+    // Przewiń do góry sekcji TYLKO, gdy zwijasz rozkład.
+    if (isFullView) {
+      document.getElementById('schedules-section')?.scrollIntoView({ behavior: 'smooth' });
+    }
   });
 
   // Price calculator toggle

@@ -931,6 +931,11 @@ label {
   section {
     padding: 3rem 0;
   }
+
+  [id^="price-result-container-"] {
+    flex-wrap: wrap; /* Pozwala elementom zawijać się do nowej linii */
+    gap: 0.5rem; /* Dodaje odstęp między ceną a informacją o karcie */
+  }
 }
 
 /* Print styles */

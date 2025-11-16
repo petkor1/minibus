@@ -244,7 +244,7 @@ Stan na: 2025-11-16
 - [ ] **Implementacja Modułu `schedules` (TDD):**
     - [x] Utworzenie gałęzi `feature/schedules-crud`.
     - [x] Zdefiniowanie schematu bazy danych dla rozkładów jazdy.
-    - [ ] Pisanie testów API (Jest) dla operacji CRUD na rozkładach jazdy.
+    - [x] Pisanie testów API (Jest) dla operacji CRUD na rozkładach jazdy.
     - [ ] Implementacja logiki API w `src/modules/schedules/lib/api.ts`.
     - [ ] Pisanie testów UI (RTL) dla komponentu do zarządzania rozkładami jazdy.
     - [ ] Budowa komponentu UI w `src/modules/schedules/components/`.

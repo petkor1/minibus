@@ -245,7 +245,7 @@ Stan na: 2025-11-16
     - [x] Utworzenie gałęzi `feature/schedules-crud`.
     - [x] Zdefiniowanie schematu bazy danych dla rozkładów jazdy.
     - [x] Pisanie testów API (Jest) dla operacji CRUD na rozkładach jazdy.
-    - [ ] Implementacja logiki API w `src/modules/schedules/lib/api.ts`.
+    - [x] Implementacja logiki API w `src/modules/schedules/lib/api.ts`.
     - [ ] Pisanie testów UI (RTL) dla komponentu do zarządzania rozkładami jazdy.
     - [ ] Budowa komponentu UI w `src/modules/schedules/components/`.
     - [ ] Refaktoryzacja i commit.

@@ -250,6 +250,22 @@ Stan na: 2025-11-16
     - [x] Budowa komponentu UI w `src/modules/schedules/components/`.
     - [ ] Refaktoryzacja i commit.
 
+### Current Issues and Next Steps (Schedules Module)
+
+**Problem:** `SchedulesManager.test.tsx` is failing.
+**Details:**
+*   `api.test.ts` for the schedules module passes successfully.
+*   `SchedulesManager.test.tsx` fails with assertions like "Unable to find an element with the text: Route A - 10:00."
+*   The root cause appears to be a timing mismatch in the test environment between React's asynchronous state updates (`setRoutes`, `setSchedules`) and the `useEffect` hooks in `SchedulesManager.tsx`. Specifically, the `fetchSchedules` function, which relies on the `routes` state to map `route_id` to `route_name`, is likely executing before the `routes` state has been fully updated and propagated within the component's test instance. This results in `routes.find` returning `undefined` and "Unknown Route" being displayed in the UI, causing `getByText` assertions to fail.
+*   Previous attempts to fix involved adjusting `useEffect` dependencies and changing `fetch` mocking strategy from `mockResolvedValueOnce` to `mockImplementation`, but these did not fully resolve the timing issues.
+
+**Next Step:**
+The proposed next step is to refine the `mockImplementation` in `SchedulesManager.test.tsx` to:
+1.  Always return the *final expected state* of both routes and schedules for `GET` requests.
+2.  Use a variable to hold the current state of schedules and update it after each mocked CRUD operation within the `mockImplementation`.
+3.  Ensure `waitFor` is used to assert the final UI state.
+This approach aims to bypass the complex timing issues of multiple `mockResolvedValueOnce` calls and `useEffect` dependencies by providing a consistent and predictable state to the component during testing.
+
 ### Faza 3: Aplikacja Publiczna (dla Pasażerów)
 - [ ] Stworzenie strony głównej wyświetlającej ogłoszenia.
 - [ ] Stworzenie strony z cennikiem.

@@ -169,6 +169,7 @@ Agent (Ty) jest w pełni odpowiedzialny za zarządzanie kontrolą wersji.
         *   `refactor(api): simplify database query logic`
         *   `test(announcements): add tests for announcement creation`
     *   **Główne typy:** `feat` (nowa funkcja), `fix` (poprawka błędu), `docs` (zmiany w dokumentacji), `style` (zmiany w formatowaniu), `refactor` (refaktoryzacja kodu), `test` (dodanie lub poprawa testów), `chore` (zmiany w budowie, narzędziach).
+*   **Push po Commicie:** Po każdym commicie, zmiany muszą być natychmiast wysłane na zdalne repozytorium (`git push`).
 
 ## **7. Testing Strategy**
 
@@ -186,9 +187,10 @@ Agent (Ty) jest w pełni odpowiedzialny za zarządzanie kontrolą wersji.
 3.  **Weryfikacja Błędów (Red):** `run_shell_command` (`npx jest sciezka/do/testu.test.ts`), aby zobaczyć, że test nie przechodzi.
 4.  **Implementacja:** `write_file` / `replace` (Pisanie kodu funkcjonalności w odpowiednich plikach modułu).
 5.  **Weryfikacja Poprawności (Green):** `run_shell_command` (`npx jest`), aby zobaczyć, że wszystkie testy przechodzą.
-6.  **Zatwierdzenie Zmian (Commit):**
+6.  **Zatwierdzenie Zmian (Commit & Push):**
     *   `run_shell_command` (`git add .`)
     *   `run_shell_command` (`git commit -m "typ(zakres): opis"`)
+    *   `run_shell_command` (`git push`)
 
 ### **Narzędzia używane z ostrożnością:**
 

@@ -223,11 +223,11 @@ Stan na: 2025-11-16
     - [x] Zdefiniowanie schematu i utworzenie pliku bazy danych SQLite.
     - [x] Implementacja logiki połączenia z bazą w `src/core/lib/db.ts`.
 - [ ] **Implementacja Modułu `announcements` (TDD):**
-    - [ ] Utworzenie gałęzi `feature/announcements-crud`.
-    - [ ] Pisanie testów API (Jest) dla operacji CRUD.
-    - [ ] Implementacja logiki API w `src/modules/announcements/lib/api.ts`.
-    - [ ] Pisanie testów UI (RTL) dla komponentu do zarządzania ogłoszeniami.
-    - [ ] Budowa komponentu UI w `src/modules/announcements/components/`.
+    - [x] Utworzenie gałęzi `feature/announcements-crud`.
+    - [x] Pisanie testów API (Jest) dla operacji CRUD.
+    - [x] Implementacja logiki API w `src/modules/announcements/lib/api.ts`.
+    - [x] Pisanie testów UI (RTL) dla komponentu do zarządzania ogłoszeniami.
+    - [x] Budowa komponentu UI w `src/modules/announcements/components/`.
     - [ ] Refaktoryzacja i commit.
 
 ### Faza 2: Rozbudowa Panelu Administratora

@@ -242,7 +242,7 @@ Stan na: 2025-11-16
     - [x] Budowa komponentu UI w `src/modules/pricelists/components/`.
     - [x] Refaktoryzacja i commit.
 - [ ] **Implementacja Modułu `schedules` (TDD):**
-    - [ ] Utworzenie gałęzi `feature/schedules-crud`.
+    - [x] Utworzenie gałęzi `feature/schedules-crud`.
     - [ ] Zdefiniowanie schematu bazy danych dla rozkładów jazdy.
     - [ ] Pisanie testów API (Jest) dla operacji CRUD na rozkładach jazdy.
     - [ ] Implementacja logiki API w `src/modules/schedules/lib/api.ts`.

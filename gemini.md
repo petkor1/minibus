@@ -237,7 +237,7 @@ Stan na: 2025-11-16
     - [x] Utworzenie gałęzi `feature/pricelists-crud`.
     - [x] Zdefiniowanie schematu bazy danych dla cenników.
     - [x] Pisanie testów API (Jest) dla operacji CRUD na cennikach.
-    - [ ] Implementacja logiki API w `src/modules/pricelists/lib/api.ts`.
+    - [x] Implementacja logiki API w `src/modules/pricelists/lib/api.ts`.
     - [ ] Pisanie testów UI (RTL) dla komponentu do zarządzania cennikami.
     - [ ] Budowa komponentu UI w `src/modules/pricelists/components/`.
     - [ ] Refaktoryzacja i commit.

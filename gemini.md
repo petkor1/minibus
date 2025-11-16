@@ -228,7 +228,7 @@ Stan na: 2025-11-16
     - [x] Implementacja logiki API w `src/modules/announcements/lib/api.ts`.
     - [x] Pisanie testów UI (RTL) dla komponentu do zarządzania ogłoszeniami.
     - [x] Budowa komponentu UI w `src/modules/announcements/components/`.
-    - [ ] Refaktoryzacja i commit.
+    - [x] Refaktoryzacja i commit.
 
 ### Faza 2: Rozbudowa Panelu Administratora
 - [ ] Implementacja modułu `pricelists` (CRUD).

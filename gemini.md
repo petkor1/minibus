@@ -234,7 +234,7 @@ Stan na: 2025-11-16
 
 ### Faza 2: Rozbudowa Panelu Administratora
 - [ ] **Implementacja Modułu `pricelists` (TDD):**
-    - [ ] Utworzenie gałęzi `feature/pricelists-crud`.
+    - [x] Utworzenie gałęzi `feature/pricelists-crud`.
     - [ ] Zdefiniowanie schematu bazy danych dla cenników.
     - [ ] Pisanie testów API (Jest) dla operacji CRUD na cennikach.
     - [ ] Implementacja logiki API w `src/modules/pricelists/lib/api.ts`.

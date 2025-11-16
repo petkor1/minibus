@@ -240,7 +240,7 @@ Stan na: 2025-11-16
     - [x] Implementacja logiki API w `src/modules/pricelists/lib/api.ts`.
     - [x] Pisanie testów UI (RTL) dla komponentu do zarządzania cennikami.
     - [x] Budowa komponentu UI w `src/modules/pricelists/components/`.
-    - [ ] Refaktoryzacja i commit.
+    - [x] Refaktoryzacja i commit.
 - [ ] **Implementacja Modułu `schedules` (TDD):**
     - [ ] Utworzenie gałęzi `feature/schedules-crud`.
     - [ ] Zdefiniowanie schematu bazy danych dla rozkładów jazdy.

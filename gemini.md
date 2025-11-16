@@ -247,7 +247,7 @@ Stan na: 2025-11-16
     - [x] Pisanie testów API (Jest) dla operacji CRUD na rozkładach jazdy.
     - [x] Implementacja logiki API w `src/modules/schedules/lib/api.ts`.
     - [x] Pisanie testów UI (RTL) dla komponentu do zarządzania rozkładami jazdy.
-    - [ ] Budowa komponentu UI w `src/modules/schedules/components/`.
+    - [x] Budowa komponentu UI w `src/modules/schedules/components/`.
     - [ ] Refaktoryzacja i commit.
 
 ### Faza 3: Aplikacja Publiczna (dla Pasażerów)
